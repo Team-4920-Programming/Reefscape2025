@@ -51,7 +51,7 @@ import java.util.function.Supplier;
 
 import org.ironmaple.simulation.IntakeSimulation;
 import org.ironmaple.simulation.SimulatedArena;
-
+import org.ironmaple.simulation.seasonspecific.reefscape2025.ReefscapeCoralAlgaeStack;
 import org.json.simple.parser.ParseException;
 import org.photonvision.targeting.PhotonPipelineResult;
 import swervelib.SwerveController;
@@ -186,15 +186,17 @@ public class SwerveSubsystem extends SubsystemBase
   @Override
   public void simulationPeriodic()
   {
-      DogLog.log("Field/NotesPositions", SimulatedArena.getInstance().getGamePiecesByType("Note")  .stream().toArray(Pose3d[]::new));
+    DogLog.log("FieldSimulation/Algae", SimulatedArena.getInstance().getGamePiecesArrayByType("Algae"));
+    DogLog.log("FieldSimulation/Coral", SimulatedArena.getInstance().getGamePiecesArrayByType("Coral"));
+    DogLog.log("FieldSimulation/StackedAlgae",  ReefscapeCoralAlgaeStack.getStackedAlgaePoses());
+    DogLog.log("FieldSimulation/StackedCoral",  ReefscapeCoralAlgaeStack.getStackedCoralPoses());
+  
   }
 
   public void SetupIntake(){
         Distance width = Inches.of(20);
         Distance Extension = Inches.of(6);
-        //SwerveDriveSimulation SDS = swerveDrive.getMapleSimDrive().get();
         intakeSimulation = intakeSimulation.OverTheBumperIntake("Coral", swerveDrive.getMapleSimDrive().get(), width, Extension, IntakeSimulation.IntakeSide.FRONT, 1);
-        //intakeSimulation = new IntakeSimulation("Note", swerveDrive.getMapleSimDrive().get(), width,Extension,IntakeSimulation.IntakeSide.BACK, 1);
         intakeSimulation.register(SimulatedArena.getInstance());
 
   }
