@@ -188,8 +188,7 @@ public class SwerveSubsystem extends SubsystemBase
   {
     DogLog.log("FieldSimulation/Algae", SimulatedArena.getInstance().getGamePiecesArrayByType("Algae"));
     DogLog.log("FieldSimulation/Coral", SimulatedArena.getInstance().getGamePiecesArrayByType("Coral"));
-    DogLog.log("FieldSimulation/StackedAlgae",  ReefscapeCoralAlgaeStack.getStackedAlgaePoses());
-    DogLog.log("FieldSimulation/StackedCoral",  ReefscapeCoralAlgaeStack.getStackedCoralPoses());
+    //DogLog.log("FieldSimulation/StackedAlgogLog.log("FieldSimulation/StackedCoral",  ReefscapeCoralAlgaeStack.getStackedCoralPoses());
   
   }
 
