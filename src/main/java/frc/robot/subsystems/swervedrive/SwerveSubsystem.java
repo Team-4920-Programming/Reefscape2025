@@ -104,7 +104,7 @@ public class SwerveSubsystem extends SubsystemBase
     //  In this case the wheel diameter is 4 inches, which must be converted to meters to get meters/second.
     //  The gear ratio is 6.75 motor revolutions per wheel rotation.
     //  The encoder resolution per motor revolution is 1 per motor revolution.
-    double driveConversionFactor = SwerveMath.calculateMetersPerRotation(Units.inchesToMeters(4), 6.75);
+    double driveConversionFactor = SwerveMath.calculateMetersPerRotation(Units.inchesToMeters(3), 3.95);
     System.out.println("\"conversionFactors\": {");
     System.out.println("\t\"angle\": {\"factor\": " + angleConversionFactor + " },");
     System.out.println("\t\"drive\": {\"factor\": " + driveConversionFactor + " }");
@@ -124,8 +124,8 @@ public class SwerveSubsystem extends SubsystemBase
     {
       throw new RuntimeException(e);
     }
-    swerveDrive.setHeadingCorrection(false); // Heading correction should only be used while controlling the robot via angle.
-    swerveDrive.setCosineCompensator(false);//!SwerveDriveTelemetry.isSimulation); // Disables cosine compensation for simulations since it causes discrepancies not seen in real life.
+    swerveDrive.setHeadingCorrection(true); // Heading correction should only be used while controlling the robot via angle.
+    swerveDrive.setCosineCompensator(true);//!SwerveDriveTelemetry.isSimulation); // Disables cosine compensation for simulations since it causes discrepancies not seen in real life.
     swerveDrive.setAngularVelocityCompensation(true,
                                                true,
                                                0.1); //Correct for skew that gets worse as angular velocity increases. Start with a coefficient of 0.1.
@@ -217,6 +217,7 @@ public class SwerveSubsystem extends SubsystemBase
   public int getIntakeGamePiecesAmount(){
     return intakeSimulation.getGamePiecesAmount();
   }
+  
   /**
    * Setup AutoBuilder for PathPlanner.
    */
@@ -325,13 +326,13 @@ public class SwerveSubsystem extends SubsystemBase
   {
     SwerveController controller = swerveDrive.getSwerveController();
     return run(
-      () -> {
-        ChassisSpeeds speeds = ChassisSpeeds.fromFieldRelativeSpeeds(0, 0,
-                                                 controller.headingCalculate(getHeading().getRadians(),
-                                                                             getSpeakerYaw().getRadians()),
-                                                                     getHeading());
-        drive(speeds);
-      }).until(() -> Math.abs(getSpeakerYaw().minus(getHeading()).getDegrees()) < tolerance);
+        () -> {
+          ChassisSpeeds speeds = ChassisSpeeds.fromFieldRelativeSpeeds(0, 0,
+                                                   controller.headingCalculate(getHeading().getRadians(),
+                                                                               getSpeakerYaw().getRadians()),
+                                                                       getHeading());
+          drive(speeds);
+        }).until(() -> Math.abs(getSpeakerYaw().minus(getHeading()).getDegrees()) < tolerance);
   }
 
   /**
@@ -408,42 +409,36 @@ public class SwerveSubsystem extends SubsystemBase
         = new AtomicReference<>(new SwerveSetpoint(swerveDrive.getRobotVelocity(),
                                                    swerveDrive.getStates(),
                                                    DriveFeedforwards.zeros(swerveDrive.getModules().length)));
-    double start = Timer.getFPGATimestamp();
-    return run(() -> {
-      SwerveSetpoint newSetpoint = setpointGenerator.generateSetpoint(prevSetpoint.get(),
-                                                                      robotRelativeChassisSpeed.get(),
-                                                                      start - Timer.getFPGATimestamp());
-      swerveDrive.drive(newSetpoint.robotRelativeSpeeds(),
-                        newSetpoint.moduleStates(),
-                        newSetpoint.feedforwards().linearForces());
-      prevSetpoint.set(newSetpoint);
+    AtomicReference<Double> previousTime = new AtomicReference<>();
 
+    return startRun(() -> previousTime.set(Timer.getFPGATimestamp()),
+                    () -> {
+                      double newTime = Timer.getFPGATimestamp();
+                      SwerveSetpoint newSetpoint = setpointGenerator.generateSetpoint(prevSetpoint.get(),
+                                                                                      robotRelativeChassisSpeed.get(),
+                                                                                      newTime - previousTime.get());
+                      swerveDrive.drive(newSetpoint.robotRelativeSpeeds(),
+                                        newSetpoint.moduleStates(),
+                                        newSetpoint.feedforwards().linearForces());
+                      prevSetpoint.set(newSetpoint);
+                      previousTime.set(newTime);
 
-    });
+                    });
   }
 
   /**
    * Drive with 254's Setpoint generator; port written by PathPlanner.
    *
-   * @param translationX Translation in the X direction of the WPILib Coordinate System. In the range of (-1, 1).
-   * @param translationY Translation in the Y direction of the WPILIb Coordinate System. In the range of (-1, 1).
-   * @param rotationX    Angular velocity in the range of (-1, 1).
+   * @param fieldRelativeSpeeds Field-Relative {@link ChassisSpeeds}
    * @return Command to drive the robot using the setpoint generator.
    */
-  public Command driveWithSetpointGenerator(DoubleSupplier translationX, DoubleSupplier translationY,
-                                            DoubleSupplier rotationX)
+  public Command driveWithSetpointGeneratorFieldRelative(Supplier<ChassisSpeeds> fieldRelativeSpeeds)
   {
-    SwerveController swerveController = swerveDrive.getSwerveController();
     try
     {
       return driveWithSetpointGenerator(() -> {
-        Translation2d scaledInputs = SwerveMath.scaleTranslation(new Translation2d(
-            translationX.getAsDouble() * swerveDrive.getMaximumChassisVelocity(),
-            translationY.getAsDouble() * swerveDrive.getMaximumChassisVelocity()), 0.8);
+        return ChassisSpeeds.fromFieldRelativeSpeeds(fieldRelativeSpeeds.get(), getHeading());
 
-        return new ChassisSpeeds(scaledInputs.getX(),
-                                 scaledInputs.getY(),
-                                 rotationX.getAsDouble() * swerveDrive.getMaximumChassisAngularVelocity());
       });
     } catch (Exception e)
     {
@@ -453,54 +448,6 @@ public class SwerveSubsystem extends SubsystemBase
 
   }
 
-
-  /**
-   * Command to drive the robot using translative values and heading as a setpoint.
-   *
-   * @param translationX Translation in the X direction. Cubed for smoother controls.
-   * @param translationY Translation in the Y direction. Cubed for smoother controls.
-   * @param headingX     Heading X to calculate angle of the joystick.
-   * @param headingY     Heading Y to calculate angle of the joystick.
-   * @return Drive command.
-   */
-  public Command driveCommand(DoubleSupplier translationX, DoubleSupplier translationY, DoubleSupplier headingX,
-                              DoubleSupplier headingY)
-  {
-    // swerveDrive.setHeadingCorrection(true); // Normally you would want heading correction for this kind of control.
-    return run(() -> {
-
-      Translation2d scaledInputs = SwerveMath.scaleTranslation(new Translation2d(translationX.getAsDouble(),
-                                                                                 translationY.getAsDouble()), 0.8);
-
-      // Make the robot move
-      driveFieldOriented(swerveDrive.swerveController.getTargetSpeeds(scaledInputs.getX(), scaledInputs.getY(),
-                                                                      headingX.getAsDouble(),
-                                                                      headingY.getAsDouble(),
-                                                                      swerveDrive.getOdometryHeading().getRadians(),
-                                                                      swerveDrive.getMaximumChassisVelocity()));
-    });
-  }
-
-  /**
-   * Command to drive the robot using translative values and heading as a setpoint.
-   *
-   * @param translationX Translation in the X direction. [-1, 1]
-   * @param translationY Translation in the Y direction. [-1, 1]
-   * @param rotation     Rotation as a value between [-1, 1] converted to radians.
-   * @return Drive command.
-   */
-  public Command simDriveCommand(DoubleSupplier translationX, DoubleSupplier translationY, DoubleSupplier rotation)
-  {
-    // swerveDrive.setHeadingCorrection(true); // Normally you would want heading correction for this kind of control.
-    return run(() -> {
-      // Make the robot move
-      driveFieldOriented(swerveDrive.swerveController.getTargetSpeeds(translationX.getAsDouble(),
-                                                                      translationY.getAsDouble(),
-                                                                      rotation.getAsDouble() * Math.PI,
-                                                                      swerveDrive.getOdometryHeading().getRadians(),
-                                                                      swerveDrive.getMaximumChassisVelocity()));
-    });
-  }
 
   /**
    * Command to characterize the robot drive motors using SysId
@@ -567,27 +514,6 @@ public class SwerveSubsystem extends SubsystemBase
     swerveDrive.replaceSwerveModuleFeedforward(new SimpleMotorFeedforward(kS, kV, kA));
   }
 
-// 4920 Modification for Robot Orient Drive - this may be in the latest version of the example subsystem  
-/**
-   * Command to drive the robot using translative values and heading as angular velocity.
-   *
-   * @param translationX     Translation in the X direction. Cubed for smoother controls.
-   * @param translationY     Translation in the Y direction. Cubed for smoother controls.
-   * @param angularRotationX Angular velocity of the robot to set. Cubed for smoother controls.
-   * @return Drive command.
-   */
-  public Command driveCommandRobotOriented(DoubleSupplier translationX, DoubleSupplier translationY, DoubleSupplier angularRotationX)
-  {
-    return run(() -> {
-      // Make the robot move
-      swerveDrive.drive(SwerveMath.scaleTranslation(new Translation2d(
-                            translationX.getAsDouble() * swerveDrive.getMaximumChassisVelocity(),
-                            translationY.getAsDouble() * swerveDrive.getMaximumChassisVelocity()), 0.8),
-                        Math.pow(angularRotationX.getAsDouble(), 3) * swerveDrive.getMaximumChassisAngularVelocity(),
-                        false,
-                        false);
-    });
-  }
   /**
    * Command to drive the robot using translative values and heading as angular velocity.
    *
@@ -606,6 +532,33 @@ public class SwerveSubsystem extends SubsystemBase
                         Math.pow(angularRotationX.getAsDouble(), 3) * swerveDrive.getMaximumChassisAngularVelocity(),
                         true,
                         false);
+    });
+  }
+
+  /**
+   * Command to drive the robot using translative values and heading as a setpoint.
+   *
+   * @param translationX Translation in the X direction. Cubed for smoother controls.
+   * @param translationY Translation in the Y direction. Cubed for smoother controls.
+   * @param headingX     Heading X to calculate angle of the joystick.
+   * @param headingY     Heading Y to calculate angle of the joystick.
+   * @return Drive command.
+   */
+  public Command driveCommand(DoubleSupplier translationX, DoubleSupplier translationY, DoubleSupplier headingX,
+                              DoubleSupplier headingY)
+  {
+    // swerveDrive.setHeadingCorrection(true); // Normally you would want heading correction for this kind of control.
+    return run(() -> {
+
+      Translation2d scaledInputs = SwerveMath.scaleTranslation(new Translation2d(translationX.getAsDouble(),
+                                                                                 translationY.getAsDouble()), 0.8);
+
+      // Make the robot move
+      driveFieldOriented(swerveDrive.swerveController.getTargetSpeeds(scaledInputs.getX(), scaledInputs.getY(),
+                                                                      headingX.getAsDouble(),
+                                                                      headingY.getAsDouble(),
+                                                                      swerveDrive.getOdometryHeading().getRadians(),
+                                                                      swerveDrive.getMaximumChassisVelocity()));
     });
   }
 
@@ -639,6 +592,18 @@ public class SwerveSubsystem extends SubsystemBase
   public void driveFieldOriented(ChassisSpeeds velocity)
   {
     swerveDrive.driveFieldOriented(velocity);
+  }
+
+  /**
+   * Drive the robot given a chassis field oriented velocity.
+   *
+   * @param velocity Velocity according to the field.
+   */
+  public Command driveFieldOriented(Supplier<ChassisSpeeds> velocity)
+  {
+    return run(() -> {
+      swerveDrive.driveFieldOriented(velocity.get());
+    });
   }
 
   /**
@@ -867,5 +832,15 @@ public class SwerveSubsystem extends SubsystemBase
   public void addFakeVisionReading()
   {
     swerveDrive.addVisionMeasurement(new Pose2d(3, 3, Rotation2d.fromDegrees(65)), Timer.getFPGATimestamp());
+  }
+
+  /**
+   * Gets the swerve drive object.
+   *
+   * @return {@link SwerveDrive}
+   */
+  public SwerveDrive getSwerveDrive()
+  {
+    return swerveDrive;
   }
 }

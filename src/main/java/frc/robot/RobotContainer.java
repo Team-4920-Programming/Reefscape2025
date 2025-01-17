@@ -4,16 +4,14 @@
 
 package frc.robot;
 
+import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
-import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.RobotBase;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -21,28 +19,8 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.swervedrive.drivebase.AbsoluteDriveAdv;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
-import frc.robot.subsystems.DataHighway.*;
-import frc.robot.subsystems.Intake.*;
-
-import frc.robot.subsystems.Shooter.*;
-//import frc.robot.commands.Shooter.*;
-import frc.robot.commands.Shooter.TeleOp.CmdT_Shoot;
-//import frc.robot.commands.Intake.*;
-import frc.robot.commands.DataHighway.*;
-import frc.robot.commands.Intake.TeleOp.*;
-import frc.robot.commands.Intake.Auto.*;
-import frc.robot.commands.Shooter.Auto.*;
-
-
-
 import java.io.File;
-
-import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.auto.NamedCommands;
-import com.pathplanner.lib.events.EventTrigger;
-
-import dev.doglog.DogLog;
-import dev.doglog.DogLogOptions;
+import swervelib.SwerveInputStream;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a "declarative" paradigm, very
@@ -55,11 +33,6 @@ public class RobotContainer
   // Replace with CommandPS4Controller or CommandJoystick if needed
   final         CommandXboxController driverXbox = new CommandXboxController(0);
   // The robot's subsystems and commands are defined here...
-  private final DataHighwaySubsystem DataHighwaySS = new DataHighwaySubsystem();
-  private final IntakeSubsystem IntakeSS = new IntakeSubsystem();
-
-  private final ShooterSubsystem ShooterSS = new ShooterSubsystem();
-  private final BoltLog BoltLogger = new BoltLog();
   private final SwerveSubsystem       drivebase  = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(),
                                                                                 "swerve/maxSwerve"));
   // Applies deadbands and inverts controls because joysticks
@@ -73,7 +46,7 @@ public class RobotContainer
                                                                  () -> -MathUtil.applyDeadband(driverXbox.getLeftY(),
                                                                                                OperatorConstants.LEFT_Y_DEADBAND),
                                                                  () -> -MathUtil.applyDeadband(driverXbox.getLeftX(),
-                                                                                               OperatorConstants.LEFT_X_DEADBAND),
+                                                                                               OperatorConstants.DEADBAND),
                                                                  () -> -MathUtil.applyDeadband(driverXbox.getRightX(),
                                                                                                OperatorConstants.RIGHT_X_DEADBAND),
                                                                  driverXbox.getHID()::getYButtonPressed,
@@ -81,83 +54,74 @@ public class RobotContainer
                                                                  driverXbox.getHID()::getXButtonPressed,
                                                                  driverXbox.getHID()::getBButtonPressed);
 
+  /**
+   * Converts driver input into a field-relative ChassisSpeeds that is controlled by angular velocity.
+   */
+  SwerveInputStream driveAngularVelocity = SwerveInputStream.of(drivebase.getSwerveDrive(),
+                                                                () -> driverXbox.getLeftY() * -1,
+                                                                () -> driverXbox.getLeftX() * -1)
+                                                            .withControllerRotationAxis(driverXbox::getRightX)
+                                                            .deadband(OperatorConstants.DEADBAND)
+                                                            .scaleTranslation(0.8)
+                                                            .allianceRelativeControl(true);
+
+  /**
+   * Clone's the angular velocity input stream and converts it to a fieldRelative input stream.
+   */
+  SwerveInputStream driveDirectAngle = driveAngularVelocity.copy().withControllerHeadingAxis(driverXbox::getRightX,
+                                                                                             driverXbox::getRightY)
+                                                           .headingWhile(true);
+
+
   // Applies deadbands and inverts controls because joysticks
   // are back-right positive while robot
   // controls are front-left positive
   // left stick controls translation
   // right stick controls the desired angle NOT angular rotation
-  Command driveFieldOrientedDirectAngle = drivebase.driveCommand(
-      () -> MathUtil.applyDeadband(driverXbox.getLeftY(), OperatorConstants.LEFT_Y_DEADBAND),
-      () -> MathUtil.applyDeadband(driverXbox.getLeftX(), OperatorConstants.LEFT_X_DEADBAND),
-      () -> driverXbox.getRightX(),
-      () -> driverXbox.getRightY());
-  Command driveRobotOrient = drivebase.driveCommandRobotOriented( 
-        () -> MathUtil.applyDeadband(driverXbox.getLeftY() * -1, OperatorConstants.LEFT_Y_DEADBAND),
-        () -> MathUtil.applyDeadband(driverXbox.getLeftX() * -1, OperatorConstants.LEFT_X_DEADBAND),
-        () -> driverXbox.getRightX() * -1);
+  Command driveFieldOrientedDirectAngle = drivebase.driveFieldOriented(driveDirectAngle);
 
-  
   // Applies deadbands and inverts controls because joysticks
   // are back-right positive while robot
   // controls are front-left positive
   // left stick controls translation
   // right stick controls the angular velocity of the robot
-  Command driveFieldOrientedAnglularVelocity = drivebase.driveCommand(
-      () -> MathUtil.applyDeadband(driverXbox.getLeftY() * -1, OperatorConstants.LEFT_Y_DEADBAND),
-      () -> MathUtil.applyDeadband(driverXbox.getLeftX() * -1, OperatorConstants.LEFT_X_DEADBAND),
-      () -> driverXbox.getRightX() * -1);
+  Command driveFieldOrientedAnglularVelocity = drivebase.driveFieldOriented(driveAngularVelocity);
 
-  Command driveFieldOrientedDirectAngleSim = drivebase.simDriveCommand(
-      () -> MathUtil.applyDeadband(-driverXbox.getLeftY(), OperatorConstants.LEFT_Y_DEADBAND),
-      () -> MathUtil.applyDeadband(-driverXbox.getLeftX(), OperatorConstants.LEFT_X_DEADBAND),
-      () -> driverXbox.getRawAxis(2));
+  Command driveSetpointGen = drivebase.driveWithSetpointGeneratorFieldRelative(driveDirectAngle);
 
-  Command driveSetpointGenSim = drivebase.simDriveCommand(
-      () -> MathUtil.applyDeadband(-driverXbox.getLeftY(), OperatorConstants.LEFT_Y_DEADBAND),
-      () -> MathUtil.applyDeadband(-driverXbox.getLeftX(), OperatorConstants.LEFT_X_DEADBAND),
-      () -> driverXbox.getRawAxis(2));
-  
-    
+  SwerveInputStream driveAngularVelocitySim = SwerveInputStream.of(drivebase.getSwerveDrive(),
+                                                                   () -> -driverXbox.getLeftY(),
+                                                                   () -> -driverXbox.getLeftX())
+                                                               .withControllerRotationAxis(() -> driverXbox.getRawAxis(2))
+                                                               .deadband(OperatorConstants.DEADBAND)
+                                                               .scaleTranslation(0.8)
+                                                               .allianceRelativeControl(true);
+  // Derive the heading axis with math!
+  SwerveInputStream driveDirectAngleSim     = driveAngularVelocitySim.copy()
+                                                                     .withControllerHeadingAxis(() -> Math.sin(
+                                                                                                    driverXbox.getRawAxis(
+                                                                                                        2) * Math.PI) * (Math.PI * 2),
+                                                                                                () -> Math.cos(
+                                                                                                    driverXbox.getRawAxis(
+                                                                                                        2) * Math.PI) *
+                                                                                                      (Math.PI * 2))
+                                                                     .headingWhile(true);
 
-  
-      private final SendableChooser<Command> autoChooser;
+  Command driveFieldOrientedDirectAngleSim = drivebase.driveFieldOriented(driveDirectAngleSim);
+
+  Command driveSetpointGenSim = drivebase.driveWithSetpointGeneratorFieldRelative(driveDirectAngleSim);
+
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
    */
   public RobotContainer()
   {
-    
-    if (Robot.isSimulation()) {
-      DogLog.setOptions(new DogLogOptions().withNtPublish(true).withCaptureDs(true));
-      BoltLogger.setLogLevelHigh();
-      }
-      else{
-        DogLog.setOptions(new DogLogOptions().withNtPublish(false).withCaptureDs(true));
-        BoltLogger.setLogLevelLow();
-      }
-      
-    DogLog.setPdh(new PowerDistribution());
-   // DogLog.setOptions(new DogLogOptions().withCaptureDs(true).withNtPublish(true));
-    DogLog.setEnabled(true);
-    BoltLogger.setLogLevelHigh();
-    PPnamed();
-    autoChooser = AutoBuilder.buildAutoChooser();
-    SmartDashboard.putData("Auto Chooser", autoChooser);
     // Configure the trigger bindings
     configureBindings();
-  
+    DriverStation.silenceJoystickConnectionWarning(true);
+    NamedCommands.registerCommand("test", Commands.print("I EXIST"));
   }
-  private void PPnamed()
-  {
-    System.out.println("define PP named commands");
-    BoltLogger.Log(BoltLogger.HighLog,"RobotContainer","PathPlanner","PPnamed","Starting","starting");
-    NamedCommands.registerCommand("IntakeOn", new CmdA_IntakeOn(IntakeSS));
-    NamedCommands.registerCommand("IntakeOff", new CmdA_IntakeOff(IntakeSS));
-    NamedCommands.registerCommand("Shoot",new CmdA_Shoot(ShooterSS));
-    new EventTrigger("E_IntakeOn").onTrue(new CmdA_IntakeOn(IntakeSS));
-    new EventTrigger("E_Shoot").onTrue(new CmdA_Shoot(ShooterSS));
 
-  }
   /**
    * Use this method to define your trigger->command mappings. Triggers can be created via the
    * {@link Trigger#Trigger(java.util.function.BooleanSupplier)} constructor with an arbitrary predicate, or via the
@@ -167,47 +131,41 @@ public class RobotContainer
    */
   private void configureBindings()
   {
-    //set default robot location if this is a simulation
+    // (Condition) ? Return-On-True : Return-on-False
+    drivebase.setDefaultCommand(!RobotBase.isSimulation() ?
+                                driveFieldOrientedAnglularVelocity :
+                                driveFieldOrientedDirectAngleSim);
+
     if (Robot.isSimulation())
     {
       driverXbox.start().onTrue(Commands.runOnce(() -> drivebase.resetOdometry(new Pose2d(3, 3, new Rotation2d()))));
     }
-
-    //if this is a in test mode - we want to be able to run SysID etc
     if (DriverStation.isTest())
     {
-      driverXbox.b().onTrue(new CmdT_IntakeOn(IntakeSS));
+      drivebase.setDefaultCommand(driveFieldOrientedAnglularVelocity); // Overrides drive command above!
+
+      driverXbox.b().whileTrue(drivebase.sysIdDriveMotorCommand());
       driverXbox.x().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
-      driverXbox.y().whileTrue(drivebase.driveToDistanceCommand(1.0, 0.2));
+      driverXbox.y().whileTrue(drivebase.driveToDistanceCommand(3.0, 0.2));
       driverXbox.start().onTrue((Commands.runOnce(drivebase::zeroGyro)));
       driverXbox.back().whileTrue(drivebase.centerModulesCommand());
       driverXbox.leftBumper().onTrue(Commands.none());
       driverXbox.rightBumper().onTrue(Commands.none());
-      drivebase.setDefaultCommand(
-          !RobotBase.isSimulation() ? driveFieldOrientedAnglularVelocity : driveFieldOrientedDirectAngleSim);
     } else
     {
-      //This is not test, so we want to use real driver commands
       driverXbox.a().onTrue((Commands.runOnce(drivebase::zeroGyro)));
-      driverXbox.x().onTrue((new CmdT_Shoot(ShooterSS)));
-      /*driverXbox.b().whileTrue(
+      driverXbox.x().onTrue(Commands.runOnce(drivebase::addFakeVisionReading));
+      driverXbox.b().whileTrue(
           drivebase.driveToPose(
               new Pose2d(new Translation2d(4, 4), Rotation2d.fromDegrees(0)))
                               );
-      */
-      driverXbox.b().onTrue(new CmdT_IntakeOn(IntakeSS));
-      driverXbox.y().whileTrue(drivebase.aimAtSpeaker(2));
+      //driverXbox.y().whileTrue(drivebase.aimAtSpeaker(2));
+      
       driverXbox.start().whileTrue(Commands.none());
       driverXbox.back().whileTrue(Commands.none());
       driverXbox.leftBumper().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
-      driverXbox.rightBumper().whileTrue(driveRobotOrient);
-      //Use same driver command for both simulation and real robot
-      drivebase.setDefaultCommand(
-          !RobotBase.isSimulation() ? driveFieldOrientedAnglularVelocity : driveFieldOrientedAnglularVelocity);
+      driverXbox.rightBumper().onTrue(Commands.none());
     }
-    //enable default command for the DataHighway - this should always be running
-    DataHighwaySS.setDefaultCommand(new DataHighway_Def_Cmd(DataHighwaySS,IntakeSS,drivebase, ShooterSS));
-
 
   }
 
@@ -219,8 +177,7 @@ public class RobotContainer
   public Command getAutonomousCommand()
   {
     // An example command will be run in autonomous
-    return autoChooser.getSelected();
-    //return drivebase.getAutonomousCommand("New Auto");
+    return drivebase.getAutonomousCommand("New Auto");
   }
 
   public void setDriveMode()
