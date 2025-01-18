@@ -2,18 +2,18 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.robot.commands.Intake.TeleOp;
+package frc.robot.commands.AlgaeIntake.TeleOp;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.BoltLog;
-import frc.robot.subsystems.Intake.IntakeSubsystem;
+import frc.robot.subsystems.AlgaeIntake.AlgaeIntakeSubsystem;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
-public class CmdT_IntakeOn extends Command {
+public class CmdT_IntakeOff extends Command {
   /** Creates a new Cmd_IntakeOn. */
-  private IntakeSubsystem IntakeSS;
+  private AlgaeIntakeSubsystem IntakeSS;
     private final BoltLog BoltLogger = new BoltLog();
-  public CmdT_IntakeOn(IntakeSubsystem Intake_Subsystem) {
+  public CmdT_IntakeOff(AlgaeIntakeSubsystem Intake_Subsystem) {
     IntakeSS = Intake_Subsystem;
     addRequirements(IntakeSS);
     // Use addRequirements() here to declare subsystem dependencies.
@@ -27,8 +27,7 @@ public class CmdT_IntakeOn extends Command {
   @Override
   public void execute() {
     BoltLogger.Log(BoltLogger.HighLog, getSubsystem(), getName(), "execute", "Executing", true);
-    if (!IntakeSS.getGPStatus()) 
-      IntakeSS.IntakeOn();;
+    IntakeSS.IntakeOff();;
   }
 
   // Called once the command ends or is interrupted.
@@ -40,6 +39,6 @@ public class CmdT_IntakeOn extends Command {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return IntakeSS.getIntakeStatus() || IntakeSS.getGPStatus();
+    return !IntakeSS.getIntakeStatus();
   }
 }

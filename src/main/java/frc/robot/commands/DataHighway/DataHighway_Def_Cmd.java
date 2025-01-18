@@ -9,20 +9,18 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.BoltLog;
 import frc.robot.Robot;
+import frc.robot.subsystems.AlgaeIntake.AlgaeIntakeSubsystem;
+import frc.robot.subsystems.CoralElevator.CoralElevator;
 import frc.robot.subsystems.DataHighway.DataHighwaySubsystem;
-import frc.robot.subsystems.Intake.IntakeSubsystem;
-
-import frc.robot.subsystems.Shooter.ShooterSubsystem;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
-import frc.robot.subsystems.Shooter.ShooterSubsystem;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class DataHighway_Def_Cmd extends Command {
   /** Creates a new DataHighway_Def_Cmd. */
   private final BoltLog BoltLogger = new BoltLog();
-  private IntakeSubsystem IntakeSS;
+  private AlgaeIntakeSubsystem IntakeSS;
   private SwerveSubsystem SwerveSS;
-  private ShooterSubsystem ShooterSS;
+  private CoralElevator ShooterSS;
 
   private boolean IntakeHasGP = false;
 
@@ -31,7 +29,7 @@ public class DataHighway_Def_Cmd extends Command {
   private Pose2d robotSimulationWorldPose;
   private ChassisSpeeds fieldChassisSpeeds;
 
-  public DataHighway_Def_Cmd(DataHighwaySubsystem data_Subsystem,IntakeSubsystem Intake_Subsystem, SwerveSubsystem Swerve_SubSystem, ShooterSubsystem Shooter_Subsystem) {
+  public DataHighway_Def_Cmd(DataHighwaySubsystem data_Subsystem,AlgaeIntakeSubsystem Intake_Subsystem, SwerveSubsystem Swerve_SubSystem, CoralElevator Shooter_Subsystem) {
     IntakeSS = Intake_Subsystem;
      SwerveSS = Swerve_SubSystem;
     ShooterSS = Shooter_Subsystem;
