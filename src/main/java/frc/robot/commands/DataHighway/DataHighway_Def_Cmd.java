@@ -56,7 +56,7 @@ public class DataHighway_Def_Cmd extends Command {
     setSwerveSS();
     setShooterSS();
     //log status at end of execute
-    BoltLogger.Log(BoltLogger.HighLog, getSubsystem(), getName(), "Execute", "IntakeOn", IntakeSS.getIntakeStatus());
+    BoltLogger.Log(BoltLogger.HighLog, getSubsystem(), getName(), "Execute", "IntakeOn", IntakeSS.getAlgaeIntakeStatus());
     BoltLogger.Log(BoltLogger.HighLog, getSubsystem(), getName(), "Execute", "IntakehasGP", IntakeHasGP);
     BoltLogger.Log(BoltLogger.HighLog, getSubsystem(), getName(), "Execute", "ShooterComplete", ShooterComplete);
     
@@ -109,7 +109,7 @@ public class DataHighway_Def_Cmd extends Command {
     {
       if (ShooterComplete)
          SwerveSS.getGamePieceFromIntake();
-      if (IntakeSS.getIntakeStatus())
+      if (IntakeSS.getAlgaeIntakeStatus())
         SwerveSS.startIntake();
       else
         SwerveSS.stopIntake();

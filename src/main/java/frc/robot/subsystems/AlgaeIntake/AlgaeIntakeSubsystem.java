@@ -12,41 +12,40 @@ public class AlgaeIntakeSubsystem extends SubsystemBase {
   /** Creates a new IntakeSubSystem. */
   
 
-     private boolean HasGP = false;
+     private boolean HasAlgaeGP = false;
      private boolean RunIntake = false;
      private boolean IntakeSensor = false;
-     private DigitalInput IntakeGPSensor; 
+     private DigitalInput IntakeAlgaeSensor; 
 
   public AlgaeIntakeSubsystem() {
-    IntakeGPSensor = new DigitalInput(0);
+    IntakeAlgaeSensor = new DigitalInput(0);
   }
     
   @Override
   public void periodic() {
-    IntakeSensor = IntakeGPSensor.get();
+    IntakeSensor = IntakeAlgaeSensor.get();
     if (Robot.isReal()){
-      HasGP = IntakeSensor;
+      HasAlgaeGP = IntakeSensor;
     }
     else{
 
     }
   }
-  public void IntakeOn(){
+  public void AlgaeIntakeOn(){
     RunIntake = true;
   }
-  public void IntakeOff(){
+  public void AlgaeIntakeOff(){
     RunIntake = false;
   }
-  public boolean getIntakeStatus(){
+  public boolean getAlgaeIntakeStatus(){
     return RunIntake;
   }
-  public boolean getGPStatus(){
-    return HasGP;
+  public boolean getAlgaeGPStatus(){
+    return HasAlgaeGP;
   }
-  public void SetSimGP(boolean GPState)
+  public void SetSimAlgaeGP(boolean GPState)
   {
     if (Robot.isSimulation()){
-      HasGP = GPState;
     }
   }
 }

@@ -23,8 +23,8 @@ public class CmdA_IntakeOn extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    if (!IntakeSS.getGPStatus()) {
-      IntakeSS.IntakeOn();
+    if (!IntakeSS.getAlgaeGPStatus()) {
+      IntakeSS.AlgaeIntakeOn();
      }
   
   }
@@ -33,8 +33,8 @@ public class CmdA_IntakeOn extends Command {
   @Override
   public void execute() {
     BoltLogger.Log(BoltLogger.HighLog, getSubsystem(), getName(), "Execute", "Executing", true);
-    if (!IntakeSS.getGPStatus()) {
-      IntakeSS.IntakeOn();
+    if (!IntakeSS.getAlgaeGPStatus()) {
+      IntakeSS.AlgaeIntakeOn();
       DogLog.log("RunIntakeRequest",true);
     }
   }
@@ -49,6 +49,6 @@ public class CmdA_IntakeOn extends Command {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return IntakeSS.getIntakeStatus() || IntakeSS.getGPStatus();
+    return IntakeSS.getAlgaeIntakeStatus() || IntakeSS.getAlgaeGPStatus();
   }
 }

@@ -10,15 +10,15 @@ import frc.robot.Robot;
 import frc.robot.subsystems.CoralElevator.CoralElevator;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
-public class CmdT_OutTake extends Command {
+public class CmdT_CoralOutTake extends Command {
   /** Creates a new Cmd_Shoot_TeleOp. */
+  CoralElevator CoralElevatorSS; 
     private final BoltLog BoltLogger = new BoltLog();
-  CoralElevator ShootSS;
-  boolean ShotDone = false;
-  public CmdT_OutTake(CoralElevator shooter_Subsystem) {
+  boolean CoralOut = false;
+  public CmdT_CoralOutTake(CoralElevator CoralElevator_Subsystem) {
     // Use addRequirements() here to declare subsystem dependencies.
-    ShootSS = shooter_Subsystem;
-    addRequirements(ShootSS);
+    CoralElevatorSS = CoralElevator_Subsystem;
+    addRequirements(CoralElevatorSS);
   }
 
   // Called when the command is initially scheduled.
@@ -30,8 +30,7 @@ public class CmdT_OutTake extends Command {
   public void execute() {
     BoltLogger.Log(BoltLogger.HighLog, getSubsystem(), getName(), "execute", "Executing", true);
     if (Robot.isSimulation()){
-        ShootSS.ShootSimGP();
-        ShotDone = true;
+                
     }
   }
 
@@ -44,6 +43,6 @@ public class CmdT_OutTake extends Command {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return ShotDone;
+    return CoralOut;
   }
 }

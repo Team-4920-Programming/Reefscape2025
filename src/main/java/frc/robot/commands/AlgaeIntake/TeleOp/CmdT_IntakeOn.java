@@ -27,8 +27,8 @@ public class CmdT_IntakeOn extends Command {
   @Override
   public void execute() {
     BoltLogger.Log(BoltLogger.HighLog, getSubsystem(), getName(), "execute", "Executing", true);
-    if (!IntakeSS.getGPStatus()) 
-      IntakeSS.IntakeOn();;
+    if (!IntakeSS.getAlgaeGPStatus()) 
+      IntakeSS.AlgaeIntakeOn();;
   }
 
   // Called once the command ends or is interrupted.
@@ -40,6 +40,6 @@ public class CmdT_IntakeOn extends Command {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return IntakeSS.getIntakeStatus() || IntakeSS.getGPStatus();
+    return IntakeSS.getAlgaeIntakeStatus() || IntakeSS.getAlgaeGPStatus();
   }
 }
