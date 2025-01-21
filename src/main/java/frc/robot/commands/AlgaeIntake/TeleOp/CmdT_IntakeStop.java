@@ -9,12 +9,14 @@ import frc.robot.BoltLog;
 import frc.robot.subsystems.AlgaeIntake.AlgaeIntakeSubsystem;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
-public class CmdT_IntakeOn extends Command {
+public class CmdT_IntakeStop extends Command {
   /** Creates a new Cmd_IntakeOn. */
   private AlgaeIntakeSubsystem IntakeSS;
+  private double rspeed;
     private final BoltLog BoltLogger = new BoltLog();
-  public CmdT_IntakeOn(AlgaeIntakeSubsystem Intake_Subsystem) {
+  public CmdT_IntakeStop(AlgaeIntakeSubsystem Intake_Subsystem, double reqspeed) {
     IntakeSS = Intake_Subsystem;
+    rspeed = reqspeed;
     addRequirements(IntakeSS);
     // Use addRequirements() here to declare subsystem dependencies.
   }
@@ -27,8 +29,9 @@ public class CmdT_IntakeOn extends Command {
   @Override
   public void execute() {
     BoltLogger.Log(BoltLogger.HighLog, getSubsystem(), getName(), "execute", "Executing", true);
-    if (!IntakeSS.getAlgaeGPStatus()) 
-      IntakeSS.AlgaeIntakeOn();;
+      IntakeSS.StopIntake();
+
+    
   }
 
   // Called once the command ends or is interrupted.
@@ -40,6 +43,11 @@ public class CmdT_IntakeOn extends Command {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return IntakeSS.getAlgaeIntakeStatus() || IntakeSS.getAlgaeGPStatus();
+    boolean atSpeed = false;
+    if (Math.abs(IntakeSS.GetIntakeSpeed()) < 0.01)
+    {
+      atSpeed = true;
+    }
+    return atSpeed;
   }
 }
