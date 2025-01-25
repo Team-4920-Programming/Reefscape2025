@@ -7,15 +7,15 @@ package frc.robot.commands.Elevator.Auto;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.BoltLog;
 import frc.robot.Robot;
-import frc.robot.subsystems.CoralElevator.CoralElevator;
+import frc.robot.subsystems.CoralElevator.CoralElevatorSubsystem;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class CmdA_CoralOutTake extends Command {
   /** Creates a new Cmd_Shoot_TeleOp. */
-  CoralElevator CoralElevatorSS; 
+  CoralElevatorSubsystem CoralElevatorSS; 
     private final BoltLog BoltLogger = new BoltLog();
   boolean CoralOut = false;
-  public CmdA_CoralOutTake(CoralElevator CoralElevator_Subsystem) {
+  public CmdA_CoralOutTake(CoralElevatorSubsystem CoralElevator_Subsystem) {
     // Use addRequirements() here to declare subsystem dependencies.
     CoralElevatorSS = CoralElevator_Subsystem;
     addRequirements(CoralElevatorSS);

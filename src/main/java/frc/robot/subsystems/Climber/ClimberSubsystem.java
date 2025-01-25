@@ -35,7 +35,7 @@ public class ClimberSubsystem extends SubsystemBase {
     IsClimberHome = ClimberHomeSwitch.get();
     ClimberPosition = ClimberRelEncoder.getPosition();
     if(IsClimberHome == true)
-    ClimberRelEncoder.setPosition(ClimberPosition)
+    ClimberRelEncoder.setPosition(ClimberPosition);
   }
   public void StopClimber(){
     ClimberMotor.set(0);

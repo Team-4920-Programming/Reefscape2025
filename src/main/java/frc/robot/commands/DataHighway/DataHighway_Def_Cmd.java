@@ -10,7 +10,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.BoltLog;
 import frc.robot.Robot;
 import frc.robot.subsystems.AlgaeIntake.AlgaeIntakeSubsystem;
-import frc.robot.subsystems.CoralElevator.CoralElevator;
+import frc.robot.subsystems.CoralElevator.CoralElevatorSubsystem;
 import frc.robot.subsystems.DataHighway.DataHighwaySubsystem;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 
@@ -20,7 +20,7 @@ public class DataHighway_Def_Cmd extends Command {
   private final BoltLog BoltLogger = new BoltLog();
   private AlgaeIntakeSubsystem IntakeSS;
   private SwerveSubsystem SwerveSS;
-  private CoralElevator ShooterSS;
+  private CoralElevatorSubsystem ShooterSS;
 
   private boolean IntakeHasGP = false;
 
@@ -29,7 +29,7 @@ public class DataHighway_Def_Cmd extends Command {
   private Pose2d robotSimulationWorldPose;
   private ChassisSpeeds fieldChassisSpeeds;
 
-  public DataHighway_Def_Cmd(DataHighwaySubsystem data_Subsystem,AlgaeIntakeSubsystem Intake_Subsystem, SwerveSubsystem Swerve_SubSystem, CoralElevator Shooter_Subsystem) {
+  public DataHighway_Def_Cmd(DataHighwaySubsystem data_Subsystem,AlgaeIntakeSubsystem Intake_Subsystem, SwerveSubsystem Swerve_SubSystem, CoralElevatorSubsystem Shooter_Subsystem) {
     IntakeSS = Intake_Subsystem;
      SwerveSS = Swerve_SubSystem;
     ShooterSS = Shooter_Subsystem;
@@ -56,9 +56,8 @@ public class DataHighway_Def_Cmd extends Command {
     setSwerveSS();
     setShooterSS();
     //log status at end of execute
-    BoltLogger.Log(BoltLogger.HighLog, getSubsystem(), getName(), "Execute", "IntakeOn", IntakeSS.getAlgaeIntakeStatus());
-    BoltLogger.Log(BoltLogger.HighLog, getSubsystem(), getName(), "Execute", "IntakehasGP", IntakeHasGP);
-    BoltLogger.Log(BoltLogger.HighLog, getSubsystem(), getName(), "Execute", "ShooterComplete", ShooterComplete);
+
+   
     
 
   }
@@ -90,7 +89,7 @@ public class DataHighway_Def_Cmd extends Command {
     robotSimulationWorldPose = SwerveSS.getPose();
     
     if (Robot.isSimulation())
-      if (SwerveSS.getIntakeGamePiecesAmount() > 0)
+      if (SwerveSS.getAIntakeGamePiecesAmount() > 0)
       {
         IntakeHasGP = true;
         
@@ -104,24 +103,15 @@ public class DataHighway_Def_Cmd extends Command {
 
   private void setSwerveSS(){
 
-    
-    if (Robot.isSimulation())
-    {
-      if (ShooterComplete)
-         SwerveSS.getGamePieceFromIntake();
-      if (IntakeSS.getAlgaeIntakeStatus())
-        SwerveSS.startIntake();
-      else
-        SwerveSS.stopIntake();
-    }
+ 
   }
   private void getShooterSS(){
-      ShooterComplete = ShooterSS.ShotComplete;
+      //ShooterComplete = ShooterSS.ShotComplete;
   }
   private void setShooterSS(){
-    ShooterSS.chassisSpeedsFieldRelative = fieldChassisSpeeds;
-    ShooterSS.robotSimulationWorldPose = robotSimulationWorldPose;
-    ShooterSS.RobotHasGP = IntakeHasGP;
+    //ShooterSS.chassisSpeedsFieldRelative = fieldChassisSpeeds;
+    //ShooterSS.robotSimulationWorldPose = robotSimulationWorldPose;
+    //ShooterSS.RobotHasGP = IntakeHasGP;
   }
 
 }

@@ -31,7 +31,7 @@ public class CmdA_IntakeOff extends Command {
   @Override
   public void execute() {
     BoltLogger.Log(BoltLogger.HighLog, getSubsystem(), getName(), "execute", "Executing", true);
-    IntakeSS.AlgaeIntakeOff();
+    //IntakeSS.AlgaeIntakeOff();
 
     
   }
@@ -46,6 +46,6 @@ public class CmdA_IntakeOff extends Command {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return !IntakeSS.getAlgaeIntakeStatus();
+    return !IntakeSS.HasAlgae();
   }
 }

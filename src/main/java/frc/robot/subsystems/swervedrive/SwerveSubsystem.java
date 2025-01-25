@@ -86,8 +86,8 @@ public class SwerveSubsystem extends SubsystemBase
    */
   private       Vision              vision;
 
-  private     IntakeSimulation intakeSimulation;
-  
+  private     IntakeSimulation AintakeSimulation;
+  private     IntakeSimulation CintakeSimulation;
 
   /**
    * Initialize {@link SwerveDrive} with the directory provided.
@@ -188,35 +188,59 @@ public class SwerveSubsystem extends SubsystemBase
   {
     DogLog.log("FieldSimulation/Algae", SimulatedArena.getInstance().getGamePiecesArrayByType("Algae"));
     DogLog.log("FieldSimulation/Coral", SimulatedArena.getInstance().getGamePiecesArrayByType("Coral"));
-    //DogLog.log("FieldSimulation/StackedAlgogLog.log("FieldSimulation/StackedCoral",  ReefscapeCoralAlgaeStack.getStackedCoralPoses());
+  
   
   }
 
   public void SetupIntake(){
         Distance width = Inches.of(20);
-        Distance Extension = Inches.of(6);
-        intakeSimulation = intakeSimulation.OverTheBumperIntake("Coral", swerveDrive.getMapleSimDrive().get(), width, Extension, IntakeSimulation.IntakeSide.FRONT, 1);
-        intakeSimulation.register(SimulatedArena.getInstance());
+        Distance Extension = Inches.of(13);
+        AintakeSimulation = AintakeSimulation.OverTheBumperIntake(
+              "Algae", 
+              swerveDrive.getMapleSimDrive().get(), 
+              width, Extension, IntakeSimulation.IntakeSide.FRONT, 1);
+        AintakeSimulation.register(SimulatedArena.getInstance());
 
+        Distance CWidth = Inches.of(5);
+        Distance cExtension = Inches.of(12);
+        CintakeSimulation = CintakeSimulation.OverTheBumperIntake(
+              "Algae", 
+              swerveDrive.getMapleSimDrive().get(), 
+              width, Extension, IntakeSimulation.IntakeSide.BACK, 1);
+        CintakeSimulation.register(SimulatedArena.getInstance());
   }
   public void setupSimulatedField()
   { 
       SimulatedArena.getInstance().resetFieldForAuto();
     
   }
-  public void startIntake()
+  public void startCIntake()
   {
-    intakeSimulation.startIntake();
+    CintakeSimulation.startIntake();
   }
-  public void stopIntake(){
-    intakeSimulation.stopIntake();
+  public void stopCIntake(){
+        CintakeSimulation.stopIntake();
   }
-  public void getGamePieceFromIntake(){
-    intakeSimulation.obtainGamePieceFromIntake();
+  public void getGamePieceFromCIntake(){
+    CintakeSimulation.obtainGamePieceFromIntake();
   }
-  public int getIntakeGamePiecesAmount(){
-    return intakeSimulation.getGamePiecesAmount();
+  public int getCIntakeGamePiecesAmount(){
+    return CintakeSimulation.getGamePiecesAmount();
   }
+  public void startAIntake()
+  {
+    AintakeSimulation.startIntake();
+  }
+  public void stopAIntake(){
+        AintakeSimulation.stopIntake();
+  }
+  public void getGamePieceFromAIntake(){
+    AintakeSimulation.obtainGamePieceFromIntake();
+  }
+  public int getAIntakeGamePiecesAmount(){
+    return AintakeSimulation.getGamePiecesAmount();
+  }
+  
   //**************************************************************End of 4920 Modificatons*************************** */
   /**
    * Setup AutoBuilder for PathPlanner.
