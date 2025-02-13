@@ -6,6 +6,7 @@ package frc.robot.subsystems.CoralElevator;
 
 import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.seasonspecific.crescendo2024.NoteOnFly;
+import org.opencv.features2d.FlannBasedMatcher;
 
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.sim.SparkMaxSim;
@@ -21,6 +22,7 @@ import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.BoltLog;
 import frc.robot.Robot;
 import edu.wpi.first.math.geometry.Pose3d;
@@ -28,6 +30,7 @@ import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import edu.wpi.first.wpilibj.simulation.ElevatorSim;
 import static edu.wpi.first.units.Units.Newton;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ArmFeedforward;
 
 import java.lang.Math;
@@ -53,24 +56,78 @@ public class CoralElevatorSubsystem extends SubsystemBase {
   SparkMax WristMotor = new SparkMax(10, MotorType.kBrushless);
   SparkMaxSim WrstMotorSim = new SparkMaxSim(WristMotor, WristGearbox);
 
-  SingleJointedArmSim m_armSim = new SingleJointedArmSim(ElbowGearbox, 0, 0, 0, 0, 0, false, 0, null) 
-  ElevatorSim m_ElevSim = new ElevatorSim(null, ElbowGearbox, 0, 0, false, 0, null)
-
-  ElevatorFeedforward ElevFF = new ElevatorFeedforward(0, 0, 0)
+  SingleJointedArmSim m_armSim = new SingleJointedArmSim(ElbowGearbox, 0, 0, 0, 0, 0, false, 0, null) ;
+  ElevatorSim m_ElevSim = new ElevatorSim(null, ElbowGearbox, 0, 0, false, 0, null);
+  ElevatorFeedforward ElevFF = new ElevatorFeedforward(0, 0, 0);
   ArmFeedforward ArmFF = new ArmFeedforward(0, 0, 0);
+
+  PIDController ElevatorPID = new PIDController(0.001, 0, 0.01);
+  PIDController ElbowPID = new PIDController(0.001, 0, 0.01);
+  PIDController WristPID = new PIDController(.001, 0, 0.01);
+
   
+
+
+
   public CoralElevatorSubsystem() {
     if (Robot.isSimulation())
-    {
+   {
       SimElevatorRoot = SimElevator.getRoot("elevator", 0.5, 0);
       Stage1 = SimElevatorRoot.append(new MechanismLigament2d("Stage1", 0.9, 90));
       Elbow = Stage1.append(new MechanismLigament2d("Elbow",0.5,170));
       Wrist = Elbow.append(new MechanismLigament2d("Wriat",0.2,90));
     }
   }
+  private void SetElevatorPosition(double Height)
+{
+  if (Height > ElevatorPID.getSetpoint() && CanMoveElevatorUP()){
+    ElevatorPID.setSetpoint(Height);
+  }
+  if (Height < ElevatorPID.getSetpoint() && CanMoveElevatorDown()){
+    ElevatorPID.setSetpoint(Height);
+  }
+}
+
+  private void SetElbowPosition(double Angle)
+{
+  if (Angle > ElbowPID.getSetpoint() && CanMoveElbowInc()){
+    ElbowPID.setSetpoint(Angle);
+  }
+  if (Angle < ElbowPID.getSetpoint() && CanMoveElbowDec()){
+    ElbowPID.setSetpoint(Angle);
+  }
+}
+  private void SetWristPosition(double Angle)
+{
+  if (Angle > WristPID.getSetpoint() && CanMoveWristInc()){
+    WristPID.setSetpoint(Angle);
+  }
+  if (Angle < WristPID.getSetpoint() && CanMoveWristDec()){
+    WristPID.setSetpoint(Angle);
+  }
+}
   
 
+    
 
+private Boolean CanMoveElevatorUP(){
+  return false;
+}
+private Boolean CanMoveElevatorDown(){
+  return false;
+}
+private Boolean CanMoveElbowInc(){
+  return false;
+}
+private Boolean CanMoveElbowDec(){
+  return false;
+}
+private Boolean CanMoveWristInc(){
+  return false;
+}
+private Boolean CanMoveWristDec(){
+  return false;
+}
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
@@ -85,6 +142,17 @@ public class CoralElevatorSubsystem extends SubsystemBase {
     SmartDashboard.putData  ("Simulation/Elevator",SimElevator);
 
   }
+// public void SysIDRun()
+// {
+//   var sysIdRoutine = new SysIdRoutine(
+//   new SysIdRoutine.Config(),
+//   new SysIdRoutine.Mechanism(
+//     (voltage) -> subsystem.runVolts(voltage.in(Volts)),
+//     null, // No log consumer, since data is recorded by URCL
+//     this
+//   )
+// );
+// }
   
 }
 
