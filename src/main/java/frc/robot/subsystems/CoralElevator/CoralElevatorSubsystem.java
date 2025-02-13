@@ -17,12 +17,14 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.simulation.ElevatorSim;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Config;
 import frc.robot.BoltLog;
 import frc.robot.Robot;
 import edu.wpi.first.math.geometry.Pose3d;
@@ -32,7 +34,7 @@ import static edu.wpi.first.units.Units.Newton;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ArmFeedforward;
-
+import static edu.wpi.first.units.Units.Volts;
 import java.lang.Math;
 import frc.robot.BoltLog;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -142,17 +144,29 @@ private Boolean CanMoveWristDec(){
     SmartDashboard.putData  ("Simulation/Elevator",SimElevator);
 
   }
-// public void SysIDRun()
-// {
-//   var sysIdRoutine = new SysIdRoutine(
-//   new SysIdRoutine.Config(),
-//   new SysIdRoutine.Mechanism(
-//     (voltage) -> subsystem.runVolts(voltage.in(Volts)),
-//     null, // No log consumer, since data is recorded by URCL
-//     this
-//   )
-// );
-// }
+public  SysIdRoutine ElevatorSysIDRun(Config config)
+{
+  return new SysIdRoutine(
+  config,
+   new SysIdRoutine.Mechanism(
+    (voltage) -> this.runVolts(voltage.in(Volts)),
+    null, // No log consumer, since data is recorded by URCL
+    this)
+    );
+}
+public void runVolts(double V)
+{
+  if (CanMoveElevatorUP() && V>0)
+    ElevatorUPDownMotor.setVoltage(V);
+  else if (CanMoveElevatorDown() && V<0)
+    ElevatorUPDownMotor.setVoltage(V);
+  else ElevatorUPDownMotor.setVoltage(0);
+
+}
+public void LogElevatorData()
+{
+
+}
   
 }
 
