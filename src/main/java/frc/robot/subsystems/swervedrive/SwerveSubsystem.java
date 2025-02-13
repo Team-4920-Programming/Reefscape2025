@@ -208,7 +208,7 @@ public class SwerveSubsystem extends SubsystemBase
         CintakeSimulation = CintakeSimulation.OverTheBumperIntake(
               "Algae", 
               swerveDrive.getMapleSimDrive().get(), 
-              width, Extension, IntakeSimulation.IntakeSide.BACK, 1);
+              width, Extension, IntakeSimulation.IntakeSide.RIGHT, 1);
         CintakeSimulation.register(SimulatedArena.getInstance());
   }
   public void setupSimulatedField()
