@@ -51,17 +51,17 @@ public class CoralElevatorSubsystem extends SubsystemBase {
   SparkMaxSim ElevatorUpDownMotorSim = new SparkMaxSim(ElevatorUPDownMotor, ElevatorUpDownGearbox);
   
   DCMotor ElbowGearbox = DCMotor.getNEO(1);
-  SparkMax ElbowMotor = new SparkMax(10, MotorType.kBrushless);
+  SparkMax ElbowMotor = new SparkMax(11, MotorType.kBrushless);
   SparkMaxSim ElbowMotorSim = new SparkMaxSim(ElbowMotor, ElbowGearbox);
 
   DCMotor WristGearbox = DCMotor.getNEO(1);
-  SparkMax WristMotor = new SparkMax(10, MotorType.kBrushless);
+  SparkMax WristMotor = new SparkMax(12, MotorType.kBrushless);
   SparkMaxSim WrstMotorSim = new SparkMaxSim(WristMotor, WristGearbox);
 
-  SingleJointedArmSim m_armSim = new SingleJointedArmSim(ElbowGearbox, 0, 0, 0, 0, 0, false, 0, null) ;
-  ElevatorSim m_ElevSim = new ElevatorSim(null, ElbowGearbox, 0, 0, false, 0, null);
-  ElevatorFeedforward ElevFF = new ElevatorFeedforward(0, 0, 0);
-  ArmFeedforward ArmFF = new ArmFeedforward(0, 0, 0);
+  //SingleJointedArmSim m_armSim = new SingleJointedArmSim(ElbowGearbox, 1, 0.1, .1, 0, .5*3.145, false, 0, null) ;
+  //ElevatorSim m_ElevSim = new ElevatorSim(null, ElbowGearbox, 0, .25, false, 0, null);
+  ElevatorFeedforward ElevFF = new ElevatorFeedforward(0.1, 0.1, 0.1);
+  ArmFeedforward ArmFF = new ArmFeedforward(0.1, 0.1, 0.1);
 
   PIDController ElevatorPID = new PIDController(0.001, 0, 0.01);
   PIDController ElbowPID = new PIDController(0.001, 0, 0.01);
