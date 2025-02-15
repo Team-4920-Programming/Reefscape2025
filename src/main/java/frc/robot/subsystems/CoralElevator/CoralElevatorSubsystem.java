@@ -4,41 +4,46 @@
 
 package frc.robot.subsystems.CoralElevator;
 
-import org.ironmaple.simulation.SimulatedArena;
-import org.ironmaple.simulation.seasonspecific.crescendo2024.NoteOnFly;
-import org.opencv.features2d.FlannBasedMatcher;
+import static edu.wpi.first.units.Units.Volts;
 
-import com.revrobotics.spark.SparkMax;
+import org.opencv.core.Mat;
+
+import com.fasterxml.jackson.databind.BeanProperty;
+import com.revrobotics.AbsoluteEncoder;
+import com.revrobotics.RelativeEncoder;
 import com.revrobotics.sim.SparkMaxSim;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.revrobotics.spark.SparkMax;
 
-import dev.doglog.DogLog;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.controller.ArmFeedforward;
+import edu.wpi.first.math.controller.ElevatorFeedforward;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.system.plant.DCMotor;
-import edu.wpi.first.units.measure.Voltage;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.simulation.ElevatorSim;
+import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Config;
 import frc.robot.BoltLog;
+import frc.robot.Constants.CanIDs.CoralElevator;
+import frc.robot.Constants.PIDs.CoralElevator.Elevator;
+import frc.robot.Constants.CanIDs;
+import frc.robot.Constants.DIO;
+import frc.robot.Constants.PIDs;
+import frc.robot.Constants.RobotLimits;
 import frc.robot.Robot;
-import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
-import edu.wpi.first.wpilibj.simulation.ElevatorSim;
-import static edu.wpi.first.units.Units.Newton;
-import edu.wpi.first.math.controller.ElevatorFeedforward;
-import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.controller.ArmFeedforward;
-import static edu.wpi.first.units.Units.Volts;
-import java.lang.Math;
-import frc.robot.BoltLog;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
+import au.grapplerobotics.LaserCan;
+import au.grapplerobotics.ConfigurationFailedException;
+import edu.wpi.first.wpilibj.TimedRobot;
+
 public class CoralElevatorSubsystem extends SubsystemBase {
+
   /** Creates a new ShooterSubsystem. */
   private final BoltLog BoltLogger = new BoltLog();
   private Mechanism2d SimElevator = new Mechanism2d(1, 1);
@@ -46,27 +51,76 @@ public class CoralElevatorSubsystem extends SubsystemBase {
   private MechanismLigament2d Stage1;
   private MechanismLigament2d Elbow;
   private MechanismLigament2d Wrist;
-  DCMotor ElevatorUpDownGearbox = DCMotor.getNEO(1);
-  SparkMax ElevatorUPDownMotor = new SparkMax(10, MotorType.kBrushless);
-  SparkMaxSim ElevatorUpDownMotorSim = new SparkMaxSim(ElevatorUPDownMotor, ElevatorUpDownGearbox);
   
+
+  /** Physical Robot Init START**/
+  
+  // Motors
+
+  SparkMax ElevatorStageMotor = new SparkMax(CoralElevator.ElevatorStage, MotorType.kBrushless);
+  SparkMax ElbowMotor = new SparkMax(CoralElevator.Elbow, MotorType.kBrushless);
+  SparkMax WristMotor = new SparkMax(CoralElevator.Wrist, MotorType.kBrushless);
+  SparkMax CoralIntakeMotor = new SparkMax(CoralElevator.CoralIntake, MotorType.kBrushless);
+
+
+  // PIDs
+
+  ElevatorFeedforward ElevFF = new ElevatorFeedforward(Elevator.ks, Elevator.kg, Elevator.kv);
+  ArmFeedforward ElbowFF = new ArmFeedforward(PIDs.CoralElevator.Elbow.ks, PIDs.CoralElevator.Elbow.kg, PIDs.CoralElevator.Elbow.kv);
+  PIDController ElevatorPID = new PIDController(PIDs.CoralElevator.Elevator.kp, PIDs.CoralElevator.Elevator.ki, PIDs.CoralElevator.Elevator.kd);
+  PIDController ElbowPID = new PIDController(PIDs.CoralElevator.Elbow.kp, PIDs.CoralElevator.Elbow.ki, PIDs.CoralElevator.Elbow.kd);
+  PIDController WristPID = new PIDController(PIDs.CoralElevator.Wrist.kp, PIDs.CoralElevator.Wrist.ki, PIDs.CoralElevator.Wrist.kd);
+
+  // Limit Switch
+
+  DigitalInput ElevatorUpStop = new DigitalInput(DIO.CoralElevator.UpStop);
+  DigitalInput ElevatorDownStop = new DigitalInput(DIO.CoralElevator.DownStop);
+  DigitalInput ElevatorCoralPresence = new DigitalInput(DIO.CoralElevator.CoralPresence);
+
+  boolean UpStop;
+  boolean DownStop;
+  boolean CoralPresent;
+
+  // Encoders
+
+  RelativeEncoder ElevatorEncoder = ElevatorStageMotor.getEncoder();
+  AbsoluteEncoder ElbowAbsoluteEncoder = ElbowMotor.getAbsoluteEncoder();
+  RelativeEncoder ElbowRelativeEncoder = ElbowMotor.getEncoder();
+  AbsoluteEncoder WristAbsoluteEncoder = WristMotor.getAbsoluteEncoder();
+  RelativeEncoder WristRelative = WristMotor.getEncoder();
+
+  double ElbowAngle;
+  double WristAngle;
+
+  // LaserCan
+  private LaserCan LaserCan = new LaserCan(CanIDs.Sensor.LaserCAN);
+  int elevatorHeightMM;
+
+
+  //MotorOutputs
+
+  double elevatorOutput;
+  double elbowOutput;
+  double wristOutput;
+
+  /** Physical Robot Init END**/
+
+  /** SIM Robot Init START */
+  DCMotor ElevatorStageGearbox = DCMotor.getNEO(1);
   DCMotor ElbowGearbox = DCMotor.getNEO(1);
-  SparkMax ElbowMotor = new SparkMax(11, MotorType.kBrushless);
-  SparkMaxSim ElbowMotorSim = new SparkMaxSim(ElbowMotor, ElbowGearbox);
-
   DCMotor WristGearbox = DCMotor.getNEO(1);
-  SparkMax WristMotor = new SparkMax(12, MotorType.kBrushless);
-  SparkMaxSim WrstMotorSim = new SparkMaxSim(WristMotor, WristGearbox);
+  DCMotor CoralIntakeGearbox = DCMotor.getNEO(1);
 
-  //SingleJointedArmSim m_armSim = new SingleJointedArmSim(ElbowGearbox, 1, 0.1, .1, 0, .5*3.145, false, 0, null) ;
-  //ElevatorSim m_ElevSim = new ElevatorSim(null, ElbowGearbox, 0, .25, false, 0, null);
-  ElevatorFeedforward ElevFF = new ElevatorFeedforward(0.1, 0.1, 0.1);
-  ArmFeedforward ArmFF = new ArmFeedforward(0.1, 0.1, 0.1);
+  SparkMaxSim ElevatorUpDownMotorSim = new SparkMaxSim(ElevatorStageMotor, ElevatorStageGearbox);
+  SparkMaxSim ElbowMotorSim = new SparkMaxSim(ElbowMotor, ElbowGearbox);
+  SparkMaxSim WristMotorSim = new SparkMaxSim(WristMotor, WristGearbox);
+  SparkMaxSim CoralIntakeSim = new SparkMaxSim(CoralIntakeMotor, CoralIntakeGearbox);
 
-  PIDController ElevatorPID = new PIDController(0.001, 0, 0.01);
-  PIDController ElbowPID = new PIDController(0.001, 0, 0.01);
-  PIDController WristPID = new PIDController(.001, 0, 0.01);
+  SingleJointedArmSim m_armSim = new SingleJointedArmSim(ElbowGearbox, 1, 0.1, .1, 0, .5*3.145, false, 0, null) ;
+  ElevatorSim m_ElevSim = new ElevatorSim(null, ElbowGearbox, 0, .25, false, 0, null);
 
+
+  /** SIM Robot Init END */
   
 
 
@@ -80,63 +134,72 @@ public class CoralElevatorSubsystem extends SubsystemBase {
       Wrist = Elbow.append(new MechanismLigament2d("Wriat",0.2,90));
     }
   }
-  private void SetElevatorPosition(double Height)
+  private void SetElevatorPosition(double height)
 {
-  if (Height > ElevatorPID.getSetpoint() && CanMoveElevatorUP()){
-    ElevatorPID.setSetpoint(Height);
+  if (height > ElevatorPID.getSetpoint() && CanMoveElevatorUp()){
+    ElevatorPID.setSetpoint(height);
   }
-  if (Height < ElevatorPID.getSetpoint() && CanMoveElevatorDown()){
-    ElevatorPID.setSetpoint(Height);
+  if (height < ElevatorPID.getSetpoint() && CanMoveElevatorDown()){
+    ElevatorPID.setSetpoint(height);
   }
 }
 
-  private void SetElbowPosition(double Angle)
+  private void SetElbowPosition(double angle)
 {
-  if (Angle > ElbowPID.getSetpoint() && CanMoveElbowInc()){
-    ElbowPID.setSetpoint(Angle);
+  if (angle > ElbowPID.getSetpoint() && CanMoveElbowInc()){
+    ElbowPID.setSetpoint(angle);
   }
-  if (Angle < ElbowPID.getSetpoint() && CanMoveElbowDec()){
-    ElbowPID.setSetpoint(Angle);
+  if (angle < ElbowPID.getSetpoint() && CanMoveElbowDec()){
+    ElbowPID.setSetpoint(angle);
   }
 }
-  private void SetWristPosition(double Angle)
+  private void SetWristPosition(double angle)
 {
-  if (Angle > WristPID.getSetpoint() && CanMoveWristInc()){
-    WristPID.setSetpoint(Angle);
+  if (angle > WristPID.getSetpoint() && CanMoveWristInc()){
+    WristPID.setSetpoint(angle);
   }
-  if (Angle < WristPID.getSetpoint() && CanMoveWristDec()){
-    WristPID.setSetpoint(Angle);
+  if (angle < WristPID.getSetpoint() && CanMoveWristDec()){
+    WristPID.setSetpoint(angle);
   }
 }
   
 
     
 
-private Boolean CanMoveElevatorUP(){
-  return false;
+private Boolean CanMoveElevatorUp(){
+  return !UpStop;
 }
 private Boolean CanMoveElevatorDown(){
-  return false;
+  return !DownStop;
 }
 private Boolean CanMoveElbowInc(){
-  return false;
+  return ElbowAngle < RobotLimits.Elbow.maxAngle;
 }
 private Boolean CanMoveElbowDec(){
-  return false;
+  return ElbowAngle > RobotLimits.Elbow.minAngle;
 }
 private Boolean CanMoveWristInc(){
-  return false;
+  return WristAngle < RobotLimits.Wrist.maxAngle;
 }
 private Boolean CanMoveWristDec(){
-  return false;
+  return WristAngle > RobotLimits.Wrist.minAngle;
 }
+
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-    
+    readSensorValues();
+   
+    elevatorOutput = ElevatorPID.calculate(elevatorHeightMM) + ElevFF.calculate(PIDs.CoralElevator.Elevator.maxVelocity);
+    elbowOutput = ElbowPID.calculate(ElbowAngle) + Math.toDegrees(ElbowFF.calculate (Math.toRadians(ElbowAbsoluteEncoder.getPosition()), PIDs.CoralElevator.Elbow.maxVelocity));
+    wristOutput = WristPID.calculate(WristAngle);
 
+    // ElevatorStageMotor.set(elevatorOutput);
+    // ElbowMotor.set(elbowOutput);
+    // WristMotor.set(wristOutput);
 
   }
+  
   @Override
   public void simulationPeriodic() {
     // This method will be called once per scheduler run
@@ -149,24 +212,82 @@ public  SysIdRoutine ElevatorSysIDRun(Config config)
   return new SysIdRoutine(
   config,
    new SysIdRoutine.Mechanism(
-    (voltage) -> this.runVolts(voltage.in(Volts)),
+    (voltage) -> this.sysidElevatorRunVoltage(voltage.in(Volts)),
     null, // No log consumer, since data is recorded by URCL
     this)
     );
 }
-public void runVolts(double V)
+public void sysidElevatorRunVoltage(double V)
 {
-  if (CanMoveElevatorUP() && V>0)
-    ElevatorUPDownMotor.setVoltage(V);
-  else if (CanMoveElevatorDown() && V<0)
-    ElevatorUPDownMotor.setVoltage(V);
-  else ElevatorUPDownMotor.setVoltage(0);
-
+  // if (CanMoveElevatorUp() && V > 0)
+  //   ElevatorStageMotor.setVoltage(V);
+  // else if (CanMoveElevatorDown() && V < 0)
+  //   ElevatorStageMotor.setVoltage(V);
+  // else
+  //   ElevatorStageMotor.setVoltage(0);
 }
+public  SysIdRoutine ElbowSysIDRun(Config config)
+{
+  return new SysIdRoutine(
+  config,
+   new SysIdRoutine.Mechanism(
+    (voltage) -> this.sysidElbowRunVoltage(voltage.in(Volts)),
+    null, // No log consumer, since data is recorded by URCL
+    this)
+    );
+}
+public void sysidElbowRunVoltage(double V)
+{
+  // if (CanMoveElbowInc() && V > 0)
+  //   ElbowMotor.setVoltage(V);
+  // else if (CanMoveElbowDec() && V < 0)
+  //   ElbowMotor.setVoltage(V);
+  // else
+  //   ElbowMotor.setVoltage(0);
+}
+public  SysIdRoutine WristSysIDRun(Config config)
+{
+  return new SysIdRoutine(
+  config,
+   new SysIdRoutine.Mechanism(
+    (voltage) -> this.sysidWristRunVoltage(voltage.in(Volts)),
+    null, // No log consumer, since data is recorded by URCL
+    this)
+    );
+}
+public void sysidWristRunVoltage(double V)
+{
+  // if (CanMoveWristInc() && V > 0)
+  //   WristMotor.setVoltage(V);
+  // else if (CanMoveWristDec() && V < 0)
+  //   WristMotor.setVoltage(V);
+  // else
+  //   WristMotor.setVoltage(0);
+}
+
 public void LogElevatorData()
 {
 
 }
-  
+
+  private void readSensorValues() {
+    UpStop = ElevatorUpStop.get();
+    DownStop = ElevatorDownStop.get();
+    CoralPresent = ElevatorCoralPresence.get();
+
+    ElbowAngle = ElbowAbsoluteEncoder.getPosition();
+    WristAngle = WristAbsoluteEncoder.getPosition();
+
+    LaserCan.Measurement measurement = LaserCan.getMeasurement();
+    
+
+    if (measurement != null && measurement.status == LaserCan.LASERCAN_STATUS_VALID_MEASUREMENT) {
+      elevatorHeightMM = measurement.distance_mm;
+    } else {
+      System.out.println("Oh no! The target is out of range, or we can't get a reliable measurement!");
+      // You can still use distance_mm in here, if you're ok tolerating a clamped value or an unreliable measurement.
+    }
+  }
+
 }
 

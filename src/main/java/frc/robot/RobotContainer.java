@@ -16,8 +16,12 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Config;
 import frc.robot.Constants.OperatorConstants;
+import frc.robot.Constants.AbsoluteEncoderID.Climber;
 import frc.robot.commands.swervedrive.drivebase.AbsoluteDriveAdv;
+import frc.robot.subsystems.AlgaeIntake.AlgaeIntakeSubsystem;
+import frc.robot.subsystems.Climber.ClimberSubsystem;
 import frc.robot.subsystems.CoralElevator.CoralElevatorSubsystem;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 import java.io.File;
@@ -37,6 +41,8 @@ public class RobotContainer
   private final SwerveSubsystem       drivebase  = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(),
                                                                                 "swerve/maxSwerve"));
   private final CoralElevatorSubsystem CoralElevatorSS = new CoralElevatorSubsystem();
+  private final ClimberSubsystem ClimberSS = new ClimberSubsystem();
+  private final AlgaeIntakeSubsystem AlgaeIntakeSS = new AlgaeIntakeSubsystem();
   // Applies deadbands and inverts controls because joysticks
   // are back-right positive while robot
   // controls are front-left positive
@@ -147,12 +153,18 @@ public class RobotContainer
       drivebase.setDefaultCommand(driveFieldOrientedAnglularVelocity); // Overrides drive command above!
 
       driverXbox.b().whileTrue(drivebase.sysIdDriveMotorCommand());
-      driverXbox.x().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
-      driverXbox.y().whileTrue(drivebase.driveToDistanceCommand(3.0, 0.2));
+      driverXbox.a().whileTrue(drivebase.sysIdAngleMotorCommand());
+      driverXbox.x().whileTrue(Commands.run(() -> CoralElevatorSS.ElevatorSysIDRun(new Config()),CoralElevatorSS));
+      driverXbox.y().whileTrue(Commands.run(() -> CoralElevatorSS.ElbowSysIDRun(new Config()),CoralElevatorSS));
+      driverXbox.leftBumper().whileTrue(Commands.run(() -> CoralElevatorSS.WristSysIDRun(new Config()),CoralElevatorSS));
+      driverXbox.rightBumper().whileTrue(Commands.run(() -> AlgaeIntakeSS.PivotSysIDRun(new Config()),AlgaeIntakeSS));
+      driverXbox.back().whileTrue(Commands.run(() -> ClimberSS.ClimberSysIDRun(new Config()),ClimberSS));
+      // driverXbox.x().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
+      // driverXbox.y().whileTrue(drivebase.driveToDistanceCommand(3.0, 0.2));
       driverXbox.start().onTrue((Commands.runOnce(drivebase::zeroGyro)));
-      driverXbox.back().whileTrue(drivebase.centerModulesCommand());
-      driverXbox.leftBumper().onTrue(Commands.none());
-      driverXbox.rightBumper().onTrue(Commands.none());
+      // driverXbox.back().whileTrue(drivebase.centerModulesCommand());
+      // driverXbox.leftBumper().onTrue(Commands.none());
+      // driverXbox.rightBumper().onTrue(Commands.none());
     } else
     {
       driverXbox.a().onTrue((Commands.runOnce(drivebase::zeroGyro)));

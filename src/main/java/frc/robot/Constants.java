@@ -4,6 +4,8 @@
 
 package frc.robot;
 
+import java.io.ObjectInputFilter.Status;
+
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
 import swervelib.math.Matter;
@@ -48,4 +50,193 @@ public final class Constants
     public static final double RIGHT_X_DEADBAND = -0.1;
     public static final double TURN_CONSTANT    = 6;
   }
+
+  public static class PIDs {
+    public static class Climber {
+      public static final double kp = 0.1;
+      public static final double ki = 0.1;
+      public static final double kd = 0.1;
+    
+      public static final double ks = 0.1;
+      public static final double kg = 0.1;
+      public static final double kv = 0.1;
+
+      public static final double maxVelocity = 0.01;
+    }
+    public static class CoralElevator {
+      public static class Elevator{
+        public static final double kp = 0.1;
+        public static final double ki = 0.1;
+        public static final double kd = 0.1;
+
+        public static final double ks = 0.1;
+        public static final double kg = 0.1;
+        public static final double kv = 0.1;
+
+        public static final double maxVelocity = 0.01;
+      }
+      public static class Elbow{
+        public static final double kp = 0.1;
+        public static final double ki = 0.1;
+        public static final double kd = 0.1;
+
+        public static final double ks = 0.1;
+        public static final double kg = 0.1;
+        public static final double kv = 0.1;
+        
+        public static final double maxVelocity = 0.01;
+      }
+      public static class Wrist{
+        public static final double kp = 0.1;
+        public static final double ki = 0.1;
+        public static final double kd = 0.1;
+        
+        public static final double ks = 0.1;
+        public static final double kg = 0.1;
+        public static final double kv = 0.1;
+        
+        public static final double maxVelocity = 0.01;
+      }
+    }
+    public static class AlgaeIntake {
+      public static final double kp = 0.1;
+      public static final double ki = 0.1;
+      public static final double kd = 0.1;
+      
+      public static final double ks = 0.1;
+      public static final double kg = 0.1;
+      public static final double kv = 0.1;
+      
+      public static final double maxVelocity = 0.01;
+    }
+  }
+
+  public static class CanIDs {
+    public static class DriveMotors {
+      public static final int FL = 3;
+      public static final int FR = 5;
+      public static final int BR = 7;
+      public static final int BL = 9;
+    }
+
+    public static class  RotationMotors {
+      public static final int FL = 2;
+      public static final int FR = 4;
+      public static final int BR = 6;
+      public static final int BL = 8;
+    }
+
+    public static class CoralElevator {
+      public static final int ElevatorStage = 10;
+      public static final int Elbow = 11;
+      public static final int Wrist = 12;
+      public static final int CoralIntake = 13;
+    }
+
+    public static class AlgaeIntake {
+      public static final int Pivot = 14;
+      public static final int BallIntake = 15;
+    }
+
+    public static class Climber {
+      public static final int Winch = 17;
+    }
+
+    public static class Sensor {
+    public static final int LaserCAN = 16;
+    public static final int Pigeon = 18;
+    }
+  }
+
+  public static class DIO {
+    public static class CoralElevator {
+      public static final int DownStop = 1;
+      public static final int UpStop = 2;
+      public static final int CoralPresence = 3;
+    }
+
+    public static class AlgaeIntake {
+      public static final int AlgaePresence = 0;
+    }
+
+    public static class Climber {
+      public static final int CagePresence = 4;
+    }
+  }
+
+  public static class AbsoluteEncoderID {
+    public static class Swerve {
+      public static final int FLRot = CanIDs.RotationMotors.FL;
+      public static final int FRRot = CanIDs.RotationMotors.FR;
+      public static final int BRRot = CanIDs.RotationMotors.BR;
+      public static final int BLRot = CanIDs.RotationMotors.BL;
+    }
+
+    public static class CoralElevator {
+      public static final int ElbowAngle = CanIDs.CoralElevator.Elbow;
+      public static final int WristAngle = CanIDs.CoralElevator.Wrist;
+    }
+
+    public static class AlgaeIntake {
+      public static final int AlgaeAngle  = CanIDs.AlgaeIntake.Pivot;
+    }
+
+    public static class Climber {
+      public static final int ClimberAngle  = CanIDs.Climber.Winch;
+    }
+  }
+
+  public static class Vision {
+    public static class AprilTag {
+      public static class Gray {
+        public static final int Cam1 = 1;
+        public static final int Cam2 = 2;
+      }
+
+      public static class Red {
+        public static final int Cam3 = 3;
+        public static final int Cam4 = 4;
+      }
+
+      public static class Blue {
+        public static final int Cam5 = 5;
+        public static final int Cam6 = 6;
+      }
+    }
+
+    public static class CoralElevator {
+      public static  final int CoralDetector = 7;
+    }
+  }
+
+  public static class RobotLimits {
+    public static class Elbow {
+      public static final double minAngle = 0;
+      public static final double maxAngle = 360;
+    }
+
+    public static class Wrist {
+      public static final double minAngle = 0;
+      public static final double maxAngle = 360;
+    }
+
+    public static class Algae {
+      public static final double minAngle = 0;
+      public static final double maxAngle = 360;
+    }
+
+    public static class Climber {
+      public static final double minAngle = 0;
+      public static final double maxAngle = 360;
+    }
+    public static class AlgaeIntake {
+      public static final double minAngle = 0;
+      public static final double maxAngle = 360;
+    }
+  }
 }
+
+
+
+     
+ 
