@@ -213,25 +213,30 @@ public final class Constants
     public static class Elbow {
       public static final double minAngle = 0;
       public static final double maxAngle = 360;
+      public static final double offset = 0;
     }
 
     public static class Wrist {
       public static final double minAngle = 0;
       public static final double maxAngle = 360;
+      public static final double offset = 0;
     }
 
     public static class Algae {
       public static final double minAngle = 0;
       public static final double maxAngle = 360;
+      public static final double offset = 0;
     }
 
     public static class Climber {
       public static final double minAngle = 0;
       public static final double maxAngle = 360;
+      public static final double offset = 0;
     }
     public static class AlgaeIntake {
       public static final double minAngle = 0;
-      public static final double maxAngle = 360;
+      public static final double maxAngle = 60;
+      public static final double offset = 0;
     }
   }
 }

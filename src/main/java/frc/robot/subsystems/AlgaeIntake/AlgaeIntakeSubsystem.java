@@ -7,15 +7,18 @@ package frc.robot.subsystems.AlgaeIntake;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.RobotController;
 
 import static edu.wpi.first.units.Units.Volts;
 
+import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkAbsoluteEncoder;
 import com.revrobotics.spark.SparkBase;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkRelativeEncoder;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Config;
@@ -24,6 +27,8 @@ import frc.robot.Constants.PIDs;
 import frc.robot.Constants.RobotLimits;
 import frc.robot.Constants.DIO.AlgaeIntake;
 import frc.robot.Robot;
+
+import dev.doglog.*;
 
 public class AlgaeIntakeSubsystem extends SubsystemBase {
   /** Creates a new IntakeSubSystem. */
@@ -39,6 +44,7 @@ public class AlgaeIntakeSubsystem extends SubsystemBase {
 
     private DigitalInput algaePresence;
     private boolean algaePresent;
+
 
   public AlgaeIntakeSubsystem() {
     pivotMotor = new SparkMax(CanIDs.AlgaeIntake.Pivot, MotorType.kBrushless);
@@ -75,18 +81,18 @@ public class AlgaeIntakeSubsystem extends SubsystemBase {
     return algaePresent;
   }
 
-  private Boolean CanMoveIntakeInc(){
-    return pivotAngle < RobotLimits.AlgaeIntake.maxAngle;
-  }
-  private Boolean CanMoveIntakeDec(){
+  private Boolean CanMoveIntakeIn(){
     return pivotAngle > RobotLimits.AlgaeIntake.minAngle;
+  }
+  private Boolean CanMoveIntakeOut(){
+    return pivotAngle < RobotLimits.AlgaeIntake.maxAngle;
   }
   public void SetIntakeAngle(double angle)
   {
-    if (angle > pivotPID.getSetpoint() && CanMoveIntakeInc()){
+    if (angle > pivotPID.getSetpoint() && CanMoveIntakeOut()){
       pivotPID.setSetpoint(angle);
     }
-    if (angle < pivotPID.getSetpoint() && CanMoveIntakeDec()){
+    if (angle < pivotPID.getSetpoint() && CanMoveIntakeIn()){
       pivotPID.setSetpoint(angle);
     }
   }
@@ -94,28 +100,43 @@ public class AlgaeIntakeSubsystem extends SubsystemBase {
     return pivotAngle;
   }
   
-   public SysIdRoutine PivotSysIDRun(Config config)
-  {
-    return new SysIdRoutine(
-    config,
-    new SysIdRoutine.Mechanism(
-      (voltage) -> this.sysidPivotRunVoltage(voltage.in(Volts)),
-      null, // No log consumer, since data is recorded by URCL
-      this)
-      );
-  }
-  public void sysidPivotRunVoltage(double V)
-  {
-    // if (CanMoveIntakeInc() && V > 0)
-    //   pivotMotor.setVoltage(V);
-    // else if (CanMoveIntakeDec() && V < 0)
-    //   pivotMotor.setVoltage(V);
-    // else
-    //   pivotMotor.setVoltage(0);
-  }
+
 
   private void ReadSensorValues() {
     algaePresent = algaePresence.get();
     pivotAngle = pivotAbsoluteEncoder.getPosition();
+  }
+
+  // SysID nonsense
+
+  private final SysIdRoutine PivotSysID = new SysIdRoutine
+  (new SysIdRoutine.Config(),
+   new SysIdRoutine.Mechanism(
+    (voltage) -> this.sysidPivotRunVoltage(voltage.in(Volts)),
+    log -> {
+      DogLog.log("SysID/Algae/VoltageApplied", pivotMotor.getAppliedOutput() * pivotMotor.getBusVoltage());
+      DogLog.log("SysID/Algae/Position", pivotAbsoluteEncoder.getPosition());
+      DogLog.log("SysID/Algae/Velocity", pivotAbsoluteEncoder.getVelocity());
+    },
+    this));
+
+  public void sysidPivotRunVoltage(double V)
+  {
+    if (CanMoveIntakeIn() && V > 0)
+      pivotMotor.setVoltage(V / RobotController.getBatteryVoltage());
+    else if (CanMoveIntakeOut() && V < 0)
+      pivotMotor.setVoltage(V / RobotController.getBatteryVoltage());
+    else
+      pivotMotor.setVoltage(0);
+  }
+
+  
+
+  public Command sysIdQuasistatic(SysIdRoutine.Direction direction) {
+    return PivotSysID.quasistatic(direction);
+  }
+
+  public Command sysIdDynamic(SysIdRoutine.Direction direction) {
+    return PivotSysID.dynamic(direction);
   }
 }

@@ -94,7 +94,7 @@ public class CoralElevatorSubsystem extends SubsystemBase {
 
   // LaserCan
   private LaserCan LaserCan = new LaserCan(CanIDs.Sensor.LaserCAN);
-  int elevatorHeightMM;
+  int elevatorHeightMM = 0;
 
 
   //MotorOutputs
@@ -116,8 +116,8 @@ public class CoralElevatorSubsystem extends SubsystemBase {
   SparkMaxSim WristMotorSim = new SparkMaxSim(WristMotor, WristGearbox);
   SparkMaxSim CoralIntakeSim = new SparkMaxSim(CoralIntakeMotor, CoralIntakeGearbox);
 
-  SingleJointedArmSim m_armSim = new SingleJointedArmSim(ElbowGearbox, 1, 0.1, .1, 0, .5*3.145, false, 0, null) ;
-  ElevatorSim m_ElevSim = new ElevatorSim(null, ElbowGearbox, 0, .25, false, 0, null);
+  // SingleJointedArmSim m_armSim = new SingleJointedArmSim(ElbowGearbox, 1, 0.1, .1, 0, .5*3.145, false, 0, null) ;
+  // ElevatorSim m_ElevSim = new ElevatorSim(null, ElbowGearbox, 0, .25, false, 0, null);
 
 
   /** SIM Robot Init END */
@@ -257,7 +257,7 @@ public  SysIdRoutine WristSysIDRun(Config config)
 }
 public void sysidWristRunVoltage(double V)
 {
-  // if (CanMoveWristInc() && V > 0)
+  // if (CanMoveWristInc() && V > 0) 
   //   WristMotor.setVoltage(V);
   // else if (CanMoveWristDec() && V < 0)
   //   WristMotor.setVoltage(V);

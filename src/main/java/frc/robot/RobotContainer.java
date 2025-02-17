@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Config;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.Constants.AbsoluteEncoderID.Climber;
@@ -152,19 +153,65 @@ public class RobotContainer
     {
       drivebase.setDefaultCommand(driveFieldOrientedAnglularVelocity); // Overrides drive command above!
 
-      driverXbox.b().whileTrue(drivebase.sysIdDriveMotorCommand());
-      driverXbox.a().whileTrue(drivebase.sysIdAngleMotorCommand());
-      driverXbox.x().whileTrue(Commands.run(() -> CoralElevatorSS.ElevatorSysIDRun(new Config()),CoralElevatorSS));
-      driverXbox.y().whileTrue(Commands.run(() -> CoralElevatorSS.ElbowSysIDRun(new Config()),CoralElevatorSS));
-      driverXbox.leftBumper().whileTrue(Commands.run(() -> CoralElevatorSS.WristSysIDRun(new Config()),CoralElevatorSS));
-      driverXbox.rightBumper().whileTrue(Commands.run(() -> AlgaeIntakeSS.PivotSysIDRun(new Config()),AlgaeIntakeSS));
-      driverXbox.back().whileTrue(Commands.run(() -> ClimberSS.ClimberSysIDRun(new Config()),ClimberSS));
       // driverXbox.x().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
       // driverXbox.y().whileTrue(drivebase.driveToDistanceCommand(3.0, 0.2));
       driverXbox.start().onTrue((Commands.runOnce(drivebase::zeroGyro)));
       // driverXbox.back().whileTrue(drivebase.centerModulesCommand());
       // driverXbox.leftBumper().onTrue(Commands.none());
       // driverXbox.rightBumper().onTrue(Commands.none());
+
+
+      //SysID Nonsense (Comment out when done)
+      //Run in this order: a, b, x, y
+
+      //DriveBase
+
+      // driverXbox.a().whileTrue(drivebase.sysIdDriveMotorCommand());
+      // driverXbox.b().whileTrue(drivebase.sysIdAngleMotorCommand());
+ 
+      
+      //Algae
+
+      driverXbox.a().whileTrue(AlgaeIntakeSS.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
+      driverXbox.b().whileTrue(AlgaeIntakeSS.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
+      driverXbox.x().whileTrue(AlgaeIntakeSS.sysIdDynamic(SysIdRoutine.Direction.kForward));
+      driverXbox.y().whileTrue(AlgaeIntakeSS.sysIdDynamic(SysIdRoutine.Direction.kReverse));
+
+      
+      //Elevator
+
+      driverXbox.a().whileTrue(CoralElevatorSS.sysIdQuasistaticElevator(SysIdRoutine.Direction.kForward));
+      driverXbox.b().whileTrue(CoralElevatorSS.sysIdQuasistaticElevator(SysIdRoutine.Direction.kReverse));
+      driverXbox.x().whileTrue(CoralElevatorSS.sysIdDynamicElevator(SysIdRoutine.Direction.kForward));
+      driverXbox.y().whileTrue(CoralElevatorSS.sysIdDynamicElevator(SysIdRoutine.Direction.kReverse));
+
+
+      //Elbow
+
+
+      driverXbox.a().whileTrue(CoralElevatorSS.sysIdQuasistaticElbow(SysIdRoutine.Direction.kForward));
+      driverXbox.b().whileTrue(CoralElevatorSS.sysIdQuasistaticElbow(SysIdRoutine.Direction.kReverse));
+      driverXbox.x().whileTrue(CoralElevatorSS.sysIdDynamicElbow(SysIdRoutine.Direction.kForward));
+      driverXbox.y().whileTrue(CoralElevatorSS.sysIdDynamicElbow(SysIdRoutine.Direction.kReverse));
+
+
+      //Wrist
+
+      driverXbox.a().whileTrue(CoralElevatorSS.sysIdQuasistaticWrist(SysIdRoutine.Direction.kForward));
+      driverXbox.b().whileTrue(CoralElevatorSS.sysIdQuasistaticWrist(SysIdRoutine.Direction.kReverse));
+      driverXbox.x().whileTrue(CoralElevatorSS.sysIdDynamicWrist(SysIdRoutine.Direction.kForward));
+      driverXbox.y().whileTrue(CoralElevatorSS.sysIdDynamicWrist(SysIdRoutine.Direction.kReverse));
+
+
+      //Climber
+
+      driverXbox.a().whileTrue(ClimberSS.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
+      driverXbox.b().whileTrue(ClimberSS.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
+      driverXbox.x().whileTrue(ClimberSS.sysIdDynamic(SysIdRoutine.Direction.kForward));
+      driverXbox.y().whileTrue(ClimberSS.sysIdDynamic(SysIdRoutine.Direction.kReverse));
+
+
+
     } else
     {
       driverXbox.a().onTrue((Commands.runOnce(drivebase::zeroGyro)));
