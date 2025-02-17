@@ -5,12 +5,16 @@
 package frc.robot;
 
 import com.pathplanner.lib.auto.NamedCommands;
+
+import dev.doglog.DogLog;
+import dev.doglog.DogLogOptions;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
+import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -129,6 +133,14 @@ public class RobotContainer
     configureBindings();
     DriverStation.silenceJoystickConnectionWarning(true);
     NamedCommands.registerCommand("test", Commands.print("I EXIST"));
+
+    if (Robot.isSimulation()) 
+      DogLog.setOptions(new DogLogOptions().withNtPublish(true));
+    else
+      DogLog.setOptions(new DogLogOptions().withNtPublish(false));
+
+    DogLog.setPdh(new PowerDistribution());
+    DogLog.setEnabled(true);
   }
 
   /**
@@ -166,33 +178,33 @@ public class RobotContainer
 
       //DriveBase
 
-      // driverXbox.a().whileTrue(drivebase.sysIdDriveMotorCommand());
-      // driverXbox.b().whileTrue(drivebase.sysIdAngleMotorCommand());
+      driverXbox.a().whileTrue(drivebase.sysIdDriveMotorCommand());
+      driverXbox.b().whileTrue(drivebase.sysIdAngleMotorCommand());
  
       
       //Algae
 
-      driverXbox.a().whileTrue(AlgaeIntakeSS.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
-      driverXbox.b().whileTrue(AlgaeIntakeSS.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
-      driverXbox.x().whileTrue(AlgaeIntakeSS.sysIdDynamic(SysIdRoutine.Direction.kForward));
-      driverXbox.y().whileTrue(AlgaeIntakeSS.sysIdDynamic(SysIdRoutine.Direction.kReverse));
+      // driverXbox.a().whileTrue(AlgaeIntakeSS.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
+      // driverXbox.b().whileTrue(AlgaeIntakeSS.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
+      // driverXbox.x().whileTrue(AlgaeIntakeSS.sysIdDynamic(SysIdRoutine.Direction.kForward));
+      // driverXbox.y().whileTrue(AlgaeIntakeSS.sysIdDynamic(SysIdRoutine.Direction.kReverse));
 
       
       //Elevator
 
-      driverXbox.a().whileTrue(CoralElevatorSS.sysIdQuasistaticElevator(SysIdRoutine.Direction.kForward));
-      driverXbox.b().whileTrue(CoralElevatorSS.sysIdQuasistaticElevator(SysIdRoutine.Direction.kReverse));
-      driverXbox.x().whileTrue(CoralElevatorSS.sysIdDynamicElevator(SysIdRoutine.Direction.kForward));
-      driverXbox.y().whileTrue(CoralElevatorSS.sysIdDynamicElevator(SysIdRoutine.Direction.kReverse));
+      // driverXbox.a().whileTrue(CoralElevatorSS.sysIdQuasistaticElevator(SysIdRoutine.Direction.kForward));
+      // driverXbox.b().whileTrue(CoralElevatorSS.sysIdQuasistaticElevator(SysIdRoutine.Direction.kReverse));
+      // driverXbox.x().whileTrue(CoralElevatorSS.sysIdDynamicElevator(SysIdRoutine.Direction.kForward));
+      // driverXbox.y().whileTrue(CoralElevatorSS.sysIdDynamicElevator(SysIdRoutine.Direction.kReverse));
 
 
       //Elbow
 
 
-      driverXbox.a().whileTrue(CoralElevatorSS.sysIdQuasistaticElbow(SysIdRoutine.Direction.kForward));
-      driverXbox.b().whileTrue(CoralElevatorSS.sysIdQuasistaticElbow(SysIdRoutine.Direction.kReverse));
-      driverXbox.x().whileTrue(CoralElevatorSS.sysIdDynamicElbow(SysIdRoutine.Direction.kForward));
-      driverXbox.y().whileTrue(CoralElevatorSS.sysIdDynamicElbow(SysIdRoutine.Direction.kReverse));
+      // driverXbox.a().whileTrue(CoralElevatorSS.sysIdQuasistaticElbow(SysIdRoutine.Direction.kForward));
+      // driverXbox.b().whileTrue(CoralElevatorSS.sysIdQuasistaticElbow(SysIdRoutine.Direction.kReverse));
+      // driverXbox.x().whileTrue(CoralElevatorSS.sysIdDynamicElbow(SysIdRoutine.Direction.kForward));
+      // driverXbox.y().whileTrue(CoralElevatorSS.sysIdDynamicElbow(SysIdRoutine.Direction.kReverse));
 
 
       //Wrist
@@ -205,10 +217,10 @@ public class RobotContainer
 
       //Climber
 
-      driverXbox.a().whileTrue(ClimberSS.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
-      driverXbox.b().whileTrue(ClimberSS.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
-      driverXbox.x().whileTrue(ClimberSS.sysIdDynamic(SysIdRoutine.Direction.kForward));
-      driverXbox.y().whileTrue(ClimberSS.sysIdDynamic(SysIdRoutine.Direction.kReverse));
+      // driverXbox.a().whileTrue(ClimberSS.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
+      // driverXbox.b().whileTrue(ClimberSS.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
+      // driverXbox.x().whileTrue(ClimberSS.sysIdDynamic(SysIdRoutine.Direction.kForward));
+      // driverXbox.y().whileTrue(ClimberSS.sysIdDynamic(SysIdRoutine.Direction.kReverse));
 
 
 

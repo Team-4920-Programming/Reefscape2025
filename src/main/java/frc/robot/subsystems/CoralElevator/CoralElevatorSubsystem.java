@@ -20,12 +20,14 @@ import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.simulation.ElevatorSim;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Config;
@@ -39,6 +41,7 @@ import frc.robot.Constants.RobotLimits;
 import frc.robot.Robot;
 
 import au.grapplerobotics.LaserCan;
+import dev.doglog.DogLog;
 import au.grapplerobotics.ConfigurationFailedException;
 import edu.wpi.first.wpilibj.TimedRobot;
 
@@ -207,68 +210,7 @@ private Boolean CanMoveWristDec(){
     SmartDashboard.putData  ("Simulation/Elevator",SimElevator);
 
   }
-public  SysIdRoutine ElevatorSysIDRun(Config config)
-{
-  return new SysIdRoutine(
-  config,
-   new SysIdRoutine.Mechanism(
-    (voltage) -> this.sysidElevatorRunVoltage(voltage.in(Volts)),
-    null, // No log consumer, since data is recorded by URCL
-    this)
-    );
-}
-public void sysidElevatorRunVoltage(double V)
-{
-  // if (CanMoveElevatorUp() && V > 0)
-  //   ElevatorStageMotor.setVoltage(V);
-  // else if (CanMoveElevatorDown() && V < 0)
-  //   ElevatorStageMotor.setVoltage(V);
-  // else
-  //   ElevatorStageMotor.setVoltage(0);
-}
-public  SysIdRoutine ElbowSysIDRun(Config config)
-{
-  return new SysIdRoutine(
-  config,
-   new SysIdRoutine.Mechanism(
-    (voltage) -> this.sysidElbowRunVoltage(voltage.in(Volts)),
-    null, // No log consumer, since data is recorded by URCL
-    this)
-    );
-}
-public void sysidElbowRunVoltage(double V)
-{
-  // if (CanMoveElbowInc() && V > 0)
-  //   ElbowMotor.setVoltage(V);
-  // else if (CanMoveElbowDec() && V < 0)
-  //   ElbowMotor.setVoltage(V);
-  // else
-  //   ElbowMotor.setVoltage(0);
-}
-public  SysIdRoutine WristSysIDRun(Config config)
-{
-  return new SysIdRoutine(
-  config,
-   new SysIdRoutine.Mechanism(
-    (voltage) -> this.sysidWristRunVoltage(voltage.in(Volts)),
-    null, // No log consumer, since data is recorded by URCL
-    this)
-    );
-}
-public void sysidWristRunVoltage(double V)
-{
-  // if (CanMoveWristInc() && V > 0) 
-  //   WristMotor.setVoltage(V);
-  // else if (CanMoveWristDec() && V < 0)
-  //   WristMotor.setVoltage(V);
-  // else
-  //   WristMotor.setVoltage(0);
-}
 
-public void LogElevatorData()
-{
-
-}
 
   private void readSensorValues() {
     UpStop = ElevatorUpStop.get();
@@ -287,6 +229,108 @@ public void LogElevatorData()
       System.out.println("Oh no! The target is out of range, or we can't get a reliable measurement!");
       // You can still use distance_mm in here, if you're ok tolerating a clamped value or an unreliable measurement.
     }
+  }
+
+  // SysID nonsense
+
+  //Elevator
+
+  private final SysIdRoutine ElevatorSysID = new SysIdRoutine
+  (new SysIdRoutine.Config(),
+   new SysIdRoutine.Mechanism(
+    (voltage) -> this.sysidElevatorRunVoltage(voltage.in(Volts)),
+    log -> {
+      DogLog.log("SysID/Elevator/VoltageApplied", ElevatorStageMotor.getAppliedOutput() * ElevatorStageMotor.getBusVoltage());
+      DogLog.log("SysID/Elevator/Position", ElevatorEncoder.getPosition());
+      DogLog.log("SysID/Elevator/Velocity", ElevatorEncoder.getVelocity());
+    },
+    this));
+
+  public void sysidElevatorRunVoltage(double V)
+  {
+    if (CanMoveElevatorUp() && V > 0)
+    ElevatorStageMotor.setVoltage(V / RobotController.getBatteryVoltage());
+    else if (CanMoveElevatorDown() && V < 0)
+    ElevatorStageMotor.setVoltage(V / RobotController.getBatteryVoltage());
+    else
+      ElevatorStageMotor.setVoltage(0);
+  }
+
+  
+
+  public Command sysIdQuasistaticElevator(SysIdRoutine.Direction direction) {
+    return ElevatorSysID.quasistatic(direction);
+  }
+
+  public Command sysIdDynamicElevator(SysIdRoutine.Direction direction) {
+    return ElevatorSysID.dynamic(direction);
+  }
+
+
+  //Elbow
+
+  private final SysIdRoutine ElbowSysID = new SysIdRoutine
+  (new SysIdRoutine.Config(),
+   new SysIdRoutine.Mechanism(
+    (voltage) -> this.sysidElbowRunVoltage(voltage.in(Volts)),
+    log -> {
+      DogLog.log("SysID/Elbow/VoltageApplied", ElbowMotor.getAppliedOutput() * ElbowMotor.getBusVoltage());
+      DogLog.log("SysID/Elbow/Position", ElbowAbsoluteEncoder.getPosition());
+      DogLog.log("SysID/Elbow/Velocity", ElbowAbsoluteEncoder.getVelocity());
+    },
+    this));
+
+  public void sysidElbowRunVoltage(double V)
+  {
+    if (CanMoveElevatorUp() && V > 0)
+    ElbowMotor.setVoltage(V / RobotController.getBatteryVoltage());
+    else if (CanMoveElevatorDown() && V < 0)
+    ElbowMotor.setVoltage(V / RobotController.getBatteryVoltage());
+    else
+    ElbowMotor.setVoltage(0);
+  }
+
+  
+
+  public Command sysIdQuasistaticElbow(SysIdRoutine.Direction direction) {
+    return ElbowSysID.quasistatic(direction);
+  }
+
+  public Command sysIdDynamicElbow(SysIdRoutine.Direction direction) {
+    return ElbowSysID.dynamic(direction);
+  }
+
+  //Wrist
+
+  private final SysIdRoutine WristSysID = new SysIdRoutine
+  (new SysIdRoutine.Config(),
+   new SysIdRoutine.Mechanism(
+    (voltage) -> this.sysidWristRunVoltage(voltage.in(Volts)),
+    log -> {
+      DogLog.log("SysID/Wrist/VoltageApplied", WristMotor.getAppliedOutput() * WristMotor.getBusVoltage());
+      DogLog.log("SysID/Wrist/Position", WristAbsoluteEncoder.getPosition());
+      DogLog.log("SysID/Wrist/Velocity", WristAbsoluteEncoder.getVelocity());
+    },
+    this));
+
+  public void sysidWristRunVoltage(double V)
+  {
+    if (CanMoveElevatorUp() && V > 0)
+    WristMotor.setVoltage(V / RobotController.getBatteryVoltage());
+    else if (CanMoveElevatorDown() && V < 0)
+    WristMotor.setVoltage(V / RobotController.getBatteryVoltage());
+    else
+    WristMotor.setVoltage(0);
+  }
+
+  
+
+  public Command sysIdQuasistaticWrist(SysIdRoutine.Direction direction) {
+    return WristSysID.quasistatic(direction);
+  }
+
+  public Command sysIdDynamicWrist(SysIdRoutine.Direction direction) {
+    return WristSysID.dynamic(direction);
   }
 
 }
