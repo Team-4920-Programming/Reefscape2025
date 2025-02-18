@@ -4,6 +4,11 @@
 
 package frc.robot;
 
+import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.MetersPerSecondPerSecond;
+import static edu.wpi.first.units.Units.Second;
+
 import java.io.ObjectInputFilter.Status;
 
 import edu.wpi.first.math.geometry.Translation3d;
@@ -65,15 +70,19 @@ public final class Constants
     }
     public static class CoralElevator {
       public static class Elevator{
-        public static final double kp = 0.1;
-        public static final double ki = 0.1;
-        public static final double kd = 0.1;
+        public static final double kp = 3.194;
+        public static final double ki = 0.0;
+        public static final double kd = 0.0;
 
-        public static final double ks = 0.1;
-        public static final double kg = 0.1;
-        public static final double kv = 0.1;
+        public static final double ks = 0.26271;
+        public static final double kv = 11.634;
+        public static final double ka = 1.8901;
+        public static final double kg = 0.4;
 
-        public static final double maxVelocity = 0.01;
+        public static double maxVelocity = Meters.of(4).per(Second).in(MetersPerSecond);
+        public static double maxAcceleration = Meters.of(8).per(Second).per(Second).in(MetersPerSecondPerSecond);
+        public static final double pulleyRadius = Units.inchesToMeters(1.0);
+        public static final double elevatorReduction = 16;
       }
       public static class Elbow{
         public static final double kp = 0.1;
@@ -222,10 +231,11 @@ public final class Constants
       public static final double offset = 0;
     }
 
-    public static class Algae {
-      public static final double minAngle = 0;
-      public static final double maxAngle = 360;
-      public static final double offset = 0;
+    public static class Elevator {
+      public static final double offset = 0.03;
+      public static final double minHeight = 0+offset;
+      public static final double maxHeight = 360+offset;
+      
     }
 
     public static class Climber {

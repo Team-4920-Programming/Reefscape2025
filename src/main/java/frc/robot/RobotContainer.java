@@ -24,6 +24,7 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Config;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.Constants.AbsoluteEncoderID.Climber;
+import frc.robot.commands.Elevator.TeleOp.MoveElevatorToPosition;
 import frc.robot.commands.swervedrive.drivebase.AbsoluteDriveAdv;
 import frc.robot.subsystems.AlgaeIntake.AlgaeIntakeSubsystem;
 import frc.robot.subsystems.Climber.ClimberSubsystem;
@@ -31,7 +32,6 @@ import frc.robot.subsystems.CoralElevator.CoralElevatorSubsystem;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 import java.io.File;
 import swervelib.SwerveInputStream;
-
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a "declarative" paradigm, very
  * little robot logic should actually be handled in the {@link Robot} periodic methods (other than the scheduler calls).
@@ -178,8 +178,8 @@ public class RobotContainer
 
       //DriveBase
 
-      driverXbox.a().whileTrue(drivebase.sysIdDriveMotorCommand());
-      driverXbox.b().whileTrue(drivebase.sysIdAngleMotorCommand());
+      // driverXbox.a().whileTrue(drivebase.sysIdDriveMotorCommand());
+      // driverXbox.b().whileTrue(drivebase.sysIdAngleMotorCommand());
  
       
       //Algae
@@ -196,7 +196,9 @@ public class RobotContainer
       // driverXbox.b().whileTrue(CoralElevatorSS.sysIdQuasistaticElevator(SysIdRoutine.Direction.kReverse));
       // driverXbox.x().whileTrue(CoralElevatorSS.sysIdDynamicElevator(SysIdRoutine.Direction.kForward));
       // driverXbox.y().whileTrue(CoralElevatorSS.sysIdDynamicElevator(SysIdRoutine.Direction.kReverse));
-
+      // driverXbox.leftBumper().whileTrue(CoralElevatorSS.sysIDElevatorAll());
+      driverXbox.leftBumper().whileTrue(new MoveElevatorToPosition(CoralElevatorSS, 0.03));
+      driverXbox.rightBumper().whileTrue(new MoveElevatorToPosition(CoralElevatorSS, 0.5));
 
       //Elbow
 
@@ -209,10 +211,10 @@ public class RobotContainer
 
       //Wrist
 
-      driverXbox.a().whileTrue(CoralElevatorSS.sysIdQuasistaticWrist(SysIdRoutine.Direction.kForward));
-      driverXbox.b().whileTrue(CoralElevatorSS.sysIdQuasistaticWrist(SysIdRoutine.Direction.kReverse));
-      driverXbox.x().whileTrue(CoralElevatorSS.sysIdDynamicWrist(SysIdRoutine.Direction.kForward));
-      driverXbox.y().whileTrue(CoralElevatorSS.sysIdDynamicWrist(SysIdRoutine.Direction.kReverse));
+      // driverXbox.a().whileTrue(CoralElevatorSS.sysIdQuasistaticWrist(SysIdRoutine.Direction.kForward));
+      // driverXbox.b().whileTrue(CoralElevatorSS.sysIdQuasistaticWrist(SysIdRoutine.Direction.kReverse));
+      // driverXbox.x().whileTrue(CoralElevatorSS.sysIdDynamicWrist(SysIdRoutine.Direction.kForward));
+      // driverXbox.y().whileTrue(CoralElevatorSS.sysIdDynamicWrist(SysIdRoutine.Direction.kReverse));
 
 
       //Climber
@@ -237,7 +239,7 @@ public class RobotContainer
       driverXbox.start().whileTrue(Commands.none());
       driverXbox.back().whileTrue(Commands.none());
       driverXbox.leftBumper().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
-      driverXbox.rightBumper().onTrue(Commands.none());
+      // driverXbox.rightBumper().onTrue(Commands.none());
     }
 
   }

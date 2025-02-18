@@ -122,12 +122,13 @@ public class AlgaeIntakeSubsystem extends SubsystemBase {
 
   public void sysidPivotRunVoltage(double V)
   {
+    System.out.println("Normalized V = " + V/ RobotController.getBatteryVoltage());
     if (CanMoveIntakeIn() && V > 0)
-      pivotMotor.setVoltage(V / RobotController.getBatteryVoltage());
+      pivotMotor.set(V / RobotController.getBatteryVoltage());
     else if (CanMoveIntakeOut() && V < 0)
-      pivotMotor.setVoltage(V / RobotController.getBatteryVoltage());
+      pivotMotor.set(V / RobotController.getBatteryVoltage());
     else
-      pivotMotor.setVoltage(0);
+      pivotMotor.set(0);
   }
 
   
