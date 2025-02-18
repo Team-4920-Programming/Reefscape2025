@@ -242,7 +242,7 @@ private Boolean CanMoveWristDec(){
     // elevatorOutput = ElevatorPID.calculate(elevatorHeightMM) + ElevFF.calculate(PIDs.CoralElevator.Elevator.maxVelocity)/RobotController.getBatteryVoltage();
     double elevatorPIDValue = ElevatorPID.calculate(getHeightLaserMeters());
     double linearVelocity = getVelocityMetersPerSecond();
-    double elevatorFFValue = ElevFF.calculate(linearVelocity);
+    double elevatorFFValue = 0.6;//ElevFF.calculate(linearVelocity);
     elevatorOutput = MathUtil.clamp(elevatorPIDValue + elevatorFFValue,-7,7);
     
     elbowOutput = ElbowPID.calculate(ElbowAngle) + Math.toDegrees(ElbowFF.calculate (Math.toRadians(ElbowAbsoluteEncoder.getPosition()), PIDs.CoralElevator.Elbow.maxVelocity));
@@ -258,13 +258,13 @@ private Boolean CanMoveWristDec(){
     if ((CanMoveElevatorUp() && elevatorOutput > 0 && !ElevatorPID.atGoal()) || (CanMoveElevatorDown() && elevatorOutput < 0 && !ElevatorPID.atGoal()))
     {
 
-      ElevatorStageMotor.setVoltage(elevatorOutput);
-
+      ElevatorStageMotor.set(elevatorOutput/7.0);
+      
     }
-    // else{
-    //   System.out.println("Here");
-    //   ElevatorStageMotor.setVoltage(0);
-    // }
+    else{
+      System.out.println("Here");
+      ElevatorStageMotor.set(0 + elevatorFFValue);
+    }
       
     // ElbowMotor.set(elbowOutput);
     // WristMotor.set(wristOutput);

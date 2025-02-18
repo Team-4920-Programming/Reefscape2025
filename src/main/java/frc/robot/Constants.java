@@ -70,14 +70,14 @@ public final class Constants
     }
     public static class CoralElevator {
       public static class Elevator{
-        public static final double kp = 3.194;
+        public static final double kp = 2.5;
         public static final double ki = 0.0;
         public static final double kd = 0.0;
 
-        public static final double ks = 0.26271;
-        public static final double kv = 11.634;
-        public static final double ka = 1.8901;
-        public static final double kg = 0.4;
+        public static final double ks = 0.6016;
+        public static final double kv = 11.991;
+        public static final double ka = 1.946;
+        public static final double kg = 0.57052;
 
         public static double maxVelocity = Meters.of(4).per(Second).in(MetersPerSecond);
         public static double maxAcceleration = Meters.of(8).per(Second).per(Second).in(MetersPerSecondPerSecond);
