@@ -4,55 +4,127 @@
 
 package frc.robot.subsystems.Climber;
 
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Config;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.RobotController;
 
+import static edu.wpi.first.units.Units.Volts;
+
+import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.spark.SparkAbsoluteEncoder;
 import com.revrobotics.spark.SparkBase;
 import com.revrobotics.spark.SparkLimitSwitch;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkRelativeEncoder;
+
+import dev.doglog.DogLog;
+
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 
-public class ClimberSubsystem extends SubsystemBase {
-  private SparkMax ClimberMotor;
-  private SparkRelativeEncoder ClimberRelEncoder;
-  private DigitalInput ClimberHomeSwitch;
-  private boolean IsClimberHome;
-  private double ClimberPosition;
+import frc.robot.Constants;
+import frc.robot.Constants.CanIDs;
+import frc.robot.Constants.DIO;
+import frc.robot.Constants.PIDs;
+import frc.robot.Constants.RobotLimits;
+import frc.robot.commands.swervedrive.drivebase.AbsoluteDrive;
 
+public class ClimberSubsystem extends SubsystemBase {
+  private SparkMax climberMotor;
+
+  private DigitalInput cagePresenceSensor;
+  private boolean cagePresent;
+
+  private AbsoluteEncoder climberAngleEncoder;
+  private double climberAngle;
+
+  PIDController ClimberPID = new PIDController(PIDs.Climber.kp, PIDs.Climber.ki, PIDs.Climber.kd);
+  double climberOutput;
 
   /** Creates a new ClimberSubsystem. */
   public ClimberSubsystem() {
-    ClimberMotor = new SparkMax(17, MotorType.kBrushless);
-    ClimberHomeSwitch = new DigitalInput(2); 
+    climberMotor = new SparkMax(CanIDs.Climber.Winch, MotorType.kBrushless);
+    cagePresenceSensor = new DigitalInput(DIO.Climber.CagePresence);
+    climberAngleEncoder = climberMotor.getAbsoluteEncoder();
     
   }
 
   @Override
   public void periodic() {
-    IsClimberHome = ClimberHomeSwitch.get();
-    ClimberPosition = ClimberRelEncoder.getPosition();
-    if(IsClimberHome == true)
-    ClimberRelEncoder.setPosition(ClimberPosition);
+    ReadSensorValues();
+
+    climberOutput = ClimberPID.calculate(climberAngle);
+    // climberMotor.set(climberOutput);
   }
+
   public void StopClimber(){
-    ClimberMotor.set(0);
+    climberMotor.set(0);
   }
   public void RunClimberIn(double speed){
-    ClimberMotor.set(speed);
+    climberMotor.set(speed);
   }
   public void RunClimberOut(double speed){
-    ClimberMotor.set(-speed);
+    climberMotor.set(-speed);
   }
-  public boolean ClimberIsHome(){
-    return IsClimberHome;
+
+  private Boolean CanMoveClimberIn(){
+    return climberAngle < RobotLimits.Climber.maxAngle;
   }
-  public double GetClimberPosition(){
-    return ClimberPosition;
+  private Boolean CanMoveClimberOut(){
+    return climberAngle > RobotLimits.Climber.minAngle;
+  }
+  public void SetClimberAngle(double angle)
+  {
+    if (angle > ClimberPID.getSetpoint() && CanMoveClimberIn()){
+      ClimberPID.setSetpoint(angle);
+    }
+    if (angle < ClimberPID.getSetpoint() && CanMoveClimberOut()){
+      ClimberPID.setSetpoint(angle);
+    }
+  }
+  
+
+
+  private void ReadSensorValues() {
+    climberAngle = climberAngleEncoder.getPosition();
+    cagePresent = cagePresenceSensor.get();
   }
 
 
 
+  // SysID nonsense
+
+  private final SysIdRoutine ClimberSysID = new SysIdRoutine
+  (new SysIdRoutine.Config(),
+   new SysIdRoutine.Mechanism(
+    (voltage) -> this.sysidClimberRunVoltage(voltage.in(Volts)),
+    log -> {
+      DogLog.log("SysID/Climber/VoltageApplied", climberMotor.getAppliedOutput() * climberMotor.getBusVoltage());
+      DogLog.log("SysID/Climber/Position", climberAngleEncoder.getPosition());
+      DogLog.log("SysID/Climber/Velocity", climberAngleEncoder.getVelocity());
+    },
+    this));
+
+  public void sysidClimberRunVoltage(double V)
+  {
+    if (CanMoveClimberIn() && V > 0)
+    climberMotor.setVoltage(V / RobotController.getBatteryVoltage());
+    else if (CanMoveClimberOut() && V < 0)
+    climberMotor.setVoltage(V / RobotController.getBatteryVoltage());
+    else
+    climberMotor.setVoltage(0);
+  }
+
+  
+
+  public Command sysIdQuasistatic(SysIdRoutine.Direction direction) {
+    return ClimberSysID.quasistatic(direction);
+  }
+
+  public Command sysIdDynamic(SysIdRoutine.Direction direction) {
+    return ClimberSysID.dynamic(direction);
+  }
 }

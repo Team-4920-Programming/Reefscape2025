@@ -30,6 +30,7 @@ public class Robot extends TimedRobot
   public Robot()
   {
     instance = this;
+    au.grapplerobotics.CanBridge.runTCP();
   }
 
   public static Robot getInstance()

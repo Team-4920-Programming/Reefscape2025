@@ -5,24 +5,33 @@
 package frc.robot;
 
 import com.pathplanner.lib.auto.NamedCommands;
+
+import dev.doglog.DogLog;
+import dev.doglog.DogLogOptions;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
+import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Config;
 import frc.robot.Constants.OperatorConstants;
+import frc.robot.Constants.AbsoluteEncoderID.Climber;
+import frc.robot.commands.Elevator.TeleOp.MoveElevatorToPosition;
 import frc.robot.commands.swervedrive.drivebase.AbsoluteDriveAdv;
+import frc.robot.subsystems.AlgaeIntake.AlgaeIntakeSubsystem;
+import frc.robot.subsystems.Climber.ClimberSubsystem;
 import frc.robot.subsystems.CoralElevator.CoralElevatorSubsystem;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 import java.io.File;
 import swervelib.SwerveInputStream;
-
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a "declarative" paradigm, very
  * little robot logic should actually be handled in the {@link Robot} periodic methods (other than the scheduler calls).
@@ -37,6 +46,8 @@ public class RobotContainer
   private final SwerveSubsystem       drivebase  = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(),
                                                                                 "swerve/maxSwerve"));
   private final CoralElevatorSubsystem CoralElevatorSS = new CoralElevatorSubsystem();
+  private final ClimberSubsystem ClimberSS = new ClimberSubsystem();
+  private final AlgaeIntakeSubsystem AlgaeIntakeSS = new AlgaeIntakeSubsystem();
   // Applies deadbands and inverts controls because joysticks
   // are back-right positive while robot
   // controls are front-left positive
@@ -122,6 +133,14 @@ public class RobotContainer
     configureBindings();
     DriverStation.silenceJoystickConnectionWarning(true);
     NamedCommands.registerCommand("test", Commands.print("I EXIST"));
+
+    if (Robot.isSimulation()) 
+      DogLog.setOptions(new DogLogOptions().withNtPublish(true));
+    else
+      DogLog.setOptions(new DogLogOptions().withNtPublish(false));
+
+    DogLog.setPdh(new PowerDistribution());
+    DogLog.setEnabled(true);
   }
 
   /**
@@ -146,13 +165,67 @@ public class RobotContainer
     {
       drivebase.setDefaultCommand(driveFieldOrientedAnglularVelocity); // Overrides drive command above!
 
-      driverXbox.b().whileTrue(drivebase.sysIdDriveMotorCommand());
-      driverXbox.x().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
-      driverXbox.y().whileTrue(drivebase.driveToDistanceCommand(3.0, 0.2));
+      // driverXbox.x().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
+      // driverXbox.y().whileTrue(drivebase.driveToDistanceCommand(3.0, 0.2));
       driverXbox.start().onTrue((Commands.runOnce(drivebase::zeroGyro)));
-      driverXbox.back().whileTrue(drivebase.centerModulesCommand());
-      driverXbox.leftBumper().onTrue(Commands.none());
-      driverXbox.rightBumper().onTrue(Commands.none());
+      // driverXbox.back().whileTrue(drivebase.centerModulesCommand());
+      // driverXbox.leftBumper().onTrue(Commands.none());
+      // driverXbox.rightBumper().onTrue(Commands.none());
+
+
+      //SysID Nonsense (Comment out when done)
+      //Run in this order: a, b, x, y
+
+      //DriveBase
+
+      // driverXbox.a().whileTrue(drivebase.sysIdDriveMotorCommand());
+      // driverXbox.b().whileTrue(drivebase.sysIdAngleMotorCommand());
+ 
+      
+      //Algae
+
+      // driverXbox.a().whileTrue(AlgaeIntakeSS.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
+      // driverXbox.b().whileTrue(AlgaeIntakeSS.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
+      // driverXbox.x().whileTrue(AlgaeIntakeSS.sysIdDynamic(SysIdRoutine.Direction.kForward));
+      // driverXbox.y().whileTrue(AlgaeIntakeSS.sysIdDynamic(SysIdRoutine.Direction.kReverse));
+
+      
+      //Elevator
+
+      // driverXbox.a().whileTrue(CoralElevatorSS.sysIdQuasistaticElevator(SysIdRoutine.Direction.kForward));
+      // driverXbox.b().whileTrue(CoralElevatorSS.sysIdQuasistaticElevator(SysIdRoutine.Direction.kReverse));
+      // driverXbox.x().whileTrue(CoralElevatorSS.sysIdDynamicElevator(SysIdRoutine.Direction.kForward));
+      // driverXbox.y().whileTrue(CoralElevatorSS.sysIdDynamicElevator(SysIdRoutine.Direction.kReverse));
+      // driverXbox.leftBumper().whileTrue(CoralElevatorSS.sysIDElevatorAll());
+      driverXbox.leftBumper().whileTrue(new MoveElevatorToPosition(CoralElevatorSS, 0.03));
+      driverXbox.rightBumper().whileTrue(new MoveElevatorToPosition(CoralElevatorSS, 0.5));
+
+      //Elbow
+
+
+      // driverXbox.a().whileTrue(CoralElevatorSS.sysIdQuasistaticElbow(SysIdRoutine.Direction.kForward));
+      // driverXbox.b().whileTrue(CoralElevatorSS.sysIdQuasistaticElbow(SysIdRoutine.Direction.kReverse));
+      // driverXbox.x().whileTrue(CoralElevatorSS.sysIdDynamicElbow(SysIdRoutine.Direction.kForward));
+      // driverXbox.y().whileTrue(CoralElevatorSS.sysIdDynamicElbow(SysIdRoutine.Direction.kReverse));
+
+
+      //Wrist
+
+      // driverXbox.a().whileTrue(CoralElevatorSS.sysIdQuasistaticWrist(SysIdRoutine.Direction.kForward));
+      // driverXbox.b().whileTrue(CoralElevatorSS.sysIdQuasistaticWrist(SysIdRoutine.Direction.kReverse));
+      // driverXbox.x().whileTrue(CoralElevatorSS.sysIdDynamicWrist(SysIdRoutine.Direction.kForward));
+      // driverXbox.y().whileTrue(CoralElevatorSS.sysIdDynamicWrist(SysIdRoutine.Direction.kReverse));
+
+
+      //Climber
+
+      // driverXbox.a().whileTrue(ClimberSS.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
+      // driverXbox.b().whileTrue(ClimberSS.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
+      // driverXbox.x().whileTrue(ClimberSS.sysIdDynamic(SysIdRoutine.Direction.kForward));
+      // driverXbox.y().whileTrue(ClimberSS.sysIdDynamic(SysIdRoutine.Direction.kReverse));
+
+
+
     } else
     {
       driverXbox.a().onTrue((Commands.runOnce(drivebase::zeroGyro)));
@@ -166,7 +239,7 @@ public class RobotContainer
       driverXbox.start().whileTrue(Commands.none());
       driverXbox.back().whileTrue(Commands.none());
       driverXbox.leftBumper().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
-      driverXbox.rightBumper().onTrue(Commands.none());
+      // driverXbox.rightBumper().onTrue(Commands.none());
     }
 
   }
