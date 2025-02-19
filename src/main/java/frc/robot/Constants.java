@@ -220,33 +220,29 @@ public final class Constants
 
   public static class RobotLimits {
     public static class Elbow {
-      public static final double minAngle = 0;
-      public static final double maxAngle = 360;
-      public static final double offset = 0;
+      public static final double minAngle = 20; // change this to correct limits
+      public static final double maxAngle = 60; // change this to correct limits
     }
 
     public static class Wrist {
-      public static final double minAngle = 0;
-      public static final double maxAngle = 360;
-      public static final double offset = 0;
+      public static final double minAngle = 20; // change this to correct limits
+      public static final double maxAngle = 60; // change this to correct limits
     }
 
     public static class Elevator {
-      public static final double offset = 0.03;
-      public static final double minHeight = 0+offset;
-      public static final double maxHeight = 360+offset;
+      public static final double minHeight = 0.03; // change this to correct limits
+      public static final double maxHeight = 0.6; // change this to correct limits
       
     }
 
     public static class Climber {
-      public static final double minAngle = 0;
-      public static final double maxAngle = 360;
-      public static final double offset = 0;
+      public static final double minAngle = 20; // change this to correct limits
+      public static final double maxAngle = 60; // change this to correct limits
+
     }
     public static class AlgaeIntake {
-      public static final double minAngle = 0;
-      public static final double maxAngle = 60;
-      public static final double offset = 0;
+      public static final double minAngle = 0; // change this to correct limits
+      public static final double maxAngle = 90; // change this to correct limits
     }
   }
 }
