@@ -27,7 +27,7 @@ public class MoveElevatorToPosition extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    double setheight = position + Constants.RobotLimits.Elevator.offset;
+    double setheight = position;
     m_ElevatorSubsystem.SetElevatorPosition(setheight);
   }
 

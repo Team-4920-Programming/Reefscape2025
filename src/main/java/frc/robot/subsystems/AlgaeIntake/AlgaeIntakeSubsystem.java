@@ -6,9 +6,19 @@ package frc.robot.subsystems.AlgaeIntake;
 
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.units.measure.MutAngle;
+import edu.wpi.first.units.measure.MutAngularVelocity;
+import edu.wpi.first.units.measure.MutDistance;
+import edu.wpi.first.units.measure.MutLinearVelocity;
+import edu.wpi.first.units.measure.MutVoltage;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.RobotController;
 
+import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.DegreesPerSecond;
+import static edu.wpi.first.units.Units.Minute;
+import static edu.wpi.first.units.Units.Rotations;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.Volts;
 
 import com.revrobotics.RelativeEncoder;
@@ -19,9 +29,12 @@ import com.revrobotics.spark.SparkRelativeEncoder;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Config;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.Constants.CanIDs;
 import frc.robot.Constants.PIDs;
 import frc.robot.Constants.RobotLimits;
@@ -44,6 +57,9 @@ public class AlgaeIntakeSubsystem extends SubsystemBase {
 
     private DigitalInput algaePresence;
     private boolean algaePresent;
+
+    public final Trigger atPivotMin = new Trigger(() -> !CanMoveIntakeIn());
+    public final Trigger atPivotMax = new Trigger(() -> !CanMoveIntakeOut());
 
 
   public AlgaeIntakeSubsystem() {
@@ -87,6 +103,7 @@ public class AlgaeIntakeSubsystem extends SubsystemBase {
   private Boolean CanMoveIntakeOut(){
     return pivotAngle < RobotLimits.AlgaeIntake.maxAngle;
   }
+
   public void SetIntakeAngle(double angle)
   {
     if (angle > pivotPID.getSetpoint() && CanMoveIntakeOut()){
@@ -109,35 +126,27 @@ public class AlgaeIntakeSubsystem extends SubsystemBase {
 
   // SysID nonsense
 
-  private final SysIdRoutine PivotSysID = new SysIdRoutine
-  (new SysIdRoutine.Config(),
-   new SysIdRoutine.Mechanism(
-    (voltage) -> this.sysidPivotRunVoltage(voltage.in(Volts)),
-    log -> {
-      DogLog.log("SysID/Algae/VoltageApplied", pivotMotor.getAppliedOutput() * pivotMotor.getBusVoltage());
-      DogLog.log("SysID/Algae/Position", pivotAbsoluteEncoder.getPosition());
-      DogLog.log("SysID/Algae/Velocity", pivotAbsoluteEncoder.getVelocity());
-    },
-    this));
+  private final MutAngle m_rotations = Rotations.mutable(0);
+  private final MutAngularVelocity m_AngularVelocity = RotationsPerSecond.mutable(0);
 
-  public void sysidPivotRunVoltage(double V)
-  {
-    System.out.println("Normalized V = " + V/ RobotController.getBatteryVoltage());
-    if (CanMoveIntakeIn() && V > 0)
-      pivotMotor.set(V / RobotController.getBatteryVoltage());
-    else if (CanMoveIntakeOut() && V < 0)
-      pivotMotor.set(V / RobotController.getBatteryVoltage());
-    else
-      pivotMotor.set(0);
+  public Command sysIDAlgaeAll(){
+    return (AlgaePivotSysID.dynamic(Direction.kForward).until(atPivotMax)
+        .andThen(AlgaePivotSysID.dynamic(Direction.kReverse).until(atPivotMin))
+        .andThen(AlgaePivotSysID.quasistatic(Direction.kForward).until(atPivotMax))
+        .andThen(AlgaePivotSysID.quasistatic(Direction.kReverse).until(atPivotMin))
+        .andThen(Commands.print("DONE")));
   }
 
-  
+    private final SysIdRoutine AlgaePivotSysID = new SysIdRoutine(
+      new SysIdRoutine.Config(),
+      new SysIdRoutine.Mechanism(
+      pivotMotor::setVoltage,
+      log -> {
+        DogLog.log("SysID/Algae/VoltageApplied", pivotMotor.getAppliedOutput() * RobotController.getBatteryVoltage());
+        DogLog.log("SysID/Algae/Position", m_rotations.mut_replace(pivotAbsoluteEncoder.getPosition(),Degrees).in(Degrees));
+        DogLog.log("SysID/Algae/Velocity", m_AngularVelocity.mut_replace(pivotAbsoluteEncoder.getVelocity(),Degrees.per(Minute)).in(DegreesPerSecond)); 
 
-  public Command sysIdQuasistatic(SysIdRoutine.Direction direction) {
-    return PivotSysID.quasistatic(direction);
-  }
+      },
+      this));
 
-  public Command sysIdDynamic(SysIdRoutine.Direction direction) {
-    return PivotSysID.dynamic(direction);
-  }
 }
