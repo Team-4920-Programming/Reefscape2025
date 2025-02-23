@@ -9,15 +9,15 @@ import frc.robot.Constants;
 import frc.robot.subsystems.CoralElevator.CoralElevatorSubsystem;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
-public class MoveElevatorToPosition extends Command {
+public class MoveWristToAngle extends Command {
   /** Creates a new MoveElevatorToPosition. */
 
   CoralElevatorSubsystem m_ElevatorSubsystem;
-  double position;
-  public MoveElevatorToPosition(CoralElevatorSubsystem elevatorSS, double pos) {
+  double angle;
+  public MoveWristToAngle(CoralElevatorSubsystem elevatorSS, double angleSetpoint) {
     // Use addRequirements() here to declare subsystem dependencies.
     m_ElevatorSubsystem = elevatorSS;
-    position = pos;
+    angle = angleSetpoint;
   }
 
   // Called when the command is initially scheduled.
@@ -27,8 +27,7 @@ public class MoveElevatorToPosition extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    double setheight = position;
-    m_ElevatorSubsystem.SetElevatorPosition(setheight);
+    m_ElevatorSubsystem.SetWristAngle(angle);
   }
 
   // Called once the command ends or is interrupted.
@@ -38,7 +37,7 @@ public class MoveElevatorToPosition extends Command {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    
-    return false;
+    double difference = Math.abs(m_ElevatorSubsystem.GetWristAngle() - angle);
+    return difference < 5;
   }
 }

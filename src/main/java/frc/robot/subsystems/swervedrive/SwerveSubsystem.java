@@ -180,6 +180,7 @@ public class SwerveSubsystem extends SubsystemBase
       vision.updatePoseEstimation(swerveDrive);
     }
     DogLog.log("Data/RobotOdo",swerveDrive.getPose());
+    DogLog.log("Data/RoboSpeed", swerveDrive.getRobotVelocity());
   }
 
 /*4920 modificaitons for simulation */
@@ -436,6 +437,7 @@ public class SwerveSubsystem extends SubsystemBase
    */
   public Command sysIdDriveMotorCommand()
   {
+    SwerveDriveTest.setModulesToRotaryPosition(swerveDrive);
     return SwerveDriveTest.generateSysIdCommand(
         SwerveDriveTest.setDriveSysIdRoutine(
             new Config(),
@@ -450,6 +452,7 @@ public class SwerveSubsystem extends SubsystemBase
    */
   public Command sysIdAngleMotorCommand()
   {
+    SwerveDriveTest.setModulesToRotaryPosition(swerveDrive);
     return SwerveDriveTest.generateSysIdCommand(
         SwerveDriveTest.setAngleSysIdRoutine(
             new Config(),
