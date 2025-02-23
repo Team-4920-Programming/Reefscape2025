@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 
 import dev.doglog.DogLog;
@@ -16,6 +17,8 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.RobotBase;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -24,6 +27,7 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Config;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.Constants.AbsoluteEncoderID.Climber;
+import frc.robot.commands.Elevator.TeleOp.MoveElbowToAngle;
 import frc.robot.commands.Elevator.TeleOp.MoveElevatorToPosition;
 import frc.robot.commands.swervedrive.drivebase.AbsoluteDriveAdv;
 import frc.robot.subsystems.AlgaeIntake.AlgaeIntakeSubsystem;
@@ -31,6 +35,8 @@ import frc.robot.subsystems.Climber.ClimberSubsystem;
 import frc.robot.subsystems.CoralElevator.CoralElevatorSubsystem;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 import java.io.File;
+
+import swervelib.SwerveDriveTest;
 import swervelib.SwerveInputStream;
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a "declarative" paradigm, very
@@ -40,6 +46,7 @@ import swervelib.SwerveInputStream;
 public class RobotContainer
 {
 
+  private final SendableChooser<Command> autoChooser;
   // Replace with CommandPS4Controller or CommandJoystick if needed
   final         CommandXboxController driverXbox = new CommandXboxController(0);
   // The robot's subsystems and commands are defined here...
@@ -60,7 +67,7 @@ public class RobotContainer
                                                                                                OperatorConstants.LEFT_Y_DEADBAND),
                                                                  () -> -MathUtil.applyDeadband(driverXbox.getLeftX(),
                                                                                                OperatorConstants.DEADBAND),
-                                                                 () -> -MathUtil.applyDeadband(driverXbox.getRightX(),
+                                                                 () -> MathUtil.applyDeadband(driverXbox.getRightX(),
                                                                                                OperatorConstants.RIGHT_X_DEADBAND),
                                                                  driverXbox.getHID()::getYButtonPressed,
                                                                  driverXbox.getHID()::getAButtonPressed,
@@ -73,7 +80,7 @@ public class RobotContainer
   SwerveInputStream driveAngularVelocity = SwerveInputStream.of(drivebase.getSwerveDrive(),
                                                                 () -> driverXbox.getLeftY() * -1,
                                                                 () -> driverXbox.getLeftX() * -1)
-                                                            .withControllerRotationAxis(driverXbox::getRightX)
+                                                            .withControllerRotationAxis(() -> driverXbox.getRightX() * -1)
                                                             .deadband(OperatorConstants.DEADBAND)
                                                             .scaleTranslation(0.8)
                                                             .allianceRelativeControl(true);
@@ -137,10 +144,14 @@ public class RobotContainer
     if (Robot.isSimulation()) 
       DogLog.setOptions(new DogLogOptions().withNtPublish(true));
     else
-      DogLog.setOptions(new DogLogOptions().withNtPublish(false));
+      DogLog.setOptions(new DogLogOptions().withNtPublish(true));
 
     DogLog.setPdh(new PowerDistribution());
     DogLog.setEnabled(true);
+
+    autoChooser = AutoBuilder.buildAutoChooser();
+
+    SmartDashboard.putData("AutoChooser", autoChooser);
   }
 
   /**
@@ -177,17 +188,13 @@ public class RobotContainer
       //Run in this order: a, b, x, y
 
       //DriveBase
-
       // driverXbox.a().whileTrue(drivebase.sysIdDriveMotorCommand());
       // driverXbox.b().whileTrue(drivebase.sysIdAngleMotorCommand());
  
       
       //Algae
 
-      // driverXbox.a().whileTrue(AlgaeIntakeSS.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
-      // driverXbox.b().whileTrue(AlgaeIntakeSS.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
-      // driverXbox.x().whileTrue(AlgaeIntakeSS.sysIdDynamic(SysIdRoutine.Direction.kForward));
-      // driverXbox.y().whileTrue(AlgaeIntakeSS.sysIdDynamic(SysIdRoutine.Direction.kReverse));
+      driverXbox.a().whileTrue(AlgaeIntakeSS.sysIDPivotAll());
 
       
       //Elevator
@@ -198,7 +205,9 @@ public class RobotContainer
       // driverXbox.y().whileTrue(CoralElevatorSS.sysIdDynamicElevator(SysIdRoutine.Direction.kReverse));
       // driverXbox.leftBumper().whileTrue(CoralElevatorSS.sysIDElevatorAll());
       driverXbox.leftBumper().whileTrue(new MoveElevatorToPosition(CoralElevatorSS, 0.03));
-      driverXbox.rightBumper().whileTrue(new MoveElevatorToPosition(CoralElevatorSS, 0.5));
+      driverXbox.rightBumper().whileTrue(new MoveElevatorToPosition(CoralElevatorSS, 0.7));
+      driverXbox.leftTrigger().whileTrue(new MoveElbowToAngle(CoralElevatorSS, 180));
+      driverXbox.rightTrigger().whileTrue(new MoveElbowToAngle(CoralElevatorSS, 5));
 
       //Elbow
 
@@ -252,7 +261,7 @@ public class RobotContainer
   public Command getAutonomousCommand()
   {
     // An example command will be run in autonomous
-    return drivebase.getAutonomousCommand("New Auto");
+    return autoChooser.getSelected();
   }
 
   public void setDriveMode()

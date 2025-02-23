@@ -26,10 +26,10 @@ import swervelib.math.Matter;
 public final class Constants
 {
 
-  public static final double ROBOT_MASS = (148 - 20.3) * 0.453592; // 32lbs * kg per pound
+  public static final double ROBOT_MASS = (115) * 0.453592; // 32lbs * kg per pound
   public static final Matter CHASSIS    = new Matter(new Translation3d(0, 0, Units.inchesToMeters(8)), ROBOT_MASS);
   public static final double LOOP_TIME  = 0.13; //s, 20ms + 110ms sprk max velocity lag
-  public static final double MAX_SPEED  = Units.feetToMeters(14.5);
+  public static final double MAX_SPEED  = Units.feetToMeters(14.63);
   // Maximum speed of the robot in meters per second, used to limit acceleration.
 
 //  public static final class AutonConstants
@@ -70,9 +70,9 @@ public final class Constants
     }
     public static class CoralElevator {
       public static class Elevator{
-        public static final double kp = 2.5;
+        public static final double kp = 3.5;
         public static final double ki = 0.0;
-        public static final double kd = 0.0;
+        public static final double kd = 0.01;
 
         public static final double ks = 0.6016;
         public static final double kv = 11.991;
@@ -85,9 +85,9 @@ public final class Constants
         public static final double elevatorReduction = 16;
       }
       public static class Elbow{
-        public static final double kp = 0.1;
-        public static final double ki = 0.1;
-        public static final double kd = 0.1;
+        public static final double kp = 0.05;
+        public static final double ki = 0.0;
+        public static final double kd = 0.0;
 
         public static final double ks = 0.1;
         public static final double kg = 0.1;
@@ -220,19 +220,19 @@ public final class Constants
 
   public static class RobotLimits {
     public static class Elbow {
-      public static final double minAngle = 0;
-      public static final double maxAngle = 360;
+      public static final double minAngle = 5;
+      public static final double maxAngle = 210;
       public static final double offset = 0;
     }
 
     public static class Wrist {
-      public static final double minAngle = 0;
-      public static final double maxAngle = 360;
+      public static final double minAngle = 8.5;
+      public static final double maxAngle = 180;
       public static final double offset = 0;
     }
 
     public static class Elevator {
-      public static final double offset = 0.03;
+      public static final double offset = 0.0;
       public static final double minHeight = 0+offset;
       public static final double maxHeight = 360+offset;
       
@@ -244,8 +244,8 @@ public final class Constants
       public static final double offset = 0;
     }
     public static class AlgaeIntake {
-      public static final double minAngle = 0;
-      public static final double maxAngle = 60;
+      public static final double minAngle = 5;
+      public static final double maxAngle = 45;
       public static final double offset = 0;
     }
   }
