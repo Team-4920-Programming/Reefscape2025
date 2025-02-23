@@ -19,6 +19,7 @@ import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.DegreesPerSecond;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
+
 import static edu.wpi.first.units.Units.Minute;
 import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
@@ -60,6 +61,9 @@ public class AlgaeIntakeSubsystem extends SubsystemBase {
 
   private DigitalInput algaePresence;
   private boolean algaePresent;
+
+    public final Trigger atPivotMin = new Trigger(() -> !CanMoveIntakeIn());
+    public final Trigger atPivotMax = new Trigger(() -> !CanMoveIntakeOut());
 
 
   public AlgaeIntakeSubsystem() {
@@ -111,6 +115,7 @@ public class AlgaeIntakeSubsystem extends SubsystemBase {
   private Boolean CanMoveIntakeOut(){
     return pivotAngle < RobotLimits.AlgaeIntake.maxAngle;
   }
+
   public void SetIntakeAngle(double angle)
   {
     if (angle > pivotPID.getSetpoint() && CanMoveIntakeOut()){

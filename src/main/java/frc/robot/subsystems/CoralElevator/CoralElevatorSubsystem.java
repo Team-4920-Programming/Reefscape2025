@@ -4,10 +4,13 @@
 
 package frc.robot.subsystems.CoralElevator;
 
+import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.DegreesPerSecond;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Minute;
 import static edu.wpi.first.units.Units.Rotations;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
 
@@ -41,6 +44,7 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.units.measure.MutAngle;
+import edu.wpi.first.units.measure.MutAngularVelocity;
 import edu.wpi.first.units.measure.MutDistance;
 import edu.wpi.first.units.measure.MutLinearVelocity;
 import edu.wpi.first.units.measure.MutVoltage;
@@ -155,8 +159,12 @@ public class CoralElevatorSubsystem extends SubsystemBase {
 
   //SysID nonsense
 
-  public final Trigger atMin = new Trigger(() -> !CanMoveElevatorDown());
-  public final Trigger atMax = new Trigger(() -> !CanMoveElevatorUp());
+  public final Trigger atElevatorMin = new Trigger(() -> !CanMoveElevatorDown());
+  public final Trigger atElevatorMax = new Trigger(() -> !CanMoveElevatorUp());
+  public final Trigger atElbowMin = new Trigger(() -> !CanMoveElbowDec());
+  public final Trigger atElbowMax = new Trigger(() -> !CanMoveElbowInc());
+  public final Trigger atWristMin = new Trigger(() -> !CanMoveWristDec());
+  public final Trigger atWristMax = new Trigger(() -> !CanMoveWristInc());
   
   public CoralElevatorSubsystem() {
 
@@ -389,12 +397,12 @@ public class CoralElevatorSubsystem extends SubsystemBase {
 
   // SysID nonsense
 
-  private final MutVoltage        m_appliedVoltage = Volts.mutable(0);
-  // Mutable holder for unit-safe linear distance values, persisted to avoid reallocation.
-  private final MutDistance       m_distance       = Meters.mutable(0);
-  private final MutAngle          m_rotations      = Rotations.mutable(0);
-  // Mutable holder for unit-safe linear velocity values, persisted to avoid reallocation.
-  private final MutLinearVelocity m_velocity       = MetersPerSecond.mutable(0);
+  // Mutable holder for unit-safe values, persisted to avoid reallocation.
+
+  private final MutDistance m_distance = Meters.mutable(0);
+  private final MutAngle m_rotations = Rotations.mutable(0);
+  private final MutLinearVelocity m_velocity = MetersPerSecond.mutable(0);
+  private final MutAngularVelocity m_AngularVelocity = RotationsPerSecond.mutable(0);
 
   //Elevator
   private final SysIdRoutine ElevatorSysID = new SysIdRoutine
@@ -421,87 +429,71 @@ public class CoralElevatorSubsystem extends SubsystemBase {
   }
 
   public Command sysIDElevatorAll(){
-    return (ElevatorSysID.dynamic(Direction.kForward).until(atMax)
-        .andThen(ElevatorSysID.dynamic(Direction.kReverse).until(atMin))
-        .andThen(ElevatorSysID.quasistatic(Direction.kForward).until(atMax))
-        .andThen(ElevatorSysID.quasistatic(Direction.kReverse).until(atMin))
+    return (ElevatorSysID.dynamic(Direction.kForward).until(atElevatorMax)
+        .andThen(ElevatorSysID.dynamic(Direction.kReverse).until(atElevatorMin))
+        .andThen(ElevatorSysID.quasistatic(Direction.kForward).until(atElevatorMax))
+        .andThen(ElevatorSysID.quasistatic(Direction.kReverse).until(atElevatorMin))
         .andThen(Commands.print("DONE")));
   }
 
-  public Command sysIdQuasistaticElevator(SysIdRoutine.Direction direction) {
-    return ElevatorSysID.quasistatic(direction);
-  }
+  // public Command sysIdQuasistaticElevator(SysIdRoutine.Direction direction) {
+  //   return ElevatorSysID.quasistatic(direction);
+  // }
 
-  public Command sysIdDynamicElevator(SysIdRoutine.Direction direction) {
-    return ElevatorSysID.dynamic(direction);
-  }
+  // public Command sysIdDynamicElevator(SysIdRoutine.Direction direction) {
+  //   return ElevatorSysID.dynamic(direction);
+  // }
 
 
   //Elbow
 
-  private final SysIdRoutine ElbowSysID = new SysIdRoutine
-  (new SysIdRoutine.Config(),
-   new SysIdRoutine.Mechanism(
-    (voltage) -> this.sysidElbowRunVoltage(voltage.in(Volts)),
-    log -> {
-      DogLog.log("SysID/Elbow/VoltageApplied", ElbowMotor.getAppliedOutput() * ElbowMotor.getBusVoltage());
-      DogLog.log("SysID/Elbow/Position", ElbowAbsoluteEncoder.getPosition());
-      DogLog.log("SysID/Elbow/Velocity", ElbowAbsoluteEncoder.getVelocity());
-    },
-    this));
-
-  public void sysidElbowRunVoltage(double V)
-  {
-    if (CanMoveElevatorUp() && V > 0)
-    ElbowMotor.setVoltage(V / RobotController.getBatteryVoltage());
-    else if (CanMoveElevatorDown() && V < 0)
-    ElbowMotor.setVoltage(V / RobotController.getBatteryVoltage());
-    else
-    ElbowMotor.setVoltage(0);
+  public Command sysIDElbowAll(){
+    return (ElbowSysID.dynamic(Direction.kForward).until(atElbowMax)
+        .andThen(ElbowSysID.dynamic(Direction.kReverse).until(atElbowMin))
+        .andThen(ElbowSysID.quasistatic(Direction.kForward).until(atElbowMax))
+        .andThen(ElbowSysID.quasistatic(Direction.kReverse).until(atElbowMin))
+        .andThen(Commands.print("DONE")));
   }
 
-  
+    private final SysIdRoutine ElbowSysID = new SysIdRoutine(
+      new SysIdRoutine.Config(),
+      new SysIdRoutine.Mechanism(
+      ElbowMotor::setVoltage,
+      log -> {
+        DogLog.log("SysID/Elbow/VoltageApplied", ElbowMotor.getAppliedOutput() * RobotController.getBatteryVoltage());
+        DogLog.log("SysID/Elbow/Position", m_rotations.mut_replace(ElbowAbsoluteEncoder.getPosition(),Degrees).in(Degrees));
+        //check to make sure these units make sense. Normally rev returns velocity in rpm, we've converted it to degrees, so velocity should return as degrees per min
+        //for sysid, we want <units> per second for velocity
+        DogLog.log("SysID/Elbow/Velocity", m_AngularVelocity.mut_replace(ElbowAbsoluteEncoder.getVelocity(),Degrees.per(Minute)).in(DegreesPerSecond)); 
 
-  public Command sysIdQuasistaticElbow(SysIdRoutine.Direction direction) {
-    return ElbowSysID.quasistatic(direction);
-  }
-
-  public Command sysIdDynamicElbow(SysIdRoutine.Direction direction) {
-    return ElbowSysID.dynamic(direction);
-  }
+      },
+      this));
 
   //Wrist
 
-  private final SysIdRoutine WristSysID = new SysIdRoutine
-  (new SysIdRoutine.Config(),
-   new SysIdRoutine.Mechanism(
-    (voltage) -> this.sysidWristRunVoltage(voltage.in(Volts)),
-    log -> {
-      DogLog.log("SysID/Wrist/VoltageApplied", WristMotor.getAppliedOutput() * WristMotor.getBusVoltage());
-      DogLog.log("SysID/Wrist/Position", WristAbsoluteEncoder.getPosition());
-      DogLog.log("SysID/Wrist/Velocity", WristAbsoluteEncoder.getVelocity());
-    },
-    this));
-
-  public void sysidWristRunVoltage(double V)
-  {
-    if (CanMoveElevatorUp() && V > 0)
-    WristMotor.setVoltage(V / RobotController.getBatteryVoltage());
-    else if (CanMoveElevatorDown() && V < 0)
-    WristMotor.setVoltage(V / RobotController.getBatteryVoltage());
-    else
-    WristMotor.setVoltage(0);
+  public Command sysIDWristAll(){
+    return (WristSysID.dynamic(Direction.kForward).until(atWristMax)
+        .andThen(WristSysID.dynamic(Direction.kReverse).until(atWristMin))
+        .andThen(WristSysID.quasistatic(Direction.kForward).until(atWristMax))
+        .andThen(WristSysID.quasistatic(Direction.kReverse).until(atWristMin))
+        .andThen(Commands.print("DONE")));
   }
 
-  
+    private final SysIdRoutine WristSysID = new SysIdRoutine(
+      new SysIdRoutine.Config(),
+      new SysIdRoutine.Mechanism(
+      WristMotor::setVoltage,
+      log -> {
+        DogLog.log("SysID/Wrist/VoltageApplied", WristMotor.getAppliedOutput() * RobotController.getBatteryVoltage());
+        DogLog.log("SysID/Wrist/Position", m_rotations.mut_replace(WristAbsoluteEncoder.getPosition(),Degrees).in(Degrees));
+        DogLog.log("SysID/Wrist/Velocity", m_AngularVelocity.mut_replace(WristAbsoluteEncoder.getVelocity(),Degrees.per(Minute)).in(DegreesPerSecond)); 
 
-  public Command sysIdQuasistaticWrist(SysIdRoutine.Direction direction) {
-    return WristSysID.quasistatic(direction);
-  }
+      },
+      this));
 
-  public Command sysIdDynamicWrist(SysIdRoutine.Direction direction) {
-    return WristSysID.dynamic(direction);
-  }
+ 
+
+  //bunch of helper functions to elevator inputs into meters for sysid
 
   public static Angle convertDistanceToRotations(Distance distance)
   {

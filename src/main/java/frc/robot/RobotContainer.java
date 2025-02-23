@@ -28,6 +28,7 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Config;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.Constants.AbsoluteEncoderID.Climber;
 import frc.robot.commands.Elevator.TeleOp.MoveElbowToAngle;
+
 import frc.robot.commands.Elevator.TeleOp.MoveElevatorToPosition;
 import frc.robot.commands.swervedrive.drivebase.AbsoluteDriveAdv;
 import frc.robot.subsystems.AlgaeIntake.AlgaeIntakeSubsystem;
@@ -183,9 +184,8 @@ public class RobotContainer
       // driverXbox.leftBumper().onTrue(Commands.none());
       // driverXbox.rightBumper().onTrue(Commands.none());
 
-
+      //********************* */
       //SysID Nonsense (Comment out when done)
-      //Run in this order: a, b, x, y
 
       //DriveBase
       // driverXbox.a().whileTrue(drivebase.sysIdDriveMotorCommand());
@@ -196,14 +196,14 @@ public class RobotContainer
 
       driverXbox.a().whileTrue(AlgaeIntakeSS.sysIDPivotAll());
 
+
+      // driverXbox.leftBumper().whileTrue(new CmdT_IntakeToPosition(AlgaeIntakeSS, 30));
+      // driverXbox.rightBumper().whileTrue(new CmdT_IntakeToPosition(AlgaeIntakeSS, 80));
       
       //Elevator
 
-      // driverXbox.a().whileTrue(CoralElevatorSS.sysIdQuasistaticElevator(SysIdRoutine.Direction.kForward));
-      // driverXbox.b().whileTrue(CoralElevatorSS.sysIdQuasistaticElevator(SysIdRoutine.Direction.kReverse));
-      // driverXbox.x().whileTrue(CoralElevatorSS.sysIdDynamicElevator(SysIdRoutine.Direction.kForward));
-      // driverXbox.y().whileTrue(CoralElevatorSS.sysIdDynamicElevator(SysIdRoutine.Direction.kReverse));
-      // driverXbox.leftBumper().whileTrue(CoralElevatorSS.sysIDElevatorAll());
+      driverXbox.a().whileTrue(CoralElevatorSS.sysIDElevatorAll());
+
       driverXbox.leftBumper().whileTrue(new MoveElevatorToPosition(CoralElevatorSS, 0.03));
       driverXbox.rightBumper().whileTrue(new MoveElevatorToPosition(CoralElevatorSS, 0.7));
       driverXbox.leftTrigger().whileTrue(new MoveElbowToAngle(CoralElevatorSS, 180));
@@ -211,27 +211,19 @@ public class RobotContainer
 
       //Elbow
 
-
-      // driverXbox.a().whileTrue(CoralElevatorSS.sysIdQuasistaticElbow(SysIdRoutine.Direction.kForward));
-      // driverXbox.b().whileTrue(CoralElevatorSS.sysIdQuasistaticElbow(SysIdRoutine.Direction.kReverse));
-      // driverXbox.x().whileTrue(CoralElevatorSS.sysIdDynamicElbow(SysIdRoutine.Direction.kForward));
-      // driverXbox.y().whileTrue(CoralElevatorSS.sysIdDynamicElbow(SysIdRoutine.Direction.kReverse));
-
+      // driverXbox.a().whileTrue(CoralElevatorSS.sysIDElbowAll());
+      
 
       //Wrist
 
-      // driverXbox.a().whileTrue(CoralElevatorSS.sysIdQuasistaticWrist(SysIdRoutine.Direction.kForward));
-      // driverXbox.b().whileTrue(CoralElevatorSS.sysIdQuasistaticWrist(SysIdRoutine.Direction.kReverse));
-      // driverXbox.x().whileTrue(CoralElevatorSS.sysIdDynamicWrist(SysIdRoutine.Direction.kForward));
-      // driverXbox.y().whileTrue(CoralElevatorSS.sysIdDynamicWrist(SysIdRoutine.Direction.kReverse));
+      // driverXbox.a().whileTrue(CoralElevatorSS.sysIDWristAll());
 
 
       //Climber
 
-      // driverXbox.a().whileTrue(ClimberSS.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
-      // driverXbox.b().whileTrue(ClimberSS.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
-      // driverXbox.x().whileTrue(ClimberSS.sysIdDynamic(SysIdRoutine.Direction.kForward));
-      // driverXbox.y().whileTrue(ClimberSS.sysIdDynamic(SysIdRoutine.Direction.kReverse));
+      // driverXbox.a().whileTrue(ClimberSS.sysIDClimberAll());
+
+
 
 
 

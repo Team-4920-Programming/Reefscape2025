@@ -239,9 +239,9 @@ public final class Constants
     }
 
     public static class Climber {
-      public static final double minAngle = 0;
-      public static final double maxAngle = 360;
-      public static final double offset = 0;
+      public static final double minAngle = 20; // change this to correct limits
+      public static final double maxAngle = 60; // change this to correct limits
+
     }
     public static class AlgaeIntake {
       public static final double minAngle = 5;
