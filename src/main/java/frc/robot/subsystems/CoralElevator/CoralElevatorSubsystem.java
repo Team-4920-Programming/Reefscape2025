@@ -145,19 +145,12 @@ public class CoralElevatorSubsystem extends SubsystemBase {
   DCMotor WristGearbox = DCMotor.getNEO(1);
   DCMotor CoralIntakeGearbox = DCMotor.getNEO(1);
 
-  SparkMaxSim ElevatorUpDownMotorSim = new SparkMaxSim(ElevatorStageMotor, ElevatorStageGearbox);
-  SparkMaxSim ElbowMotorSim = new SparkMaxSim(ElbowMotor, ElbowGearbox);
-  SparkMaxSim WristMotorSim = new SparkMaxSim(WristMotor, WristGearbox);
-  SparkMaxSim CoralIntakeSim = new SparkMaxSim(CoralIntakeMotor, CoralIntakeGearbox);
-
-  // SingleJointedArmSim m_armSim = new SingleJointedArmSim(ElbowGearbox, 1, 0.1, .1, 0, .5*3.145, false, 0, null) ;
-  // ElevatorSim m_ElevSim = new ElevatorSim(null, ElbowGearbox, 0, .25, false, 0, null);
-
+  // simulated motors were here
 
   /** SIM Robot Init END */
 
 
-  //SysID nonsense
+
 
   public final Trigger atElevatorMin = new Trigger(() -> !CanMoveElevatorDown());
   public final Trigger atElevatorMax = new Trigger(() -> !CanMoveElevatorUp());
@@ -193,19 +186,12 @@ public class CoralElevatorSubsystem extends SubsystemBase {
     // 151.875 rotations of the motor is one rotation of the wrist
     // 360/151.875 is conversion factor
 
-    elbowConfig.encoder.positionConversionFactor(2.37);
+    //elbowConfig.encoder.positionConversionFactor(2.37);
     elbowConfig.inverted(true);
     ElbowMotor.configure(elbowConfig, SparkBase.ResetMode.kNoResetSafeParameters, SparkBase.PersistMode.kPersistParameters);
-    
-    ElbowRelativeEncoder.setPosition(180 - GetElbowAbsoluteEncoder());
 
-    if (Robot.isSimulation())
-    {
-      SimElevatorRoot = SimElevator.getRoot("elevator", 0.1, 0);
-      Stage1 = SimElevatorRoot.append(new MechanismLigament2d("Stage1", 0.9, 90));
-      Elbow = Stage1.append(new MechanismLigament2d("Elbow",0.5,170));
-      Wrist = Elbow.append(new MechanismLigament2d("Wrist",0.2,90));
-    }
+    // if robot.issimulation was here
+
   }
 
   /* Elevator */
@@ -246,35 +232,21 @@ public class CoralElevatorSubsystem extends SubsystemBase {
   }
   
   private Boolean CanMoveElbowInc(){
-    if (getHeightLaserMeters() > 0.67)  
+    if (getHeightLaserMeters() > 0.0)  
       return GetElbowAngle() < RobotLimits.Elbow.maxAngle;
     else
       return false;
   }
 
   private Boolean CanMoveElbowDec(){
-    if (getHeightLaserMeters() > 0.67) 
+    if (getHeightLaserMeters() > 0.0) 
       return GetElbowAngle() > RobotLimits.Elbow.minAngle;
     else
       return false;
   }
 
-  private Double GetElbowAbsoluteEncoder(){
-    double eAng = ElbowAbsoluteEncoder.getPosition();
-
-    if (eAng <= 360 && eAng > 180) {
-      eAng = eAng - 180;
-    }
-    else {
-      eAng = eAng + 180;
-    }
-    // pulley Ratio
-    double result = (180 - eAng) / 3.375;
-    return result;
-  }
-
   public Double GetElbowAngle() {
-    return ElbowRelativeEncoder.getPosition();
+    return ElbowAbsoluteEncoder.getPosition();
   }
 
   /* Wrist */
@@ -321,7 +293,7 @@ public class CoralElevatorSubsystem extends SubsystemBase {
     if (DriverStation.isEnabled()){
       //elevatorOutput = MathUtil.clamp(elevatorPIDValue + elevatorFFValue,-7,7);
       elevatorOutput = MathUtil.clamp(elevatorPIDValue,-1,1);
-      elbowOutput = ElbowPID.calculate(GetElbowAngle()); //+ Math.toDegrees(ElbowFF.calculate (Math.toRadians(ElbowAbsoluteEncoder.getPosition()), PIDs.CoralElevator.Elbow.maxVelocity));
+      elbowOutput = ElbowPID.calculate(GetElbowAngle());
       wristOutput = WristPID.calculate(GetWristAngleWorldCoordinates());
     }
     else
@@ -367,13 +339,8 @@ public class CoralElevatorSubsystem extends SubsystemBase {
   }
   }
   
-  @Override
-  public void simulationPeriodic() {
-    // This method will be called once per scheduler run
-    if (Robot.isSimulation())
-    SmartDashboard.putData  ("Simulation/Elevator",SimElevator);
+  //simulation Periodic was here
 
-  }
 
   private boolean getUpStop() {
     return !ElevatorUpStop.get();
@@ -394,6 +361,89 @@ public class CoralElevatorSubsystem extends SubsystemBase {
       elevatorHeightMM = measurement.distance_mm;
     }
   }
+
+  
+
+ 
+
+  //bunch of helper functions to elevator inputs into meters for sysid
+
+  public static Angle convertDistanceToRotations(Distance distance)
+  {
+      return Rotations.of(distance.in(Meters) /
+                          (PIDs.CoralElevator.Elevator.pulleyRadius * 2 * Math.PI) *
+                          PIDs.CoralElevator.Elevator.elevatorReduction);
+  }
+
+  public static Distance convertRotationsToDistance(Angle rotations)
+  {
+    return Meters.of((rotations.in(Rotations) / PIDs.CoralElevator.Elevator.elevatorReduction) *
+                      (PIDs.CoralElevator.Elevator.pulleyRadius * 2 * Math.PI));
+  }
+
+  
+  public double getHeightMeters()
+  {
+    double elevatorHeight = (ElevatorEncoder.getPosition() / PIDs.CoralElevator.Elevator.elevatorReduction) *
+    (2 * Math.PI * PIDs.CoralElevator.Elevator.pulleyRadius);
+    SmartDashboard.putNumber("Elevator Height", elevatorHeight);
+    return elevatorHeight;
+  }
+
+  public double getHeightLaserMeters(){
+    
+    LaserCan.Measurement measurement= LaserCan.getMeasurement();
+    double elevatorHeight = measurement.distance_mm / 1000.0;
+    SmartDashboard.putNumber("Elevator Height", elevatorHeight);
+    return elevatorHeight;
+  }
+
+  public double getVelocityMetersPerSecond()
+  {
+    return ((ElevatorEncoder.getVelocity()/ 60 )/ PIDs.CoralElevator.Elevator.elevatorReduction) *
+           (2 * Math.PI * PIDs.CoralElevator.Elevator.pulleyRadius);
+  }
+
+  public LinearVelocity getLinearVelocity()
+  {
+    return convertRotationsToDistance(Rotations.of(ElevatorEncoder.getVelocity())).per(Minute);
+  }
+
+  public Distance getLinearPosition()
+  {
+    return convertRotationsToDistance(Rotations.of(ElevatorEncoder.getPosition()));
+  }
+
+  //Simulation stuff
+
+  @Override
+  public void simulationPeriodic() {
+    // This method will be called once per scheduler run
+    if (Robot.isSimulation())
+    SmartDashboard.putData  ("Simulation/Elevator",SimElevator);
+
+  }
+
+  /*     if (Robot.isSimulation())
+  {
+    SimElevatorRoot = SimElevator.getRoot("elevator", 0.1, 0);
+    Stage1 = SimElevatorRoot.append(new MechanismLigament2d("Stage1", 0.9, 90));
+    Elbow = Stage1.append(new MechanismLigament2d("Elbow",0.5,170));
+    Wrist = Elbow.append(new MechanismLigament2d("Wrist",0.2,90));
+  }
+ */
+
+ SparkMaxSim ElevatorUpDownMotorSim = new SparkMaxSim(ElevatorStageMotor, ElevatorStageGearbox);
+ SparkMaxSim ElbowMotorSim = new SparkMaxSim(ElbowMotor, ElbowGearbox);
+ SparkMaxSim WristMotorSim = new SparkMaxSim(WristMotor, WristGearbox);
+ SparkMaxSim CoralIntakeSim = new SparkMaxSim(CoralIntakeMotor, CoralIntakeGearbox);
+
+ // SingleJointedArmSim m_armSim = new SingleJointedArmSim(ElbowGearbox, 1, 0.1, .1, 0, .5*3.145, false, 0, null) ;
+ // ElevatorSim m_ElevSim = new ElevatorSim(null, ElbowGearbox, 0, .25, false, 0, null);
+
+
+
+  /*******************************
 
   // SysID nonsense
 
@@ -435,14 +485,6 @@ public class CoralElevatorSubsystem extends SubsystemBase {
         .andThen(ElevatorSysID.quasistatic(Direction.kReverse).until(atElevatorMin))
         .andThen(Commands.print("DONE")));
   }
-
-  // public Command sysIdQuasistaticElevator(SysIdRoutine.Direction direction) {
-  //   return ElevatorSysID.quasistatic(direction);
-  // }
-
-  // public Command sysIdDynamicElevator(SysIdRoutine.Direction direction) {
-  //   return ElevatorSysID.dynamic(direction);
-  // }
 
 
   //Elbow
@@ -491,62 +533,6 @@ public class CoralElevatorSubsystem extends SubsystemBase {
       },
       this));
 
- 
-
-  //bunch of helper functions to elevator inputs into meters for sysid
-
-  public static Angle convertDistanceToRotations(Distance distance)
-  {
-      return Rotations.of(distance.in(Meters) /
-                          (PIDs.CoralElevator.Elevator.pulleyRadius * 2 * Math.PI) *
-                          PIDs.CoralElevator.Elevator.elevatorReduction);
-  }
-
-  public static Distance convertRotationsToDistance(Angle rotations)
-  {
-    return Meters.of((rotations.in(Rotations) / PIDs.CoralElevator.Elevator.elevatorReduction) *
-                      (PIDs.CoralElevator.Elevator.pulleyRadius * 2 * Math.PI));
-  }
-
-  
-  public double getHeightMeters()
-  {
-    double elevatorHeight = (ElevatorEncoder.getPosition() / PIDs.CoralElevator.Elevator.elevatorReduction) *
-    (2 * Math.PI * PIDs.CoralElevator.Elevator.pulleyRadius);
-    SmartDashboard.putNumber("Elevator Height", elevatorHeight);
-    return elevatorHeight;
-  }
-
-  public double getHeightLaserMeters(){
-    
-    LaserCan.Measurement measurement= LaserCan.getMeasurement();
-    double elevatorHeight = measurement.distance_mm / 1000.0;
-    SmartDashboard.putNumber("Elevator Height", elevatorHeight);
-    return elevatorHeight;
-    // if (measurement != null && measurement.status == LaserCan.LASERCAN_STATUS_VALID_MEASUREMENT) {
-    //   elevatorHeightMM = measurement.distance_mm;
-    // } else {
-    //   System.out.println("Oh no! The target is out of range, or we can't get a reliable measurement!");
-    //   // You can still use distance_mm in here, if you're ok tolerating a clamped value or an unreliable measurement.
-    // }
-  }
-
-  public double getVelocityMetersPerSecond()
-  {
-    return ((ElevatorEncoder.getVelocity()/ 60 )/ PIDs.CoralElevator.Elevator.elevatorReduction) *
-           (2 * Math.PI * PIDs.CoralElevator.Elevator.pulleyRadius);
-  }
-
-  public LinearVelocity getLinearVelocity()
-  {
-    return convertRotationsToDistance(Rotations.of(ElevatorEncoder.getVelocity())).per(Minute);
-  }
-
-  public Distance getLinearPosition()
-  {
-    return convertRotationsToDistance(Rotations.of(ElevatorEncoder.getPosition()));
-  }
-
-
+    ******************************/
 }
 

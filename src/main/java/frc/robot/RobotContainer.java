@@ -202,7 +202,7 @@ public class RobotContainer
       
       //Elevator
 
-      driverXbox.a().whileTrue(CoralElevatorSS.sysIDElevatorAll());
+      // driverXbox.a().whileTrue(CoralElevatorSS.sysIDElevatorAll());
 
       driverXbox.leftBumper().whileTrue(new MoveElevatorToPosition(CoralElevatorSS, 0.03));
       driverXbox.rightBumper().whileTrue(new MoveElevatorToPosition(CoralElevatorSS, 0.7));
@@ -256,8 +256,8 @@ public class RobotContainer
     return autoChooser.getSelected();
   }
 
-  public void setDriveMode()
-  {
+  public void setDriveMode(){
+  
     configureBindings();
   }
 

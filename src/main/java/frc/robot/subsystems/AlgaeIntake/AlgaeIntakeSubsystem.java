@@ -62,9 +62,6 @@ public class AlgaeIntakeSubsystem extends SubsystemBase {
   private DigitalInput algaePresence;
   private boolean algaePresent;
 
-    public final Trigger atPivotMin = new Trigger(() -> !CanMoveIntakeIn());
-    public final Trigger atPivotMax = new Trigger(() -> !CanMoveIntakeOut());
-
 
   public AlgaeIntakeSubsystem() {
     pivotMotor = new SparkMax(CanIDs.AlgaeIntake.Pivot, MotorType.kBrushless);
