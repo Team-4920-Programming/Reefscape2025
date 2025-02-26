@@ -21,22 +21,34 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Config;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.Constants.AbsoluteEncoderID.Climber;
+import frc.robot.commands.AlgaeIntake.TeleOp.CmdT_IntakeAlgae;
+import frc.robot.commands.AlgaeIntake.TeleOp.CmdT_OuttakeAlgae;
+import frc.robot.commands.AlgaeIntake.TeleOp.CmdT_IntakeToPosition;
+import frc.robot.commands.Elevator.TeleOp.CmdT_CoralIntake;
 import frc.robot.commands.Elevator.TeleOp.MoveElbowToAngle;
-
+import frc.robot.commands.Elevator.TeleOp.MoveWristToAngle;
 import frc.robot.commands.Elevator.TeleOp.MoveElevatorToPosition;
 import frc.robot.commands.swervedrive.drivebase.AbsoluteDriveAdv;
 import frc.robot.subsystems.AlgaeIntake.AlgaeIntakeSubsystem;
 import frc.robot.subsystems.Climber.ClimberSubsystem;
 import frc.robot.subsystems.CoralElevator.CoralElevatorSubsystem;
+import frc.robot.subsystems.DataHighway.DataHighwaySubsystem;
+import frc.robot.subsystems.ReefSurvey.ReefSurveySubsystem;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 import java.io.File;
-
+import frc.robot.commands.Elevator.TeleOp.CmdT_CoralIntake;
+import frc.robot.commands.Elevator.TeleOp.CmdT_CoralOutTake;
+import frc.robot.commands.Elevator.TeleOp.CmdT_Level2;
+import frc.robot.commands.Elevator.TeleOp.CmdT_Level3;
+import frc.robot.commands.Elevator.TeleOp.CmdT_Level4;
+import frc.robot.commands.Elevator.TeleOp.CmdT_Station;
 import swervelib.SwerveDriveTest;
 import swervelib.SwerveInputStream;
 /**
@@ -50,12 +62,15 @@ public class RobotContainer
   private final SendableChooser<Command> autoChooser;
   // Replace with CommandPS4Controller or CommandJoystick if needed
   final         CommandXboxController driverXbox = new CommandXboxController(0);
+  final CommandJoystick OperatorJoystick = new CommandJoystick(1);
   // The robot's subsystems and commands are defined here...
   private final SwerveSubsystem       drivebase  = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(),
                                                                                 "swerve/maxSwerve"));
   private final CoralElevatorSubsystem CoralElevatorSS = new CoralElevatorSubsystem();
   private final ClimberSubsystem ClimberSS = new ClimberSubsystem();
   private final AlgaeIntakeSubsystem AlgaeIntakeSS = new AlgaeIntakeSubsystem();
+  private final DataHighwaySubsystem DataHighwaySS = new DataHighwaySubsystem();
+  private final ReefSurveySubsystem ReefSurveySS = new ReefSurveySubsystem();
   // Applies deadbands and inverts controls because joysticks
   // are back-right positive while robot
   // controls are front-left positive
@@ -194,9 +209,17 @@ public class RobotContainer
       
       //Algae
 
-      driverXbox.a().whileTrue(AlgaeIntakeSS.sysIDPivotAll());
-
-
+      //driverXbox.a().whileTrue(AlgaeIntakeSS.sysIDPivotAll());
+      OperatorJoystick.button(1).whileTrue(new CmdT_IntakeToPosition(AlgaeIntakeSS, 0));
+   //Algae Intake
+      OperatorJoystick.button(2).whileTrue(new CmdT_OuttakeAlgae(AlgaeIntakeSS));
+      OperatorJoystick.button(3).whileTrue(new CmdT_IntakeToPosition(AlgaeIntakeSS, 60).
+        andThen(new CmdT_IntakeAlgae(AlgaeIntakeSS)).
+        andThen(new CmdT_IntakeToPosition(AlgaeIntakeSS, 25)));
+      OperatorJoystick.button(4).whileTrue(new CmdT_Level2(CoralElevatorSS));
+      OperatorJoystick.button(5).whileTrue(new CmdT_Level3(CoralElevatorSS));
+      OperatorJoystick.button(6).whileTrue(new CmdT_Level4(CoralElevatorSS));
+      OperatorJoystick.button(7).whileTrue(new CmdT_Station(CoralElevatorSS));
       // driverXbox.leftBumper().whileTrue(new CmdT_IntakeToPosition(AlgaeIntakeSS, 30));
       // driverXbox.rightBumper().whileTrue(new CmdT_IntakeToPosition(AlgaeIntakeSS, 80));
       
@@ -205,20 +228,22 @@ public class RobotContainer
       // driverXbox.a().whileTrue(CoralElevatorSS.sysIDElevatorAll());
 
       driverXbox.leftBumper().whileTrue(new MoveElevatorToPosition(CoralElevatorSS, 0.03));
-      driverXbox.rightBumper().whileTrue(new MoveElevatorToPosition(CoralElevatorSS, 0.7));
-      driverXbox.leftTrigger().whileTrue(new MoveElbowToAngle(CoralElevatorSS, 180));
-      driverXbox.rightTrigger().whileTrue(new MoveElbowToAngle(CoralElevatorSS, 5));
-
+      driverXbox.rightBumper().whileTrue(new MoveElevatorToPosition(CoralElevatorSS, 0.725));
+     
       //Elbow
 
       // driverXbox.a().whileTrue(CoralElevatorSS.sysIDElbowAll());
-      
+      driverXbox.leftTrigger().whileTrue(new MoveElbowToAngle(CoralElevatorSS, 185));
+      driverXbox.rightTrigger().whileTrue(new MoveElbowToAngle(CoralElevatorSS, 5));
+ 
 
       //Wrist
 
       // driverXbox.a().whileTrue(CoralElevatorSS.sysIDWristAll());
-
-
+      driverXbox.a().whileTrue(new MoveWristToAngle(CoralElevatorSS, 90));
+      driverXbox.b().whileTrue(new MoveWristToAngle(CoralElevatorSS, 5));
+      driverXbox.x().whileTrue(new CmdT_CoralIntake(CoralElevatorSS ));
+      driverXbox.y().whileTrue(new CmdT_CoralOutTake(CoralElevatorSS ));
       //Climber
 
       // driverXbox.a().whileTrue(ClimberSS.sysIDClimberAll());

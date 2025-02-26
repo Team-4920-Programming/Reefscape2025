@@ -29,8 +29,13 @@ public class CmdT_IntakeToPosition extends Command {
   @Override
   public void execute() {
     BoltLogger.Log(BoltLogger.HighLog, getSubsystem(), getName(), "execute", "Executing", true);
-    
+    if (!IntakeSS.HasAlgae() )
       IntakeSS.SetIntakeAngle(rAngle);;
+    if (IntakeSS.HasAlgae() && rAngle >24)
+      IntakeSS.SetIntakeAngle(rAngle);;
+      if (IntakeSS.HasAlgae() && rAngle <24)
+      IntakeSS.SetIntakeAngle(25);;
+    
   }
 
   // Called once the command ends or is interrupted.
@@ -42,11 +47,11 @@ public class CmdT_IntakeToPosition extends Command {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    boolean atAngle = false;
-    if (Math.abs(IntakeSS.GetIntakeAngle() - rAngle) < 2)
-    {
-      atAngle = true;
-    }
-    return atAngle;
+    // boolean atAngle = false;
+    // if (Math.abs(IntakeSS.GetIntakeAngle() - rAngle) < 2)
+    // {
+    //   atAngle = true;
+    // }
+    return true;// atAngle;
   }
 }

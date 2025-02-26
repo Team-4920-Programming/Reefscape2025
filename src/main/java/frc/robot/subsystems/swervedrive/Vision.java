@@ -22,6 +22,7 @@ import edu.wpi.first.networktables.NetworkTablesJNI;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Robot;
 import java.awt.Desktop;
 import java.util.ArrayList;
@@ -40,7 +41,7 @@ import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
 import swervelib.SwerveDrive;
 import swervelib.telemetry.SwerveDriveTelemetry;
-
+import dev.doglog.*;
 
 /**
  * Example PhotonVision class to aid in the pursuit of accurate odometry. Taken from
@@ -140,12 +141,18 @@ public class Vision
        */
       visionSim.update(swerveDrive.getSimulationDriveTrainPose().get());
     }
+    DogLog.log("Camera Values ", Cameras.values());
     for (Cameras camera : Cameras.values())
     {
       Optional<EstimatedRobotPose> poseEst = getEstimatedGlobalPose(camera);
+      DogLog.log("CamPosePresent"+camera.name(),poseEst.isPresent());
+      DogLog.log("CamPoseTime"+camera.name(),camera.lastReadTimestamp);
       if (poseEst.isPresent())
       {
         var pose = poseEst.get();
+        Pose3d CamPose = pose.estimatedPose;
+        DogLog.log("CamPose"+camera.name(),CamPose);
+        
         swerveDrive.addVisionMeasurement(pose.estimatedPose.toPose2d(),
                                          pose.timestampSeconds,
                                          camera.curStdDevs);
@@ -338,16 +345,16 @@ public class Vision
     /**
      * Left Camera
      */
-    LEFT_CAM("left",
-             new Rotation3d(0, Math.toRadians(-24.094), Math.toRadians(30)),
-             new Translation3d(Units.inchesToMeters(12.056),
-                               Units.inchesToMeters(10.981),
-                               Units.inchesToMeters(8.44)),
+    ReefRedCam("ReefRedCam",
+             new Rotation3d(0, Math.toRadians(0), Math.toRadians(0)),
+             new Translation3d(Units.inchesToMeters(14),
+                               Units.inchesToMeters(13.5),
+                               Units.inchesToMeters(38.5)),
              VecBuilder.fill(4, 4, 8), VecBuilder.fill(0.5, 0.5, 1)),
     /**
      * Right Camera
      */
-    RIGHT_CAM("right",
+    GeneralRedCam("GeneralRedCam",
               new Rotation3d(0, Math.toRadians(-24.094), Math.toRadians(-30)),
               new Translation3d(Units.inchesToMeters(12.056),
                                 Units.inchesToMeters(-10.981),
@@ -356,7 +363,7 @@ public class Vision
     /**
      * Center Camera
      */
-    CENTER_CAM("center",
+    GreyFeederCam("GreyFeederCam",
                new Rotation3d(0, Units.degreesToRadians(18), 0),
                new Translation3d(Units.inchesToMeters(-4.628),
                                  Units.inchesToMeters(-10.687),

@@ -110,26 +110,26 @@ public class ClimberSubsystem extends SubsystemBase {
 
   // SysID nonsense
 
-  private final MutAngle m_rotations = Rotations.mutable(0);
-  private final MutAngularVelocity m_AngularVelocity = RotationsPerSecond.mutable(0);
+  // private final MutAngle m_rotations = Rotations.mutable(0);
+  // private final MutAngularVelocity m_AngularVelocity = RotationsPerSecond.mutable(0);
 
-  public Command sysIDClimberAll(){
-    return (ClimberSysID.dynamic(Direction.kForward).until(atClimberMax)
-        .andThen(ClimberSysID.dynamic(Direction.kReverse).until(atClimberMin))
-        .andThen(ClimberSysID.quasistatic(Direction.kForward).until(atClimberMax))
-        .andThen(ClimberSysID.quasistatic(Direction.kReverse).until(atClimberMin))
-        .andThen(Commands.print("DONE")));
-  }
+  // public Command sysIDClimberAll(){
+  //   return (ClimberSysID.dynamic(Direction.kForward).until(atClimberMax)
+  //       .andThen(ClimberSysID.dynamic(Direction.kReverse).until(atClimberMin))
+  //       .andThen(ClimberSysID.quasistatic(Direction.kForward).until(atClimberMax))
+  //       .andThen(ClimberSysID.quasistatic(Direction.kReverse).until(atClimberMin))
+  //       .andThen(Commands.print("DONE")));
+  // }
 
-  private final SysIdRoutine ClimberSysID = new SysIdRoutine(
-    new SysIdRoutine.Config(),
-    new SysIdRoutine.Mechanism(
-    climberMotor::setVoltage,
-    log -> {
-      DogLog.log("SysID/Climber/VoltageApplied", climberMotor.getAppliedOutput() * RobotController.getBatteryVoltage());
-      DogLog.log("SysID/Climber/Position", m_rotations.mut_replace(climberAngleEncoder.getPosition(),Degrees).in(Degrees));
-      DogLog.log("SysID/Climber/Velocity", m_AngularVelocity.mut_replace(climberAngleEncoder.getVelocity(),Degrees.per(Minute)).in(DegreesPerSecond));
-
-    },
-    this));
+//  private final SysIdRoutine ClimberSysID = new SysIdRoutine(
+//    new SysIdRoutine.Config(),
+//    new SysIdRoutine.Mechanism(
+//    climberMotor::setVoltage,
+//    log -> {
+//      DogLog.log("SysID/Climber/VoltageApplied", climberMotor.getAppliedOutput() * RobotController.getBatteryVoltage());
+//      DogLog.log("SysID/Climber/Position", m_rotations.mut_replace(climberAngleEncoder.getPosition(),Degrees).in(Degrees));
+//      DogLog.log("SysID/Climber/Velocity", m_AngularVelocity.mut_replace(climberAngleEncoder.getVelocity(),Degrees.per(Minute)).in(DegreesPerSecond));
+//
+//    },
+//    this));
   }

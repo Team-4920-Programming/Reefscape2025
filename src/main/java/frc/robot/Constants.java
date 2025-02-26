@@ -85,7 +85,7 @@ public final class Constants
         public static final double elevatorReduction = 16;
       }
       public static class Elbow{
-        public static final double kp = 0.05;
+        public static final double kp = 0.03;
         public static final double ki = 0.0;
         public static final double kd = 0.0;
 
@@ -96,9 +96,9 @@ public final class Constants
         public static final double maxVelocity = 0.01;
       }
       public static class Wrist{
-        public static final double kp = 0.1;
-        public static final double ki = 0.1;
-        public static final double kd = 0.1;
+        public static final double kp = 0.01;
+        public static final double ki = 0;
+        public static final double kd = 0;
         
         public static final double ks = 0.1;
         public static final double kg = 0.1;
@@ -108,9 +108,9 @@ public final class Constants
       }
     }
     public static class AlgaeIntake {
-      public static final double kp = 0.1;
-      public static final double ki = 0.1;
-      public static final double kd = 0.1;
+      public static final double kp = 0.01;
+      public static final double ki = 0;
+      public static final double kd = 0;
       
       public static final double ks = 0.1;
       public static final double kg = 0.1;
@@ -217,17 +217,38 @@ public final class Constants
       public static  final int CoralDetector = 7;
     }
   }
-
+  public static class RobotPositions{
+    public static class CoralStation {
+      public static final double wrist = 35; //degrees
+      public static final double elbow =10; //degrees
+      public static final double height = 0.4; //meters
+  }
+    public static class Level2 {
+        public static final double wrist = -35; //degrees
+        public static final double elbow =10; //degrees
+        public static final double height = 0.5; //meters
+    }
+    public static class Level3 {
+      public static final double wrist = -35; //degrees
+      public static final double elbow =170; //degrees
+      public static final double height = 0.12; //meters
+  }
+  public static class Level4 {
+    public static final double wrist = -35; //degrees
+    public static final double elbow =175; //degrees
+    public static final double height = 0.725; //meters
+}
+  }
   public static class RobotLimits {
     public static class Elbow {
-      public static final double minAngle = 5;
+      public static final double minAngle = 350;
       public static final double maxAngle = 210;
       public static final double offset = 0;
     }
 
     public static class Wrist {
-      public static final double minAngle = 8.5;
-      public static final double maxAngle = 180;
+      public static final double minAngle = 12;
+      public static final double maxAngle = 300;
       public static final double offset = 0;
     }
 
@@ -244,7 +265,7 @@ public final class Constants
 
     }
     public static class AlgaeIntake {
-      public static final double minAngle = 5;
+      public static final double minAngle = 0;
       public static final double maxAngle = 45;
       public static final double offset = 0;
     }

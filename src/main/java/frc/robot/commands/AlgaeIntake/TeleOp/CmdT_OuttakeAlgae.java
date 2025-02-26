@@ -4,19 +4,21 @@
 
 package frc.robot.commands.AlgaeIntake.TeleOp;
 
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.BoltLog;
 import frc.robot.subsystems.AlgaeIntake.AlgaeIntakeSubsystem;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
-public class CmdT_IntakeStop extends Command {
+public class CmdT_OuttakeAlgae extends Command {
   /** Creates a new Cmd_IntakeOn. */
   private AlgaeIntakeSubsystem IntakeSS;
+   private Timer PresentTimer = new Timer();
   private double rspeed;
     private final BoltLog BoltLogger = new BoltLog();
-  public CmdT_IntakeStop(AlgaeIntakeSubsystem Intake_Subsystem, double reqspeed) {
+  public CmdT_OuttakeAlgae(AlgaeIntakeSubsystem Intake_Subsystem) {
     IntakeSS = Intake_Subsystem;
-    rspeed = reqspeed;
+    
     addRequirements(IntakeSS);
     // Use addRequirements() here to declare subsystem dependencies.
   }
@@ -29,25 +31,24 @@ public class CmdT_IntakeStop extends Command {
   @Override
   public void execute() {
     BoltLogger.Log(BoltLogger.HighLog, getSubsystem(), getName(), "execute", "Executing", true);
-      IntakeSS.StopIntake();
-
-    
+      //if (!IntakeSS.HasAlgae())
+        IntakeSS.RunIntake(-0.5);;
+      
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
     BoltLogger.Log(BoltLogger.HighLog, getSubsystem(), getName(), "Execute", "Executing", false);
+    IntakeSS.RunIntake(0);
   }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    boolean atSpeed = false;
-    if (Math.abs(IntakeSS.GetIntakeSpeed()) < 0.01)
-    {
-      atSpeed = true;
-    }
-    return atSpeed;
+    if (!IntakeSS.HasAlgae() && !PresentTimer.isRunning())
+        PresentTimer.start();
+ 
+    return false;//(PresentTimer.hasElapsed(.5));
   }
 }

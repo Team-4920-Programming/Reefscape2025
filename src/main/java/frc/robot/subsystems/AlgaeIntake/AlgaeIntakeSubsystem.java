@@ -4,6 +4,7 @@
 
 package frc.robot.subsystems.AlgaeIntake;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.units.measure.MutAngle;
@@ -30,6 +31,8 @@ import com.revrobotics.spark.SparkAbsoluteEncoder;
 import com.revrobotics.spark.SparkBase;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkRelativeEncoder;
+import com.revrobotics.spark.config.SparkMaxConfig;
+import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 
 import edu.wpi.first.wpilibj2.command.Command;
@@ -51,7 +54,7 @@ public class AlgaeIntakeSubsystem extends SubsystemBase {
   /** Creates a new IntakeSubSystem. */
   private SparkMax algaeIntakeMotor;
   private SparkMax pivotMotor;
-  
+   SparkMaxConfig algaeIntakeConfig = new SparkMaxConfig();
   private SparkAbsoluteEncoder pivotAbsoluteEncoder;
   private double pivotAngle;
 
@@ -66,9 +69,16 @@ public class AlgaeIntakeSubsystem extends SubsystemBase {
   public AlgaeIntakeSubsystem() {
     pivotMotor = new SparkMax(CanIDs.AlgaeIntake.Pivot, MotorType.kBrushless);
     pivotAbsoluteEncoder = pivotMotor.getAbsoluteEncoder();
-
     algaeIntakeMotor = new SparkMax(CanIDs.AlgaeIntake.BallIntake, MotorType.kBrushless);
+    algaeIntakeConfig.inverted(true);
+    algaeIntakeConfig.idleMode(IdleMode.kBrake);
+    algaeIntakeMotor.configure(algaeIntakeConfig, SparkBase.ResetMode.kResetSafeParameters, SparkBase.PersistMode.kPersistParameters);
+    
+    
+    
     pivotPID = new PIDController(PIDs.AlgaeIntake.kp, PIDs.AlgaeIntake.ki, PIDs.AlgaeIntake.kd);
+    pivotPID.setTolerance(5);
+    pivotPID.setSetpoint(0);
     algaePresence = new DigitalInput(AlgaeIntake.AlgaePresence);
   }
     
@@ -76,15 +86,36 @@ public class AlgaeIntakeSubsystem extends SubsystemBase {
   public void periodic() {
     ReadSensorValues();
 
-    SmartDashboard.putNumber("pivot Output", pivotOutput);
+
     SmartDashboard.putNumber("pivot Setpoint", pivotPID.getSetpoint());
     SmartDashboard.putNumber("pivotabsolute", pivotAbsoluteEncoder.getPosition());
+    SmartDashboard.putBoolean("HasAlgae", algaePresent);
+    double pivotOutput = pivotPID.calculate(pivotAngle);
+    pivotOutput = - pivotOutput;
+    if (GetIntakeAngle()> 300 && pivotPID.getSetpoint() > 0)
+    {
+      pivotOutput = 0.1;
+    }
+    if (GetIntakeAngle() >300 && pivotPID.getSetpoint() <5)
+    {
+      pivotOutput = 0;
+    }
+    if (GetIntakeAngle()>80)
+      {
+        pivotOutput = MathUtil.clamp(pivotOutput, -0.1,0);
+      }
+    pivotOutput = MathUtil.clamp(pivotOutput, -0.1, 0.1);
+    if (pivotPID.atSetpoint())
+      pivotOutput = 0;
+
+      SmartDashboard.putNumber("pivot Output", pivotOutput);
+      pivotMotor.set(pivotOutput);
 
     // pivotOutput = pivotPID.calculate(pivotAngle) + Math.toDegrees(pivotFF.calculate (Math.toRadians(pivotAbsoluteEncoder.getPosition()), PIDs.AlgaeIntake.maxVelocity));
     // pivotMotor.set(pivotOutput);
   }
 
-  public void RunIntakeIn(double speed) {
+  public void RunIntake(double speed) {
       algaeIntakeMotor.set(speed);
   }
   
@@ -129,7 +160,7 @@ public class AlgaeIntakeSubsystem extends SubsystemBase {
 
 
   private void ReadSensorValues() {
-    algaePresent = algaePresence.get();
+    algaePresent = !algaePresence.get();
     pivotAngle = pivotAbsoluteEncoder.getPosition();
   }
 
