@@ -7,6 +7,7 @@ package frc.robot.commands.Elevator.TeleOp;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.CoralElevator.CoralElevatorSubsystem;
 import frc.robot.Constants.RobotPositions;
+import frc.robot.Constants.RobotPositions.Level2;
 import frc.robot.Constants.RobotPositions.Level3;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
@@ -27,117 +28,9 @@ public class CmdT_Level3 extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    //safety Checks
-    boolean ElevatorDirectionUp = false;
-    boolean ElevatorDirectionDown = false;
-    boolean ElbowUp = false;
-    boolean ElbowDown = false;
-    boolean WristUp = false;
-    boolean WristDown = false;
 
-    if (m_ElevatorSubsystem.getHeightMeters() < Level3.height )
-    {
-      ElevatorDirectionUp = true;
-      ElevatorDirectionDown = false;
-
-    }
-    if (m_ElevatorSubsystem.getHeightMeters() > Level3.height )
-    {
-      ElevatorDirectionDown = true;
-      ElevatorDirectionUp = false;
-    }
-
-    if (m_ElevatorSubsystem.GetElbowAngle() < Level3.elbow )
-    {
-      ElbowUp = true;
-      ElbowDown = false;
-
-    }
-    if (m_ElevatorSubsystem.GetElbowAngle() > Level3.elbow )
-    {
-      ElbowDown = true;
-      ElbowUp = false;
-    }
-    if (m_ElevatorSubsystem.GetWristAngleWorldCoordinates() < Level3.wrist )
-    {
-      WristUp = true;
-      WristDown = false;
-
-    }
-    if (m_ElevatorSubsystem.GetWristAngleWorldCoordinates() > Level3.wrist )
-    {
-      WristUp = false;
-      WristDown = true;
-
-    }
-
-    //Elevator Height Move
-
-    Boolean ElbowClearForElevatorUp = false;
-    Boolean ElbowClearForEleavatorDown = false;
-    Boolean WristClearForElevatorUp = false;
-    Boolean WristClearforElevatorDown = false;
-
-    if (m_ElevatorSubsystem.GetElbowAngle() > 0 && m_ElevatorSubsystem.GetElbowAngle() < 190 )
-    {
-      ElbowClearForEleavatorDown = true;
-      ElbowClearForElevatorUp = true;
-    }
-    if (m_ElevatorSubsystem.GetWristAngleWorldCoordinates() > -90  && m_ElevatorSubsystem.GetWristAngleWorldCoordinates() < 90 )
-    {
-      WristClearforElevatorDown  = true;
-      WristClearForElevatorUp = true;
-    }
-    if (ElevatorDirectionUp && ElbowClearForElevatorUp && WristClearForElevatorUp)
-    {
-        m_ElevatorSubsystem.SetElevatorPosition(Level3.height);
-    }
-    if (ElevatorDirectionDown && ElbowClearForEleavatorDown && WristClearforElevatorDown )
-    {
-        m_ElevatorSubsystem.SetElevatorPosition(Level3.height);
-    }
-
-    //Elbow Move
-    Boolean ElevatorClearForElbowUp = false;
-    Boolean ElevatorClearForElbowDown = false;
-    if (m_ElevatorSubsystem.getHeightMeters() >0 && m_ElevatorSubsystem.getHeightMeters() < .8)
-    {
-      if (Level3.elbow >0 && Level3.elbow <190)
-      {
-        ElevatorClearForElbowUp = true;
-        ElevatorClearForElbowDown = true;
+        m_ElevatorSubsystem.setArmPosition(Level3.height, Level3.elbow, Level3.wrist);
       }
-    }
-    Boolean WristClearforElbowUp = false;
-    Boolean WristClearforElbowDown = false;
-    if (m_ElevatorSubsystem.GetWristAngleWorldCoordinates() >-85 && m_ElevatorSubsystem.GetWristAngleWorldCoordinates() < 85)
-    {
-     
-        WristClearforElbowUp = true;
-        WristClearforElbowDown = true;
-      
-    }
-    if (ElbowUp && ElevatorClearForElbowUp && WristClearforElbowUp)
-      m_ElevatorSubsystem.SetElbowAngle(Level3.elbow);
-    if (ElbowDown && ElevatorClearForElbowDown && WristClearforElbowDown)
-      m_ElevatorSubsystem.SetElbowAngle(Level3.elbow);
-
-    Boolean ElbowClearForWristUp = false;
-    Boolean ElbowClearForWristDown = false;
-    if (m_ElevatorSubsystem.GetElbowAngle() >0 && m_ElevatorSubsystem.GetElbowAngle() <190)
-    {
-     ElbowClearForWristUp = true;
-      ElbowClearForWristDown = true;
-    }
-    if (WristUp && ElbowClearForWristUp)
-    {
-      m_ElevatorSubsystem.SetWristAngle(Level3.wrist);
-    }
-    if (WristDown && ElbowClearForWristDown)
-    {
-      m_ElevatorSubsystem.SetWristAngle(Level3.wrist);
-    }
-  }
 
   // Called once the command ends or is interrupted.
   @Override
@@ -146,6 +39,6 @@ public class CmdT_Level3 extends Command {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return false;
+    return (Math.abs(m_ElevatorSubsystem.getHeightLaserMeters() - Level3.height) < 0.1) && (Math.abs(m_ElevatorSubsystem.GetElbowAngle() - Level3.elbow) < 5) && (Math.abs(m_ElevatorSubsystem.GetWristAngleWorldCoordinates() - Level3.wrist) < 5) ;
   }
 }

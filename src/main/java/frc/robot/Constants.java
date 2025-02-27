@@ -70,9 +70,9 @@ public final class Constants
     }
     public static class CoralElevator {
       public static class Elevator{
-        public static final double kp = 3.5;
+        public static final double kp = 3.5;//3.5
         public static final double ki = 0.0;
-        public static final double kd = 0.01;
+        public static final double kd = 0.00;
 
         public static final double ks = 0.6016;
         public static final double kv = 11.991;
@@ -219,10 +219,15 @@ public final class Constants
   }
   public static class RobotPositions{
     public static class CoralStation {
-      public static final double wrist = 35; //degrees
+      public static final double wrist = 60; //degrees
       public static final double elbow =10; //degrees
       public static final double height = 0.4; //meters
   }
+  public static class Level1 {
+    public static final double wrist = 30; //degrees
+    public static final double elbow =1; //degrees
+    public static final double height = 0.05; //meters
+}
     public static class Level2 {
         public static final double wrist = -35; //degrees
         public static final double elbow =10; //degrees
@@ -238,24 +243,27 @@ public final class Constants
     public static final double elbow =175; //degrees
     public static final double height = 0.725; //meters
 }
+public static class ArmNeutral {
+  public static final double wrist = 67; //degrees
+  public static final double elbow = 0.5; //degrees
+  public static final double height = 0.05; //meters
+}
   }
   public static class RobotLimits {
     public static class Elbow {
-      public static final double minAngle = 350;
-      public static final double maxAngle = 210;
-      public static final double offset = 0;
+      public static final double minAngle = -10;
+      public static final double maxAngle = 190;
     }
 
     public static class Wrist {
-      public static final double minAngle = 12;
-      public static final double maxAngle = 300;
-      public static final double offset = 0;
+      public static final double minAngle = -95;
+      public static final double maxAngle = 100;
     }
 
     public static class Elevator {
-      public static final double offset = 0.0;
-      public static final double minHeight = 0+offset;
-      public static final double maxHeight = 360+offset;
+      public static final double minHeight = 0;
+      public static final double maxHeight = 0.75;
+      public static final double offset = 0.04;
       
     }
 
@@ -267,8 +275,26 @@ public final class Constants
     public static class AlgaeIntake {
       public static final double minAngle = 0;
       public static final double maxAngle = 45;
-      public static final double offset = 0;
     }
+  }
+
+  public static class RobotMotionLimits {
+    public static class Elbow {
+      public static final double minAngle = 0;
+      public static final double maxAngle = 190;
+    }
+
+    public static class Wrist {
+      public static final double minAngle = -90;
+      public static final double maxAngle = 90;
+    }
+
+    public static class Elevator {
+      public static final double minHeight = 0;
+      public static final double maxHeight = 0.75;
+      
+    }
+    
   }
 }
 

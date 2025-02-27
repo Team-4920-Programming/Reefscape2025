@@ -31,10 +31,12 @@ import frc.robot.Constants.AbsoluteEncoderID.Climber;
 import frc.robot.commands.AlgaeIntake.TeleOp.CmdT_IntakeAlgae;
 import frc.robot.commands.AlgaeIntake.TeleOp.CmdT_OuttakeAlgae;
 import frc.robot.commands.AlgaeIntake.TeleOp.CmdT_IntakeToPosition;
+import frc.robot.commands.Elevator.TeleOp.CmdT_ArmNeutral;
 import frc.robot.commands.Elevator.TeleOp.CmdT_CoralIntake;
 import frc.robot.commands.Elevator.TeleOp.MoveElbowToAngle;
 import frc.robot.commands.Elevator.TeleOp.MoveWristToAngle;
 import frc.robot.commands.Elevator.TeleOp.MoveElevatorToPosition;
+import frc.robot.commands.swervedrive.TeleOp.CmdT_DriveToFeederPosition;
 import frc.robot.commands.swervedrive.drivebase.AbsoluteDriveAdv;
 import frc.robot.subsystems.AlgaeIntake.AlgaeIntakeSubsystem;
 import frc.robot.subsystems.Climber.ClimberSubsystem;
@@ -45,9 +47,14 @@ import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 import java.io.File;
 import frc.robot.commands.Elevator.TeleOp.CmdT_CoralIntake;
 import frc.robot.commands.Elevator.TeleOp.CmdT_CoralOutTake;
+import frc.robot.commands.Elevator.TeleOp.CmdT_Level1;
+import frc.robot.commands.Elevator.TeleOp.CmdT_Level2;
 import frc.robot.commands.Elevator.TeleOp.CmdT_Level2;
 import frc.robot.commands.Elevator.TeleOp.CmdT_Level3;
+import frc.robot.commands.Elevator.TeleOp.CmdT_Level3;
 import frc.robot.commands.Elevator.TeleOp.CmdT_Level4;
+import frc.robot.commands.Elevator.TeleOp.CmdT_Level4;
+import frc.robot.commands.Elevator.TeleOp.CmdT_Station;
 import frc.robot.commands.Elevator.TeleOp.CmdT_Station;
 import swervelib.SwerveDriveTest;
 import swervelib.SwerveInputStream;
@@ -220,6 +227,8 @@ public class RobotContainer
       OperatorJoystick.button(5).whileTrue(new CmdT_Level3(CoralElevatorSS));
       OperatorJoystick.button(6).whileTrue(new CmdT_Level4(CoralElevatorSS));
       OperatorJoystick.button(7).whileTrue(new CmdT_Station(CoralElevatorSS));
+      OperatorJoystick.button(8).whileTrue(new CmdT_Level1(CoralElevatorSS));
+      OperatorJoystick.button(9).whileTrue(new CmdT_ArmNeutral(CoralElevatorSS));
       // driverXbox.leftBumper().whileTrue(new CmdT_IntakeToPosition(AlgaeIntakeSS, 30));
       // driverXbox.rightBumper().whileTrue(new CmdT_IntakeToPosition(AlgaeIntakeSS, 80));
       
@@ -248,7 +257,8 @@ public class RobotContainer
 
       // driverXbox.a().whileTrue(ClimberSS.sysIDClimberAll());
 
-
+      //Drive Subssystem
+      OperatorJoystick.button(10).whileTrue(new CmdT_DriveToFeederPosition(drivebase, 0, 0));
 
 
 

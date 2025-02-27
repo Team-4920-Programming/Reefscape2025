@@ -7,14 +7,14 @@ package frc.robot.commands.Elevator.TeleOp;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.CoralElevator.CoralElevatorSubsystem;
 import frc.robot.Constants.RobotPositions;
-import frc.robot.Constants.RobotPositions.CoralStation;
+import frc.robot.Constants.RobotPositions.Level1;
 import frc.robot.Constants.RobotPositions.Level2;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
-public class CmdT_Station extends Command {
+public class CmdT_Level1 extends Command {
   /** Creates a new CmdT_Level1. */
   CoralElevatorSubsystem m_ElevatorSubsystem;
-  public CmdT_Station(CoralElevatorSubsystem elevatorSS) {
+  public CmdT_Level1(CoralElevatorSubsystem elevatorSS) {
     // Use addRequirements() here to declare subsystem dependencies.
     m_ElevatorSubsystem = elevatorSS;
     addRequirements(m_ElevatorSubsystem);
@@ -29,7 +29,7 @@ public class CmdT_Station extends Command {
   @Override
   public void execute() {
 
-        m_ElevatorSubsystem.setArmPosition(CoralStation.height, CoralStation.elbow, CoralStation.wrist);
+        m_ElevatorSubsystem.setArmPosition(Level1.height, Level1.elbow, Level1.wrist);
       }
 
   // Called once the command ends or is interrupted.
@@ -39,6 +39,6 @@ public class CmdT_Station extends Command {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return (Math.abs(m_ElevatorSubsystem.getHeightLaserMeters() - CoralStation.height) < 0.1) && (Math.abs(m_ElevatorSubsystem.GetElbowAngle() - CoralStation.elbow) < 5) && (Math.abs(m_ElevatorSubsystem.GetWristAngleWorldCoordinates() - CoralStation.wrist) < 5) ;
+    return (Math.abs(m_ElevatorSubsystem.getHeightLaserMeters() - Level1.height) < 0.1) && (Math.abs(m_ElevatorSubsystem.GetElbowAngle() - Level1.elbow) < 5) && (Math.abs(m_ElevatorSubsystem.GetWristAngleWorldCoordinates() - Level1.wrist) < 5) ;
   }
 }
