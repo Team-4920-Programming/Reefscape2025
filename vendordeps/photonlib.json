@@ -13,7 +13,7 @@
         {
             "groupId": "org.photonvision",
             "artifactId": "photontargeting-cpp",
-            "version": "v2025.2.1-rc2",
+            "version": "v2025.2.1",
             "skipInvalidPlatforms": true,
             "isJar": false,
             "validPlatforms": [

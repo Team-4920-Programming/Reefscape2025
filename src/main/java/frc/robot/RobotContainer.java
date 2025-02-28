@@ -258,7 +258,8 @@ public class RobotContainer
       // driverXbox.a().whileTrue(ClimberSS.sysIDClimberAll());
 
       //Drive Subssystem
-      OperatorJoystick.button(10).whileTrue(new CmdT_DriveToFeederPosition(drivebase, 0, 0));
+      OperatorJoystick.button(10).whileTrue(new CmdT_DriveToFeederPosition(drivebase, 0, 1));
+      OperatorJoystick.button(11).whileTrue(new CmdT_DriveToFeederPosition(drivebase, 0, 2));
 
 
 

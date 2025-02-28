@@ -345,21 +345,21 @@ public class Vision
     /**
      * Left Camera
      */
-    ReefRedCam("ReefRedCam",
-             new Rotation3d(0, Math.toRadians(30), Math.toRadians(0)),
-             new Translation3d(Units.inchesToMeters(12),
-                               Units.inchesToMeters(13.5),
-                               Units.inchesToMeters(38.5)),
-             VecBuilder.fill(4, 4, 8), VecBuilder.fill(0.5, 0.5, 1)),
-    /**
+    // ReefRedCam("ReefRedCam",
+    //          new Rotation3d(0, Math.toRadians(30), Math.toRadians(0)),
+    //          new Translation3d(Units.inchesToMeters(12),
+    //                            Units.inchesToMeters(13.5),
+    //                            Units.inchesToMeters(38.5)),
+    //          VecBuilder.fill(4, 4, 8), VecBuilder.fill(0.5, 0.5, 1)),
+     /**
      * Right Camera
      */
-    GeneralRedCam("GeneralRedCam",
-              new Rotation3d(0, Math.toRadians(-15), Math.toRadians(90)),
-              new Translation3d(Units.inchesToMeters(6),
-                                Units.inchesToMeters(14.25),
-                                Units.inchesToMeters(38.5)),
-              VecBuilder.fill(4, 4, 8), VecBuilder.fill(0.5, 0.5, 1)),
+    // GeneralRedCam("GeneralRedCam",
+    //           new Rotation3d(0, Math.toRadians(-15), Math.toRadians(90)),
+    //           new Translation3d(Units.inchesToMeters(6),
+    //                             Units.inchesToMeters(14.25),
+    //                             Units.inchesToMeters(38.5)),
+    //           VecBuilder.fill(4, 4, 8), VecBuilder.fill(0.5, 0.5, 1)),
     /**
      * Center Camera
      */
@@ -368,13 +368,13 @@ public class Vision
                new Translation3d(Units.inchesToMeters(12.5),
                                  Units.inchesToMeters(-13),
                                  Units.inchesToMeters(34.625)),
-               VecBuilder.fill(4, 4, 8), VecBuilder.fill(0.5, 0.5, 1)),
-     ReefGreyCam("ReefGreyCam",
-               new Rotation3d(0, Units.degreesToRadians(37), 0),
-               new Translation3d(Units.inchesToMeters(12.5),
-                                 Units.inchesToMeters(-13.5),
-                                 Units.inchesToMeters(35.5)),
                VecBuilder.fill(4, 4, 8), VecBuilder.fill(0.5, 0.5, 1));
+    //  ReefGreyCam("ReefGreyCam",
+    //            new Rotation3d(0, Units.degreesToRadians(37), 0),
+    //            new Translation3d(Units.inchesToMeters(12.5),
+    //                              Units.inchesToMeters(-13.5),
+    //                              Units.inchesToMeters(35.5)),
+    //            VecBuilder.fill(4, 4, 8), VecBuilder.fill(0.5, 0.5, 1));
     /**
      * Latency alert to use when high latency is detected.
      */
