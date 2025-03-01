@@ -19,8 +19,7 @@ import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class CmdT_DriveToFeederPosition extends Command {
   /** Creates a new CmdT_DriveToFeederPosition. */
-  Integer Feeder_Side;
-  Integer Feeder_Slot;
+
   SwerveSubsystem DriveSS;
   Pose2d FeederPose;
   double Feeder_X;
@@ -29,10 +28,9 @@ public class CmdT_DriveToFeederPosition extends Command {
   PIDController XPID = new PIDController(0.5, 0, 0);
   PIDController YPID = new PIDController(0.5, 0, 0);
   PIDController RotPID = new PIDController(0.1,0,0);
-  public CmdT_DriveToFeederPosition(SwerveSubsystem DriveSubsystem, Integer FeederSide, Integer FeederSlot) {
+  public CmdT_DriveToFeederPosition(SwerveSubsystem DriveSubsystem) {
     // Use addRequirements() here to declare subsystem dependencies.
-    Feeder_Side = FeederSide;
-    Feeder_Slot = FeederSlot;
+
     DriveSS = DriveSubsystem;
     addRequirements(DriveSS);
   }

@@ -11,7 +11,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.units.measure.Current;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 
@@ -37,20 +37,33 @@ public class CmdT_DriveToReefPosition extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    Pose2d CurrentLocation = DriveSS.getPose();
-    Pose2d TargetPose = new Pose2d (0,0, Rotation2d.fromDegrees(0));
+
     double CenterofReefX  = 4.5; //wall to wall
     double CenterofReefY = 4; //aliance Wall to Alliance Wall
+    double ReefRadius = Units.inchesToMeters(65.5)/2;
     //onshape cordinates of blue 
     //y along alliance wall
     //x from blue to red
-    double LeftOffsetX=0, LeftOffsetY=0;
-    double RightOFfsetX=0, RightOffetY=0;
-    double RobotOffsetX = 0.386; //38.6cm
-    double RobotOffsetY = 0.322; //32.2cm
+    double LeftOffsetAng=-12;
+    double RightOFfsetAng=12;
+    double RobotOffset = Units.inchesToMeters(15); 
+    
+    double offsetAng = 0;
     System.out.println("Initializing Drive to Reef *****************");
     int ReefSegment = DriveSS.getReefSegment();
     System.out.println("ReefSegment" + ReefSegment);
+    if (Reef_Side ==1)
+      offsetAng = LeftOffsetAng;
+    if (Reef_Side == 2)
+      offsetAng = RightOFfsetAng;
+
+    double x = (ReefRadius + RobotOffset) * Math.cos(Units.degreesToRadians(ReefSegment *60)+offsetAng) + CenterofReefX;
+    double y = (ReefRadius + RobotOffset) * Math.sin(Units.degreesToRadians(ReefSegment *60)+offsetAng) + CenterofReefY;
+    double rot = ReefSegment * 60;
+    ReefPose = new Pose2d(x,y, Rotation2d.fromDegrees(rot));
+    DogLog.log ("ReefScore/ReefPose", ReefPose);
+
+
     
     
     XPID.setTolerance(0.1);
@@ -76,10 +89,10 @@ public class CmdT_DriveToReefPosition extends Command {
     YVel = MathUtil.clamp(YVel, -0.2,0.2);
     RotVel = MathUtil.clamp(RotVel, -0.2, 0.2);
     DriveSS.drive(new Translation2d(XVel,YVel),RotVel,true);
-    DogLog.log("Xvel",XVel);
-    DogLog.log("Yvel",YVel);
-    DogLog.log("Rotvel",RotVel);
-    DogLog.log("ReefPose", ReefPose);
+    DogLog.log("ReefScore/Xvel",XVel);
+    DogLog.log("ReefScore/Yvel",YVel);
+    DogLog.log("ReefScore/Rotvel",RotVel);
+   
     System.out.println("Driving toReef");
   }
 

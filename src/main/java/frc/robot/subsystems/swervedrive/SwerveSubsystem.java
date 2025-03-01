@@ -92,6 +92,11 @@ public class SwerveSubsystem extends SubsystemBase
   private     IntakeSimulation AintakeSimulation;
   private     IntakeSimulation CintakeSimulation;
 
+  // Datahighway information
+  public boolean DH_In_HasCoral = false;
+  public int DH_Out_ReefSegment = 0;
+  public double DH_Out_ReefDistance = 0;
+
   /**
    * Initialize {@link SwerveDrive} with the directory provided.
    *
@@ -195,6 +200,10 @@ public class SwerveSubsystem extends SubsystemBase
     DogLog.log("Data/RobotOdo",swerveDrive.getPose());
     DogLog.log("Data/RoboSpeed", swerveDrive.getRobotVelocity());
     DogLog.log("Data/Reefposition",getReefSegment());
+    DogLog.log("Data/Reefposition",getReefDistance());
+
+    DH_Out_ReefSegment = getReefSegment();
+    DH_Out_ReefDistance = getReefDistance();
   }
   public int getReefSegment()
 {
@@ -238,7 +247,21 @@ public class SwerveSubsystem extends SubsystemBase
 
   return(seg);
 }
+public double getReefDistance(){
+  Pose2d CurrentPose = getPose();
+  double ReefX = 4.0;
+  double ReefY = 4.5;
+  if (isRedAlliance())
+    ReefY = 17.5-4.5;
 
+  double RobottoReefX = CurrentPose.getX() - ReefX;
+  double RobottoReefY = CurrentPose.getY() - ReefY;
+
+  double distance = Math.sqrt(Math.pow(RobottoReefX - ReefX,2)+Math.pow(RobottoReefY-ReefY,2));
+  
+  return distance;
+
+}
 
 /*4920 modificaitons for simulation */
 

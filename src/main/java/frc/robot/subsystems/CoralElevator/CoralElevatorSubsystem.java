@@ -92,6 +92,9 @@ public class CoralElevatorSubsystem extends SubsystemBase {
   private MechanismLigament2d Elbow;
   private MechanismLigament2d Wrist;
   
+  // DataHighway
+  public boolean DH_Out_HasCoral = false;
+  public double DH_In_DistanceFromReef = 0;
 
   /** Physical Robot Init START**/
   
@@ -156,7 +159,7 @@ public class CoralElevatorSubsystem extends SubsystemBase {
   /** SIM Robot Init END */
 
 
-
+  private int ScoreSelection;
 
   public final Trigger atElevatorMin = new Trigger(() -> !CanMoveElevatorDown());
   public final Trigger atElevatorMax = new Trigger(() -> !CanMoveElevatorUp());
@@ -202,6 +205,14 @@ public class CoralElevatorSubsystem extends SubsystemBase {
     WristPID.setTolerance(1);
     // if robot.issimulation was here
 
+    ScoreSelection = 0;
+
+  }
+
+  public Command SetScoreSelection(int level)
+  {
+    ScoreSelection = level;
+    return Commands.none();
   }
 
   /* Elevator */
@@ -536,6 +547,10 @@ public class CoralElevatorSubsystem extends SubsystemBase {
   // else {
   //    ElbowMotor.set(0.0);
   // }
+    // Datahighway
+    DH_Out_HasCoral = isCoralPresent();
+
+
   }
   
   //simulation Periodic was here

@@ -76,7 +76,7 @@ public class RobotContainer
   private final CoralElevatorSubsystem CoralElevatorSS = new CoralElevatorSubsystem();
   private final ClimberSubsystem ClimberSS = new ClimberSubsystem();
   private final AlgaeIntakeSubsystem AlgaeIntakeSS = new AlgaeIntakeSubsystem();
-  private final DataHighwaySubsystem DataHighwaySS = new DataHighwaySubsystem();
+  private final DataHighwaySubsystem DataHighwaySS = new DataHighwaySubsystem(drivebase,CoralElevatorSS);
   private final ReefSurveySubsystem ReefSurveySS = new ReefSurveySubsystem();
   // Applies deadbands and inverts controls because joysticks
   // are back-right positive while robot
@@ -258,10 +258,14 @@ public class RobotContainer
       // driverXbox.a().whileTrue(ClimberSS.sysIDClimberAll());
 
       //Drive Subssystem
-      OperatorJoystick.button(10).whileTrue(new CmdT_DriveToFeederPosition(drivebase, 0, 1));
-      OperatorJoystick.button(11).whileTrue(new CmdT_DriveToFeederPosition(drivebase, 0, 2));
+      OperatorJoystick.button(10).whileTrue(new CmdT_DriveToFeederPosition(drivebase));
+      
 
-
+      //Scoring Buttons
+      OperatorJoystick.button(14).onTrue(new CoralElevatorSubsystem().SetScoreSelection(2));
+      OperatorJoystick.button(15).onTrue(new CoralElevatorSubsystem().SetScoreSelection(3));
+      OperatorJoystick.button(16).onTrue(new CoralElevatorSubsystem().SetScoreSelection(4));
+      
 
     } else
     {
