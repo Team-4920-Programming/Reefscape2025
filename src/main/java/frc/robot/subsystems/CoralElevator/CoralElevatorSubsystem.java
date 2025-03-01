@@ -592,8 +592,15 @@ public class CoralElevatorSubsystem extends SubsystemBase {
   public double getHeightLaserMeters(){
     
     LaserCan.Measurement measurement= LaserCan.getMeasurement();
-    double elevatorHeight = measurement.distance_mm / 1000.0;
-    SmartDashboard.putNumber("Elevator Height", elevatorHeight);
+
+    double elevatorHeight = 0;
+    try {
+      elevatorHeight = measurement.distance_mm / 1000.0;
+      SmartDashboard.putNumber("Elevator Height", elevatorHeight);
+        
+    } catch (Exception e) {
+      // TODO: handle exception
+    }
     return elevatorHeight;
   }
 

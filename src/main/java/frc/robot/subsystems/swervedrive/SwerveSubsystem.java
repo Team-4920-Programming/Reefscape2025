@@ -54,6 +54,7 @@ import org.ironmaple.simulation.IntakeSimulation;
 import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.seasonspecific.reefscape2025.ReefscapeCoralAlgaeStack;
 import org.json.simple.parser.ParseException;
+import org.opencv.features2d.FlannBasedMatcher;
 import org.photonvision.targeting.PhotonPipelineResult;
 import swervelib.SwerveController;
 import swervelib.SwerveDrive;
@@ -65,6 +66,7 @@ import swervelib.parser.SwerveParser;
 import swervelib.telemetry.SwerveDriveTelemetry;
 import swervelib.telemetry.SwerveDriveTelemetry.TelemetryVerbosity;
 
+import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Inches;
 
 public class SwerveSubsystem extends SubsystemBase
@@ -125,9 +127,19 @@ public class SwerveSubsystem extends SubsystemBase
     {
       throw new RuntimeException(e);
     }
-    swerveDrive.setHeadingCorrection(true); // Heading correction should only be used while controlling the robot via angle.
-    swerveDrive.setCosineCompensator(true);//!SwerveDriveTelemetry.isSimulation); // Disables cosine compensation for simulations since it causes discrepancies not seen in real life.
-    swerveDrive.setAngularVelocityCompensation(true,
+    if (Robot.isReal())
+    {
+      swerveDrive.setHeadingCorrection(true); // Heading correction should only be used while controlling the robot via angle.
+      swerveDrive.setCosineCompensator(true);//!SwerveDriveTelemetry.isSimulation); // Disables cosine compensation for simulations since it causes discrepancies not seen in real life.
+      
+    }
+    else
+    {
+      swerveDrive.setHeadingCorrection(false); // Heading correction should only be used while controlling the robot via angle.
+      swerveDrive.setCosineCompensator(false);//!SwerveDriveTelemetry.isSimulation); // Disables cosine compensation for simulations since it causes discrepancies not seen in real life.
+         
+    }
+   swerveDrive.setAngularVelocityCompensation(true,
                                                true,
                                                0.1); //Correct for skew that gets worse as angular velocity increases. Start with a coefficient of 0.1.
     swerveDrive.setModuleEncoderAutoSynchronize(false,
@@ -182,7 +194,51 @@ public class SwerveSubsystem extends SubsystemBase
     }
     DogLog.log("Data/RobotOdo",swerveDrive.getPose());
     DogLog.log("Data/RoboSpeed", swerveDrive.getRobotVelocity());
+    DogLog.log("Data/Reefposition",getReefSegment());
   }
+  public int getReefSegment()
+{
+  Pose2d CurrentPose = getPose();
+  double ReefX = 4.0;
+  double ReefY = 4.5;
+  if (isRedAlliance())
+    ReefY = 17.5-4.5;
+
+  double RobottoReefX = CurrentPose.getX() - ReefX;
+  double RobottoReefY = CurrentPose.getY() - ReefY;
+  double RobotAngletoReef = Math.atan2(RobottoReefX, RobottoReefY);
+  double Segment = Units.radiansToDegrees(RobotAngletoReef);
+  DogLog.log("segmentangle", Segment);
+//-180 to 180  
+  //Segment = Segment/ 60;
+  //- 3 to 3
+  int seg  =0;
+  if (Segment > -30 && Segment < 30 )
+    seg = 0; 
+  if (Segment >= 30 && Segment < 90)
+    seg = 1;
+  if (Segment >= 90 && Segment < 150)
+    seg =2;
+  if (Segment >= 150 || Segment < -150)
+    seg =3;
+  if (Segment >= -150 && Segment < -90)
+    seg =4;
+  if (Segment >= -90 && Segment <= -30)
+    seg =5;
+    
+  
+
+  // 0 in front of blue driver station
+  // 1 bottem corner near blue
+  // 2 near processor 
+  // 3 
+  // 4 - top corner near blue
+  //5
+  //5
+
+  return(seg);
+}
+
 
 /*4920 modificaitons for simulation */
 
@@ -191,8 +247,14 @@ public class SwerveSubsystem extends SubsystemBase
   {
     DogLog.log("FieldSimulation/Algae", SimulatedArena.getInstance().getGamePiecesArrayByType("Algae"));
     DogLog.log("FieldSimulation/Coral", SimulatedArena.getInstance().getGamePiecesArrayByType("Coral"));
-  
+    //DogLog.log("Simulated Position",Simulate)
     SmartDashboard.putNumber("y",100);
+    DogLog.log("FieldSimulation/Robot",swerveDrive.getMapleSimDrive().get().getSimulatedDriveTrainPose());
+    //swerveDrive.addVisionMeasurement(getPose(), getAIntakeGamePiecesAmount());
+
+    //swerveDrive.addVisionMeasurement(swerveDrive.getMapleSimDrive().get().getSimulatedDriveTrainPose(),Timer.getFPGATimestamp());
+
+      //swerveDrive.getMapleSimDrive().get().getSimulatedDriveTrainPose())
 
   }
 
@@ -202,7 +264,7 @@ public class SwerveSubsystem extends SubsystemBase
         AintakeSimulation = AintakeSimulation.OverTheBumperIntake(
               "Algae", 
               swerveDrive.getMapleSimDrive().get(), 
-              width, Extension, IntakeSimulation.IntakeSide.FRONT, 1);
+              width, Extension, IntakeSimulation.IntakeSide.LEFT, 1);
         AintakeSimulation.register(SimulatedArena.getInstance());
 
         Distance CWidth = Inches.of(5);
@@ -210,7 +272,7 @@ public class SwerveSubsystem extends SubsystemBase
         CintakeSimulation = CintakeSimulation.OverTheBumperIntake(
               "Algae", 
               swerveDrive.getMapleSimDrive().get(), 
-              width, Extension, IntakeSimulation.IntakeSide.RIGHT, 1);
+              width, Extension, IntakeSimulation.IntakeSide.FRONT, 1);
         CintakeSimulation.register(SimulatedArena.getInstance());
   }
   public void setupSimulatedField()
