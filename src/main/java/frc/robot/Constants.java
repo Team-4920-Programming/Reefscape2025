@@ -11,10 +11,24 @@ import static edu.wpi.first.units.Units.Second;
 
 import java.io.ObjectInputFilter.Status;
 
+import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.apriltag.AprilTagFields;
+import edu.wpi.first.math.Nat;
+import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.util.Units;
 import swervelib.math.Matter;
-
+import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.Nat;
+import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.numbers.N3;
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean constants. This
  * class should not be used for any other purpose. All constants should be declared globally (i.e. public static). Do
@@ -70,7 +84,7 @@ public final class Constants
     }
     public static class CoralElevator {
       public static class Elevator{
-        public static final double kp = 3.5;//3.5
+        public static final double kp = 2.0;//3.5
         public static final double ki = 0.0;
         public static final double kd = 0.00;
 
@@ -296,6 +310,84 @@ public static class ArmNeutral {
     }
     
   }
+  public static class Vision4920 {
+    public static final String kGreyFeederCam = "GreyFeederCam";
+    public static final String kReefGreyCam = "GreyReefCam";
+    public static final String kReefRedCam = "Arducam_OV9281_Right";
+    public static final String kGeneralRedCam = "Arducam_OV9281_Left";
+    public static final String kClimberBlueCam = "Arducam_5MP_Camera_Module";
+    public static final String kAlgaeBlueCam = "Arducam_5MP_Camera_Module";
+    // Cam mounted facing forward, half a meter forward of center, half a meter up from center.
+
+    // positive x to the left, positive y up
+    public static final Transform3d kRobotToGreyFeederCam =
+            new Transform3d(new Translation3d(Units.inchesToMeters(12.5), Units.inchesToMeters(-13), Units.inchesToMeters(34.625)), new Rotation3d(0, Units.degreesToRadians(314), 0)); //
+  public static final Transform3d kRobotToGreyReefCam =
+            new Transform3d(new Translation3d(Units.inchesToMeters(12.5), Units.inchesToMeters(-13.5), Units.inchesToMeters(35.5)), new Rotation3d(0, Units.degreesToRadians(37), 0)); // 0.48
+  public static final Transform3d kRobotToRedReefCam =
+            new Transform3d(new Translation3d(Units.inchesToMeters(11), Units.inchesToMeters(-12.5), Units.inchesToMeters(19.875)), new Rotation3d(0, Units.degreesToRadians(324), 3*Math.PI/2)); // 0.48
+  public static final Transform3d kRobotToGeneralRedCam =
+            new Transform3d(new Translation3d(Units.inchesToMeters(11), Units.inchesToMeters(12.5), Units.inchesToMeters(19.875)), new Rotation3d(0, Units.degreesToRadians(326), Math.PI/2)); // 0.48
+  public static final Transform3d kRobotToClimberBlueCam =
+            new Transform3d(new Translation3d(Units.inchesToMeters(11), Units.inchesToMeters(12.5), Units.inchesToMeters(19.875)), new Rotation3d(0, Units.degreesToRadians(326), Math.PI/2)); // 0.48
+    public static final Transform3d kRobotAlgaeBlueCam =
+            new Transform3d(new Translation3d(Units.inchesToMeters(11), Units.inchesToMeters(12.5), Units.inchesToMeters(19.875)), new Rotation3d(0, Units.degreesToRadians(326), Math.PI/2)); // 0.48
+  
+  public static final Transform3d ROBOT_TO_CAMERA_Front = kRobotToGreyFeederCam.inverse();
+  public static final Transform3d ROBOT_TO_CAMERA_Rear = kRobotToGreyReefCam.inverse();
+  public static final Transform3d ROBOT_TO_CAMERA_Right = kRobotToRedReefCam .inverse();
+  public static final Transform3d ROBOT_TO_CAMERA_Left = kRobotToGeneralRedCam.inverse();
+  
+        public static final AprilTagFieldLayout kTagLayout =
+                AprilTagFields.k2025ReefscapeWelded.loadAprilTagLayoutField();
+   
+
+    // The standard deviations of our vision estimated poses, which affect correction rate
+    // (Fake values. Experiment and determine estimation noise on an actual robot.)
+    public static final Matrix<N3, N1> kSingleTagStdDevs = VecBuilder.fill(4, 4, 8);
+    public static final Matrix<N3, N1> kMultiTagStdDevs = VecBuilder.fill(.5, .5, 1);
+
+// from Hemlock5712
+    /** Minimum target ambiguity. Targets with higher ambiguity will be discarded */
+    public static final double APRILTAG_AMBIGUITY_THRESHOLD = 0.2;
+    public static final double POSE_AMBIGUITY_SHIFTER = 0.2;
+    public static final double POSE_AMBIGUITY_MULTIPLIER = 4;
+    public static final double NOISY_DISTANCE_METERS = 2.5;
+    public static final double DISTANCE_WEIGHT = 7;
+    public static final int TAG_PRESENCE_WEIGHT = 10;
+
+    /**
+     * Standard deviations of model states. Increase these numbers to trust your
+     * model's state estimates less. This
+     * matrix is in the form [x, y, theta]ᵀ, with units in meters and radians, then
+     * meters.
+     */
+    public static final Matrix<N3, N1> VISION_MEASUREMENT_STANDARD_DEVIATIONS = VecBuilder
+        .fill(
+            // if these numbers are less than one, multiplying will do bad things
+            1, // x
+            1, // y
+            1 * Math.PI // theta
+        );
+
+    /**
+     * Standard deviations of the vision measurements. Increase these numbers to
+     * trust global measurements from vision
+     * less. This matrix is in the form [x, y, theta]ᵀ, with units in meters and
+     * radians.
+     */
+   
+
+
+
+    public static final Matrix<N3, N1> STATE_STANDARD_DEVIATIONS = VecBuilder
+        .fill(
+            // if these numbers are less than one, multiplying will do bad things
+            .1, // x
+            .1, // y
+            .1);
+
+}
 }
 
 

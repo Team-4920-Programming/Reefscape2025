@@ -24,8 +24,8 @@ public class CmdT_DriveToReefPosition extends Command {
   SwerveSubsystem DriveSS;
   Pose2d ReefPose;
 
-  PIDController XPID = new PIDController(0.5, 0, 0);
-  PIDController YPID = new PIDController(0.5, 0, 0);
+  PIDController XPID = new PIDController(2, 0, 0);
+  PIDController YPID = new PIDController(2, 0, 0);
   PIDController RotPID = new PIDController(0.1,0,0);
   public CmdT_DriveToReefPosition(SwerveSubsystem DriveSubsystem, Integer Side) {
     // Use addRequirements() here to declare subsystem dependencies.
@@ -38,14 +38,14 @@ public class CmdT_DriveToReefPosition extends Command {
   @Override
   public void initialize() {
 
-    double CenterofReefX  = 4.5; //wall to wall
-    double CenterofReefY = 4; //aliance Wall to Alliance Wall
+    double CenterofReefX  = 4.481; //wall to wall
+    double CenterofReefY = 4.0; //aliance Wall to Alliance Wall
     double ReefRadius = Units.inchesToMeters(65.5)/2;
     //onshape cordinates of blue 
-    //y along alliance wall
+    //y along alliance wall 
     //x from blue to red
-    double LeftOffsetAng=-12;
-    double RightOFfsetAng=12;
+    double LeftOffsetAng=-8;
+    double RightOFfsetAng=8;
     double RobotOffset = Units.inchesToMeters(15); 
     
     double offsetAng = 0;
@@ -57,8 +57,8 @@ public class CmdT_DriveToReefPosition extends Command {
     if (Reef_Side == 2)
       offsetAng = RightOFfsetAng;
 
-    double x = (ReefRadius + RobotOffset) * Math.cos(Units.degreesToRadians(ReefSegment *60)+offsetAng) + CenterofReefX;
-    double y = (ReefRadius + RobotOffset) * Math.sin(Units.degreesToRadians(ReefSegment *60)+offsetAng) + CenterofReefY;
+    double x = (ReefRadius + RobotOffset) * Math.cos(Units.degreesToRadians((ReefSegment *60)+offsetAng)) + CenterofReefX;
+    double y = (ReefRadius + RobotOffset) * Math.sin(Units.degreesToRadians((ReefSegment *60)+offsetAng)) + CenterofReefY;
     double rot = ReefSegment * 60;
     ReefPose = new Pose2d(x,y, Rotation2d.fromDegrees(rot));
     DogLog.log ("ReefScore/ReefPose", ReefPose);
@@ -80,18 +80,26 @@ public class CmdT_DriveToReefPosition extends Command {
     double CurrentRot = DriveSS.getPose().getRotation().getDegrees();
     double Reef_X = ReefPose.getX();
     double Reef_Y = ReefPose.getY();
-    double Reef_Rot = ReefPose.getRotation().getDegrees();
+    double Reef_Rot = ReefPose.getRotation().getDegrees()+180;
 
     double XVel = XPID.calculate(CurrentX, Reef_X);
     double YVel = YPID.calculate(CurrentY, Reef_Y);
     double RotVel = RotPID.calculate(CurrentRot,Reef_Rot);
-    XVel = MathUtil.clamp(XVel, -0.2, 0.2);
-    YVel = MathUtil.clamp(YVel, -0.2,0.2);
-    RotVel = MathUtil.clamp(RotVel, -0.2, 0.2);
+    XVel = MathUtil.clamp(XVel, -2, 2);
+    YVel = MathUtil.clamp(YVel, -2,2);
+    RotVel = MathUtil.clamp(RotVel, -3, 3);
+  //  if (XVel >0 && XVel < .5) XVel = 0.5;
+   // if (YVel >0 && YVel < .5) YVel = 0.5;
+   // if (XVel <0 && XVel > -.5) XVel = -0.5;
+   // if (YVel <0 && YVel < -.5) YVel = -0.5;
+
     DriveSS.drive(new Translation2d(XVel,YVel),RotVel,true);
     DogLog.log("ReefScore/Xvel",XVel);
     DogLog.log("ReefScore/Yvel",YVel);
     DogLog.log("ReefScore/Rotvel",RotVel);
+    DogLog.log("Reef XPID current", CurrentX);
+    DogLog.log("Reef YPID current", CurrentY);
+    
    
     System.out.println("Driving toReef");
   }

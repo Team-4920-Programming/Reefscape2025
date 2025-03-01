@@ -95,6 +95,7 @@ public class CoralElevatorSubsystem extends SubsystemBase {
   // DataHighway
   public boolean DH_Out_HasCoral = false;
   public double DH_In_DistanceFromReef = 0;
+  public boolean DH_In_RedZone = true;
 
   /** Physical Robot Init START**/
   
@@ -158,7 +159,7 @@ public class CoralElevatorSubsystem extends SubsystemBase {
 
   /** SIM Robot Init END */
 
-
+ 
   private int ScoreSelection;
 
   public final Trigger atElevatorMin = new Trigger(() -> !CanMoveElevatorDown());
@@ -506,7 +507,7 @@ public class CoralElevatorSubsystem extends SubsystemBase {
     
     SmartDashboard.putBoolean("HasCoral", isCoralPresent());
     SmartDashboard.putNumber("IntakeSpeed", CoralIntakeMotor.get());
-
+    if (!DH_In_RedZone){
     if (!ElevatorPID.atSetpoint() && ((CanMoveElevatorUp() && elevatorOutput > 0) || (CanMoveElevatorDown() && elevatorOutput < 0)))
     {
         ElevatorStageMotor.set(elevatorOutput + 0.025); 
@@ -541,7 +542,7 @@ public class CoralElevatorSubsystem extends SubsystemBase {
       WristMotor.set(wristOutput);
   else 
     WristMotor.set(0);
-
+  }
       // WristMotor.set(wristOutput);
   //  }
   // else {

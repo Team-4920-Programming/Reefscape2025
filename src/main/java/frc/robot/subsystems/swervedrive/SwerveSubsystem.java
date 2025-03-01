@@ -21,13 +21,17 @@ import com.pathplanner.lib.util.swerve.SwerveSetpointGenerator;
 import dev.doglog.DogLog;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
+import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
+import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Distance;
@@ -65,6 +69,7 @@ import swervelib.parser.SwerveDriveConfiguration;
 import swervelib.parser.SwerveParser;
 import swervelib.telemetry.SwerveDriveTelemetry;
 import swervelib.telemetry.SwerveDriveTelemetry.TelemetryVerbosity;
+import frc.robot.Vision4920;
 
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Inches;
@@ -83,7 +88,7 @@ public class SwerveSubsystem extends SubsystemBase
   /**
    * Enable vision odometry updates while driving.
    */
-  private final boolean             visionDriveTest     =true;
+  private final boolean             visionDriveTest     =false; //YAGSL Vision
   /**
    * PhotonVision class to keep an accurate odometry.
    */
@@ -96,6 +101,13 @@ public class SwerveSubsystem extends SubsystemBase
   public boolean DH_In_HasCoral = false;
   public int DH_Out_ReefSegment = 0;
   public double DH_Out_ReefDistance = 0;
+
+  //Vision
+  private Vision4920 GreyFeederCamera;
+  private Vision4920 GreyReefCamera;
+  public Pose3d GreyFeederCameraPose3d = new Pose3d();
+  public Pose3d GreyReefCameraPose3d = new Pose3d();
+
 
   /**
    * Initialize {@link SwerveDrive} with the directory provided.
@@ -156,12 +168,18 @@ public class SwerveSubsystem extends SubsystemBase
       // Stop the odometry thread if we are using vision that way we can synchronize updates better.
       swerveDrive.stopOdometryThread();
     }
+
+    //4920 Vision
+    GreyFeederCamera = new Vision4920(Constants.Vision4920.kGreyFeederCam, Constants.Vision4920.kRobotToGreyFeederCam);
+    GreyReefCamera = new Vision4920(Constants.Vision4920.kReefGreyCam, Constants.Vision4920.kRobotToGreyReefCam);
+
     setupPathPlanner();
     if (Robot.isSimulation())
     {
       SetupIntake();
       setupSimulatedField();
     }
+    
   }
 
   /**
@@ -197,10 +215,15 @@ public class SwerveSubsystem extends SubsystemBase
       vision.updatePoseEstimation(swerveDrive);
       //vision.getEstimatedGlobalPose(vision.)
     }
+    //4920 Vision
+    swerveDrive.updateOdometry();
+    ProcessVision4920();
+
+
     DogLog.log("Data/RobotOdo",swerveDrive.getPose());
     DogLog.log("Data/RoboSpeed", swerveDrive.getRobotVelocity());
     DogLog.log("Data/Reefposition",getReefSegment());
-    DogLog.log("Data/Reefposition",getReefDistance());
+    DogLog.log("Data/ReefDistance",getReefDistance());
 
     DH_Out_ReefSegment = getReefSegment();
     DH_Out_ReefDistance = getReefDistance();
@@ -208,32 +231,32 @@ public class SwerveSubsystem extends SubsystemBase
   public int getReefSegment()
 {
   Pose2d CurrentPose = getPose();
-  double ReefX = 4.0;
-  double ReefY = 4.5;
+  double ReefX = 4.5;
+  double ReefY = 4;
   if (isRedAlliance())
-    ReefY = 17.5-4.5;
+    ReefX = 17.5-4;
 
   double RobottoReefX = CurrentPose.getX() - ReefX;
   double RobottoReefY = CurrentPose.getY() - ReefY;
   double RobotAngletoReef = Math.atan2(RobottoReefX, RobottoReefY);
   double Segment = Units.radiansToDegrees(RobotAngletoReef);
-  DogLog.log("segmentangle", Segment);
+  DogLog.log("Data/Reefsegmentangle", Segment);
 //-180 to 180  
   //Segment = Segment/ 60;
   //- 3 to 3
   int seg  =0;
-  if (Segment > -30 && Segment < 30 )
+  if (Segment > 60 && Segment < 120 )
     seg = 0; 
-  if (Segment >= 30 && Segment < 90)
-    seg = 1;
-  if (Segment >= 90 && Segment < 150)
+  if (Segment >= 120 && Segment < 180)
+    seg = 5;
+  if (Segment <=0 && Segment > -60)
     seg =2;
-  if (Segment >= 150 || Segment < -150)
+  if (Segment <= -60 && Segment > -120)
     seg =3;
-  if (Segment >= -150 && Segment < -90)
+  if (Segment <= -120 && Segment > -180)
     seg =4;
-  if (Segment >= -90 && Segment <= -30)
-    seg =5;
+  if (Segment >= 0 && Segment <= 60)
+    seg =1;
     
   
 
@@ -254,15 +277,62 @@ public double getReefDistance(){
   if (isRedAlliance())
     ReefY = 17.5-4.5;
 
-  double RobottoReefX = CurrentPose.getX() - ReefX;
-  double RobottoReefY = CurrentPose.getY() - ReefY;
+  double RobottoReefX = CurrentPose.getX();
+  double RobottoReefY = CurrentPose.getY();
 
   double distance = Math.sqrt(Math.pow(RobottoReefX - ReefX,2)+Math.pow(RobottoReefY-ReefY,2));
   
   return distance;
 
 }
+private void ProcessVision4920()
+{
+  //Process Vision
+  Pose2d GreyFeederPose = new Pose2d(0.0 ,0.0, Rotation2d.fromDegrees(0.0));
+  double GreyFeederVisionTimestamp;
 
+  
+  if ( DriverStation.isDSAttached() && GreyFeederCamera != null)
+  {
+     var visionEst = GreyFeederCamera.getEstimatedGlobalPose();
+     SmartDashboard.putBoolean("GreyFeederCamera Present", GreyFeederCamera.isConnected());
+     
+      if (visionEst.isPresent()){
+          GreyFeederPose = visionEst.get().estimatedPose.toPose2d();
+          GreyFeederCameraPose3d = visionEst.get().estimatedPose;
+
+          
+          GreyFeederVisionTimestamp = visionEst.get().timestampSeconds;
+          DogLog.log("Grey Feeder Camera Pose", GreyFeederPose);
+          DogLog.log("Grey Feeder TimeStamp",GreyFeederVisionTimestamp);
+            VisionReading(GreyFeederPose, GreyFeederVisionTimestamp);
+      }
+  
+  }
+ 
+  Pose2d GreyReefPose= new Pose2d(0.0 ,0.0, Rotation2d.fromDegrees(0.0));;
+  double GreyReefVisionTimestamp;
+  
+  
+  if ( DriverStation.isDSAttached() && GreyReefCamera != null)
+  {
+     var visionEst = GreyReefCamera.getEstimatedGlobalPose();
+     SmartDashboard.putBoolean("GreyReefCamera Present", GreyReefCamera.isConnected());
+     
+      if (visionEst.isPresent()){
+          GreyReefPose = visionEst.get().estimatedPose.toPose2d();
+          GreyReefCameraPose3d = visionEst.get().estimatedPose;
+
+          
+          GreyReefVisionTimestamp = visionEst.get().timestampSeconds;
+          DogLog.log("Grey Reef Camera Pose", GreyReefPose);
+          DogLog.log("Grey Reef TimeStamp",GreyReefVisionTimestamp);
+            VisionReading(GreyReefPose, GreyReefVisionTimestamp);
+      }
+  
+  }
+  
+}
 /*4920 modificaitons for simulation */
 
   @Override
@@ -906,7 +976,10 @@ public double getReefDistance(){
   {
     swerveDrive.addVisionMeasurement(new Pose2d(3, 3, Rotation2d.fromDegrees(65)), Timer.getFPGATimestamp());
   }
-
+  public void VisionReading(Pose2d visionPose,double Timestamp)
+  {
+    swerveDrive.addVisionMeasurement(visionPose, Timestamp);
+  }
   /**
    * Gets the swerve drive object.
    *

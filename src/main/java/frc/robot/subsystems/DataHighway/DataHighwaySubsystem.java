@@ -4,6 +4,7 @@
 package frc.robot.subsystems.DataHighway;
 
 import edu.wpi.first.hal.PWMJNI;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.LEDPattern;
@@ -20,6 +21,7 @@ public class DataHighwaySubsystem extends SubsystemBase {
   private boolean hasCoral = false;
   private double ReefDistance = 0;
   private int ReefSegment = 0;
+  private boolean InRedZone = true;
   private SwerveSubsystem Drive_SS;
   private CoralElevatorSubsystem Coral_SS;
   public DataHighwaySubsystem(SwerveSubsystem DriveSS, CoralElevatorSubsystem CoralSS) {
@@ -34,10 +36,14 @@ public class DataHighwaySubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
+     double ReefRadius = Units.inchesToMeters(65.5)/2;
+   
     getDriveData();
     getCoralData();
     setDriveData();
     setCoralData();
+    double distancefromReefWall = ReefDistance- ReefRadius;
+    DogLog.log ("DistanceToReefWall", distancefromReefWall);
     LEDPattern red = LEDPattern.solid(Color.kRed);
     LEDPattern white = LEDPattern.solid(Color.kWhite);
     LEDPattern yellow = LEDPattern.solid(Color.kYellow);
@@ -45,14 +51,21 @@ public class DataHighwaySubsystem extends SubsystemBase {
     LEDPattern blue = LEDPattern.solid(Color.kBlue);
     if (hasCoral){
       white.applyTo(m_ledBuffer);
-      if (ReefDistance < 2 & ReefDistance > 1)
+      if (distancefromReefWall < 2 & distancefromReefWall > 1.25)
         yellow.applyTo(m_ledBuffer);
-      if (ReefDistance < 1 & ReefDistance > 0.5)
-        red.applyTo(m_ledBuffer);
+
     }
     else
       green.applyTo(m_ledBuffer);
-
+    if (distancefromReefWall < 1.25 & distancefromReefWall > 0.0)
+    {
+      red.applyTo(m_ledBuffer);
+      InRedZone = true;
+    }
+    else
+    {
+      InRedZone = false;
+    }
     // Write the data to the LED strip
     m_led.setData(m_ledBuffer);
 
@@ -70,6 +83,7 @@ public class DataHighwaySubsystem extends SubsystemBase {
   }
   private void setCoralData(){
     Coral_SS.DH_In_DistanceFromReef = ReefDistance;
+    Coral_SS.DH_In_RedZone = InRedZone;
     
   }
     // This method will be called once per scheduler run

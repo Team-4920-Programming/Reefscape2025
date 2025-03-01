@@ -56,6 +56,7 @@ import frc.robot.commands.Elevator.TeleOp.CmdT_Level4;
 import frc.robot.commands.Elevator.TeleOp.CmdT_Level4;
 import frc.robot.commands.Elevator.TeleOp.CmdT_Station;
 import frc.robot.commands.Elevator.TeleOp.CmdT_Station;
+import frc.robot.commands.swervedrive.TeleOp.CmdT_DriveToReefPosition;
 import swervelib.SwerveDriveTest;
 import swervelib.SwerveInputStream;
 /**
@@ -259,12 +260,12 @@ public class RobotContainer
 
       //Drive Subssystem
       OperatorJoystick.button(10).whileTrue(new CmdT_DriveToFeederPosition(drivebase));
-      
+      OperatorJoystick.button(11).whileTrue(new CmdT_DriveToReefPosition(drivebase,1));
 
       //Scoring Buttons
-      OperatorJoystick.button(14).onTrue(new CoralElevatorSubsystem().SetScoreSelection(2));
-      OperatorJoystick.button(15).onTrue(new CoralElevatorSubsystem().SetScoreSelection(3));
-      OperatorJoystick.button(16).onTrue(new CoralElevatorSubsystem().SetScoreSelection(4));
+      //OperatorJoystick.button(14).onTrue(CoralElevatorSubsystem().SetScoreSelection(2));
+      //OperatorJoystick.button(15).onTrue(new CoralElevatorSubsystem().SetScoreSelection(3));
+      //OperatorJoystick.button(16).onTrue(new CoralElevatorSubsystem().SetScoreSelection(4));
       
 
     } else
