@@ -253,9 +253,29 @@ public final class Constants
       public static final double height = 0.12; //meters
   }
   public static class Level4 {
-    public static final double wrist = -35; //degrees
+    public static final double wrist = 0; //degrees
     public static final double elbow =175; //degrees
     public static final double height = 0.725; //meters
+}
+public static class AlgaeLowApproach {
+  public static final double wrist = 0; //degrees
+  public static final double elbow =10; //degrees
+  public static final double height = 0.5; //meters
+}
+public static class AlgaeMidApproach {
+  public static final double wrist = -35; //degrees
+  public static final double elbow =10; //degrees
+  public static final double height = 0.5; //meters
+}
+public static class AlgaeLowRetract {
+  public static final double wrist = -35; //degrees
+  public static final double elbow =10; //degrees
+  public static final double height = 0.5; //meters
+}
+public static class AlgaeMidRetract {
+  public static final double wrist = -35; //degrees
+  public static final double elbow =10; //degrees
+  public static final double height = 0.5; //meters
 }
 public static class ArmNeutral {
   public static final double wrist = 67; //degrees

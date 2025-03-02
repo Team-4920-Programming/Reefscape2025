@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.CoralElevator.CoralElevatorSubsystem;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 import dev.doglog.*;
+import edu.wpi.first.math.geometry.Pose2d;
 public class DataHighwaySubsystem extends SubsystemBase {
   /** Creates a new DataHighwaySubsystem. */
   AddressableLED m_led = new AddressableLED(0);
@@ -37,7 +38,7 @@ public class DataHighwaySubsystem extends SubsystemBase {
   @Override
   public void periodic() {
      double ReefRadius = Units.inchesToMeters(65.5)/2;
-   
+    Pose2d  CurrentPose = Drive_SS.getPose();
     getDriveData();
     getCoralData();
     setDriveData();
@@ -57,15 +58,31 @@ public class DataHighwaySubsystem extends SubsystemBase {
     }
     else
       green.applyTo(m_ledBuffer);
+
+    //red zone - reduced speed - no elevator functions
+    InRedZone = false;  
     if (distancefromReefWall < 1.25 & distancefromReefWall > 0.0)
     {
       red.applyTo(m_ledBuffer);
       InRedZone = true;
     }
-    else
+    if (CurrentPose.getX() > 8 && CurrentPose.getX() < 9.5)
     {
-      InRedZone = false;
+      //in climber zone
+      InRedZone = true;
     }
+    
+    // TODO: redzone Coral Stations
+    // 3.3m from 0 to 3.3m (on a 45)
+   double BlueRightX = CurrentPose.getX();
+   double BlueRightY = CurrentPose.getY();
+    double BlueRightr = Math.sqrt(pow(BlueRightX,2)+pow(BlueRightY,2));
+    if (BlueRightr <2.5){
+      InRedZone = true;
+    }
+    
+    
+    
     // Write the data to the LED strip
     m_led.setData(m_ledBuffer);
 

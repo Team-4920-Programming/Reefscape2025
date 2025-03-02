@@ -96,6 +96,7 @@ public class CoralElevatorSubsystem extends SubsystemBase {
   public boolean DH_Out_HasCoral = false;
   public double DH_In_DistanceFromReef = 0;
   public boolean DH_In_RedZone = true;
+  public boolean OverrideRedZone = false; //set from the algae commands
 
   /** Physical Robot Init START**/
   
@@ -507,7 +508,7 @@ public class CoralElevatorSubsystem extends SubsystemBase {
     
     SmartDashboard.putBoolean("HasCoral", isCoralPresent());
     SmartDashboard.putNumber("IntakeSpeed", CoralIntakeMotor.get());
-    if (!DH_In_RedZone){
+    if (!DH_In_RedZone || OverrideRedZone){
     if (!ElevatorPID.atSetpoint() && ((CanMoveElevatorUp() && elevatorOutput > 0) || (CanMoveElevatorDown() && elevatorOutput < 0)))
     {
         ElevatorStageMotor.set(elevatorOutput + 0.025); 

@@ -35,6 +35,7 @@ import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.units.measure.Velocity;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -99,6 +100,7 @@ public class SwerveSubsystem extends SubsystemBase
 
   // Datahighway information
   public boolean DH_In_HasCoral = false;
+  public boolean DH_In_InRedZone = false;
   public int DH_Out_ReefSegment = 0;
   public double DH_Out_ReefDistance = 0;
 
@@ -745,7 +747,18 @@ private void ProcessVision4920()
   public Command driveFieldOriented(Supplier<ChassisSpeeds> velocity)
   {
     return run(() -> {
-      swerveDrive.driveFieldOriented(velocity.get());
+      //4920 modifications limit Driver (Jackson) speed in Red Zones
+
+      ChassisSpeeds speed = velocity.get();
+        
+      if (DH_In_InRedZone)
+      {
+        if (speed.vxMetersPerSecond> 1)  speed.vxMetersPerSecond =1;
+        if (speed.vyMetersPerSecond >1)  speed.vyMetersPerSecond =1;
+         
+
+      }
+      swerveDrive.driveFieldOriented(speed);
     });
   }
 

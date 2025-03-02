@@ -27,7 +27,7 @@ public class CmdT_DriveToReefPosition extends Command {
   PIDController XPID = new PIDController(2, 0, 0);
   PIDController YPID = new PIDController(2, 0, 0);
   PIDController RotPID = new PIDController(0.1,0,0);
-  public CmdT_DriveToReefPosition(SwerveSubsystem DriveSubsystem, Integer Side) {
+  public CmdT_DriveToReefPosition(SwerveSubsystem DriveSubsystem, int Side) {
     // Use addRequirements() here to declare subsystem dependencies.
     Reef_Side = Side;
       DriveSS = DriveSubsystem;
@@ -56,7 +56,12 @@ public class CmdT_DriveToReefPosition extends Command {
       offsetAng = LeftOffsetAng;
     if (Reef_Side == 2)
       offsetAng = RightOFfsetAng;
+    if (Reef_Side == 3 || Reef_Side == 4)
+      offsetAng = 0; // algae position
+    if ( Reef_Side == 4)
+        RobotOffset = RobotOffset +1; // move 1 meter further if removeing algae
 
+        
     double x = (ReefRadius + RobotOffset) * Math.cos(Units.degreesToRadians((ReefSegment *60)+offsetAng)) + CenterofReefX;
     double y = (ReefRadius + RobotOffset) * Math.sin(Units.degreesToRadians((ReefSegment *60)+offsetAng)) + CenterofReefY;
     double rot = ReefSegment * 60;

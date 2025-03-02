@@ -29,7 +29,7 @@ public class CmdT_DriveToFeederPosition extends Command {
   PIDController XPID = new PIDController(2, 0, 0);
   PIDController YPID = new PIDController(2, 0, 0);
   PIDController RotPID = new PIDController(0.1,0,0);
-  
+  boolean StartingPositionOK = false;
   public CmdT_DriveToFeederPosition(SwerveSubsystem DriveSubsystem) {
     // Use addRequirements() here to declare subsystem dependencies.
 
@@ -73,6 +73,7 @@ public class CmdT_DriveToFeederPosition extends Command {
       //onshape cordinates -> World Co-ordinates (8.75-x, 4-y) -> Robot Cordinates (Wx+.386, Wy +.322)
       
       //slot 1 -8.41, -3.03 -> 0.34, 0.97
+      StartingPositionOK = true;
       s1x = s1x + RobotOffsetX;
       s1y =  s1y + RobotOffsetY;
       //slot 2 -8.245, -3.15 -> 0.505, 0.85
@@ -93,17 +94,6 @@ public class CmdT_DriveToFeederPosition extends Command {
       //slot 7 -7.423, -3.747 -> 1.327, 0.253
       s7x =  s7x + RobotOffsetX;
       s7y =  s7y + RobotOffsetY;
-      
-      System.out.println("s1x:"+s1x+" s1y:"+s1y);
-      System.out.println("s2x:"+s2x+" s2y:"+s2y);
-      System.out.println("s3x:"+s3x+" s3y:"+s3y);
-      System.out.println("s4x:"+s4x+" s4y:"+s4y);
-      System.out.println("s5x:"+s5x+" s5y:"+s5y);
-      System.out.println("s6x:"+s6x+" s6y:"+s6y);
-      System.out.println("s7x:"+s7x+" s7y:"+s7y);
-      System.out.println("Cx:"+CurrentLocation.getX()+" Cy:"+CurrentLocation.getY());
-
-
       TargetRot = -126;
       //middle slot is at 0.834m,0.612m (1.22, .93) (Add .386, .322 to Slot Locations)
 
@@ -140,16 +130,6 @@ public class CmdT_DriveToFeederPosition extends Command {
   Translation2d S6 = new Translation2d(s6x,s6y);
   Translation2d S7 = new Translation2d(s7x,s7y);
   
-    // double DistanceS1 = CurrentTranslation.minus(S1).getNorm();
-    System.out.println("Distance S1 " + DistanceS1 );
-    System.out.println("Distance S2 " + DistanceS2 );
-    System.out.println("Distance S3 " + DistanceS3 );
-    System.out.println("Distance S4 " + DistanceS4 );
-    System.out.println("Distance S5 " + DistanceS5 );
-    System.out.println("Distance S6 " + DistanceS6 );
-    System.out.println("Distance S7 " + DistanceS7 );
-
-
     double closest = Math.min(DistanceS1, DistanceS2);
     closest = Math.min(closest, DistanceS3);
     closest = Math.min(closest, DistanceS4);
@@ -215,7 +195,10 @@ public class CmdT_DriveToFeederPosition extends Command {
     XVel = MathUtil.clamp(XVel, -2, 2);
     YVel = MathUtil.clamp(YVel, -2, 2);
     RotVel = MathUtil.clamp(RotVel, -1, 1);
-    DriveSS.drive(new Translation2d(XVel,YVel),RotVel,true);
+    if (StartingPositionOK)
+    {
+      DriveSS.drive(new Translation2d(XVel,YVel),RotVel,true);
+    }
     DogLog.log("Xvel",XVel);
     DogLog.log("Yvel",YVel);
     DogLog.log("Rotvel",RotVel);
@@ -234,6 +217,6 @@ public class CmdT_DriveToFeederPosition extends Command {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return XPID.atSetpoint() & YPID.atSetpoint() & RotPID.atSetpoint();
-  }
+    return (XPID.atSetpoint() & YPID.atSetpoint() & RotPID.atSetpoint()) || !StartingPositionOK;
+  } 
 }
