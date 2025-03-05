@@ -84,9 +84,9 @@ public final class Constants
     }
     public static class CoralElevator {
       public static class Elevator{
-        public static final double kp = 2.0;//3.5
+        public static final double kp = 3.0;//3.5
         public static final double ki = 0.0;
-        public static final double kd = 0.00;
+        public static final double kd = 0.01;
 
         public static final double ks = 0.6016;
         public static final double kv = 11.991;
@@ -176,6 +176,9 @@ public final class Constants
       public static final int DownStop = 1;
       public static final int UpStop = 2;
       public static final int CoralPresence = 3;
+      public static final int UltrasonicTrigger = 5;
+      public static final int UltrasonicEcho = 6;
+
     }
 
     public static class AlgaeIntake {
@@ -233,9 +236,9 @@ public final class Constants
   }
   public static class RobotPositions{
     public static class CoralStation {
-      public static final double wrist = 60; //degrees
+      public static final double wrist = 35; //degrees
       public static final double elbow =10; //degrees
-      public static final double height = 0.4; //meters
+      public static final double height = 0.42; //meters
   }
   public static class Level1 {
     public static final double wrist = 30; //degrees
@@ -253,24 +256,24 @@ public final class Constants
       public static final double height = 0.12; //meters
   }
   public static class Level4 {
-    public static final double wrist = 0; //degrees
+    public static final double wrist = -30; //degrees
     public static final double elbow =175; //degrees
     public static final double height = 0.725; //meters
 }
 public static class AlgaeLowApproach {
   public static final double wrist = 0; //degrees
-  public static final double elbow =10; //degrees
-  public static final double height = 0.5; //meters
+  public static final double elbow =90; //degrees
+  public static final double height = 0.35; //meters
 }
 public static class AlgaeMidApproach {
   public static final double wrist = -35; //degrees
   public static final double elbow =10; //degrees
-  public static final double height = 0.5; //meters
+  public static final double height = 0.55; //meters
 }
 public static class AlgaeLowRetract {
-  public static final double wrist = -35; //degrees
-  public static final double elbow =10; //degrees
-  public static final double height = 0.5; //meters
+  public static final double wrist = -50; //degrees
+  public static final double elbow =90; //degrees
+  public static final double height = 0.35; //meters
 }
 public static class AlgaeMidRetract {
   public static final double wrist = -35; //degrees

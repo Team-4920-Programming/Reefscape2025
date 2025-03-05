@@ -14,17 +14,17 @@ import swervelib.SwerveDrive;
 // NOTE:  Consider using this command inline, rather than writing a subclass.  For more
 // information, see:
 // https://docs.wpilib.org/en/stable/docs/software/commandbased/convenience-features.html
-public class Cmd_SeqRemoveAlgea extends SequentialCommandGroup {
+public class Cmd_SeqScoreRight extends SequentialCommandGroup {
   /** Creates a new Cmd_SeqRemoveAlgea. */
-  public Cmd_SeqRemoveAlgea(CoralElevatorSubsystem Coral_SS, SwerveSubsystem Drive_SS) {
+  public Cmd_SeqScoreRight(CoralElevatorSubsystem Coral_SS, SwerveSubsystem Drive_SS) {
     // Add your commands in the addCommands() call, e.g.
     // addCommands(new FooCommand(), new BarCommand());
-
-    addCommands(new CmdT_AlgaeLowApproach(Coral_SS),
-      new CmdT_DriveToReefPosition(Drive_SS,3),
-      new CmdT_AlgaeLowRetract(Coral_SS),
-      new CmdT_DriveToReefPosition(Drive_SS,4)
-
+    //
+    addCommands(new CmdT_MoveToLevel(Coral_SS),
+      new CmdT_DriveToReefPosition(Drive_SS,2),
+      new CmdT_CoralOutTake(Coral_SS),
+      new CmdT_DriveToReefPosition(Drive_SS,4),
+      new CmdT_Station(Coral_SS)
       );
   }
 }

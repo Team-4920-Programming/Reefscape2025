@@ -42,6 +42,7 @@ public class CmdT_DriveToFeederPosition extends Command {
   public void initialize() {
     Pose2d CurrentLocation = DriveSS.getPose();
     Pose2d TargetPose = new Pose2d (0,0, Rotation2d.fromDegrees(0));
+    DriveSS.DH_Out_AtCoralStation = false;
     double FieldWidth = 8; //wall to wall
     double FieldDepth = 17.55; //aliance Wall to Alliance Wall
     //onshape cordinates of blue 
@@ -177,8 +178,8 @@ public class CmdT_DriveToFeederPosition extends Command {
     Feeder_Y = TargetPose.getY();
     Feeder_Rot = TargetPose.getRotation().getDegrees();
     FeederPose = new Pose2d(Feeder_X, Feeder_Y,Rotation2d.fromDegrees(Feeder_Rot));
-    XPID.setTolerance(0.01);
-    YPID.setTolerance(0.01);
+    XPID.setTolerance(0.05);
+    YPID.setTolerance(0.05);
     RotPID.setTolerance(5);
     RotPID.enableContinuousInput(-180, 180);
   }
@@ -189,9 +190,14 @@ public class CmdT_DriveToFeederPosition extends Command {
     double CurrentX = DriveSS.getPose().getX();
     double CurrentY = DriveSS.getPose().getY();
     double CurrentRot = DriveSS.getPose().getRotation().getDegrees();
-    double XVel = XPID.calculate(CurrentX, Feeder_X);
-    double YVel = YPID.calculate(CurrentY, Feeder_Y);
     double RotVel = RotPID.calculate(CurrentRot,Feeder_Rot);
+    double XVel = 0;  
+    double YVel =0;
+    if (RotPID.atSetpoint()){
+     XVel = XPID.calculate(CurrentX, Feeder_X);
+     YVel = YPID.calculate(CurrentY, Feeder_Y);
+    }
+    
     XVel = MathUtil.clamp(XVel, -2, 2);
     YVel = MathUtil.clamp(YVel, -2, 2);
     RotVel = MathUtil.clamp(RotVel, -1, 1);
@@ -203,7 +209,7 @@ public class CmdT_DriveToFeederPosition extends Command {
     DogLog.log("Yvel",YVel);
     DogLog.log("Rotvel",RotVel);
     DogLog.log("FeederPose", FeederPose);
-    System.out.println("Driving toFeeder");
+    //System.out.println("Driving toFeeder");
   }
 
   // Called once the command ends or is interrupted.
@@ -211,6 +217,16 @@ public class CmdT_DriveToFeederPosition extends Command {
   public void end(boolean interrupted) {
     DriveSS.drive(new ChassisSpeeds(0,0,0));
     System.out.println("DrivetoFeeder Finished");
+    System.out.println ("XPID" + XPID.atSetpoint());
+    System.out.println ("YPID" + YPID.atSetpoint());
+    System.out.println ("RotPID" + RotPID.atSetpoint());
+    
+    if (XPID.atSetpoint() & YPID.atSetpoint() & RotPID.atSetpoint())
+    {
+      
+      System.out.println("At CoralStation");
+        DriveSS.DH_Out_AtCoralStation = true;
+    }
 
   }
 

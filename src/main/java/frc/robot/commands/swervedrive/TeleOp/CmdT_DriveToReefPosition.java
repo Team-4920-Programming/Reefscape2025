@@ -86,9 +86,12 @@ public class CmdT_DriveToReefPosition extends Command {
     double Reef_X = ReefPose.getX();
     double Reef_Y = ReefPose.getY();
     double Reef_Rot = ReefPose.getRotation().getDegrees()+180;
-
-    double XVel = XPID.calculate(CurrentX, Reef_X);
-    double YVel = YPID.calculate(CurrentY, Reef_Y);
+    double XVel = 0;  
+    double YVel =0;
+    if (RotPID.atSetpoint()){
+      XVel = XPID.calculate(CurrentX, Reef_X);
+      YVel = YPID.calculate(CurrentY, Reef_Y);
+    }
     double RotVel = RotPID.calculate(CurrentRot,Reef_Rot);
     XVel = MathUtil.clamp(XVel, -2, 2);
     YVel = MathUtil.clamp(YVel, -2,2);
@@ -114,7 +117,8 @@ public class CmdT_DriveToReefPosition extends Command {
   public void end(boolean interrupted) {
     DriveSS.drive(new ChassisSpeeds(0,0,0));
     System.out.println("DrivetoReef Finished");
-
+    System.out.println("interrupted"+interrupted);
+    
   }
 
   // Returns true when the command should end.

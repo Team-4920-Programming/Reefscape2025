@@ -21,7 +21,9 @@ import com.pathplanner.lib.util.swerve.SwerveSetpointGenerator;
 import dev.doglog.DogLog;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -101,8 +103,11 @@ public class SwerveSubsystem extends SubsystemBase
   // Datahighway information
   public boolean DH_In_HasCoral = false;
   public boolean DH_In_InRedZone = false;
+  public boolean DH_In_CoralYellow =false;
+  public boolean DH_InStationZone = false;
   public int DH_Out_ReefSegment = 0;
   public double DH_Out_ReefDistance = 0;
+  public boolean DH_Out_AtCoralStation = false;
 
   //Vision
   private Vision4920 GreyFeederCamera;
@@ -110,6 +115,7 @@ public class SwerveSubsystem extends SubsystemBase
   public Pose3d GreyFeederCameraPose3d = new Pose3d();
   public Pose3d GreyReefCameraPose3d = new Pose3d();
 
+  private PIDController RotPID = new PIDController(0.1,0,0);
 
   /**
    * Initialize {@link SwerveDrive} with the directory provided.
@@ -274,8 +280,8 @@ public class SwerveSubsystem extends SubsystemBase
 }
 public double getReefDistance(){
   Pose2d CurrentPose = getPose();
-  double ReefX = 4.0;
-  double ReefY = 4.5;
+  double ReefX = 4.5;
+  double ReefY = 4.0;
   if (isRedAlliance())
     ReefY = 17.5-4.5;
 
@@ -758,9 +764,45 @@ private void ProcessVision4920()
          
 
       }
-      swerveDrive.driveFieldOriented(speed);
+      if (DH_In_HasCoral && !DH_InStationZone)
+      {
+      double RotVel = getRotationVelocity();
+      speed.omegaRadiansPerSecond = RotVel;
+      //swerveDrive.driveFieldOriented(speed);
+    }
+    swerveDrive.driveFieldOriented(speed);
     });
   }
+
+  private double getRotationVelocity()
+  {
+    Pose2d ReefPose;
+    double CenterofReefX  = 4.481; //wall to wall
+    double CenterofReefY = 4.0; //aliance Wall to Alliance Wall
+    double ReefRadius = Units.inchesToMeters(65.5)/2;
+    //onshape cordinates of blue 
+    //y along alliance wall 
+    //x from blue to red
+    double LeftOffsetAng=-8;
+    double RightOFfsetAng=8;
+    double RobotOffset = Units.inchesToMeters(15); 
+    double CurrentRot = getPose().getRotation().getDegrees();
+    double offsetAng = 0;
+    //  System.out.println("Initializing Drive to Reef *****************");
+    int ReefSegment = getReefSegment();
+  
+     double Reefrot = ReefSegment * 60;
+  
+    RotPID.setTolerance(5);
+    RotPID.enableContinuousInput(-180, 180);
+    double Reef_Rot = Reefrot +180;
+
+    double RotVel = RotPID.calculate(CurrentRot,Reef_Rot);
+    RotVel = MathUtil.clamp(RotVel, -3, 3);
+
+    return RotVel;
+  }
+
 
   /**
    * Drive according to the chassis robot oriented velocity.
