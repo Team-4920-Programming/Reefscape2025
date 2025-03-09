@@ -65,8 +65,8 @@ public class CmdT_DriveToFeederPosition extends Command {
     double s7x=Units.inchesToMeters(52.5), s7y=Units.inchesToMeters(10);
   
     double TargetRot=0;
-    double RobotOffsetX = Units.inchesToMeters(10); //38.6cm
-    double RobotOffsetY = Units.inchesToMeters(14.5);
+    double RobotOffsetX = Units.inchesToMeters(8); //38.6cm
+    double RobotOffsetY = Units.inchesToMeters(12.5);
     System.out.println("Initializing Drive to Feeder *****************");
     if (CurrentLocation.getX() < 2.5 && CurrentLocation.getY() < 2.5)
     {
@@ -95,7 +95,8 @@ public class CmdT_DriveToFeederPosition extends Command {
       //slot 7 -7.423, -3.747 -> 1.327, 0.253
       s7x =  s7x + RobotOffsetX;
       s7y =  s7y + RobotOffsetY;
-      TargetRot = -126;
+      // TargetRot = -126;
+      TargetRot = 54;
       //middle slot is at 0.834m,0.612m (1.22, .93) (Add .386, .322 to Slot Locations)
 
     }
@@ -141,37 +142,37 @@ public class CmdT_DriveToFeederPosition extends Command {
 
     if (DistanceS1 == closest)
     {
-      TargetPose = new Pose2d(S1,Rotation2d.fromDegrees(-126));
+      TargetPose = new Pose2d(S1,Rotation2d.fromDegrees(TargetRot));
       DogLog.log("Target slot", 1);
     }
     if (DistanceS2 == closest)
     {
-      TargetPose = new Pose2d(S2,Rotation2d.fromDegrees(-126));
+      TargetPose = new Pose2d(S2,Rotation2d.fromDegrees(TargetRot));
       DogLog.log("Target slot", 2);
     }
     if (DistanceS3 == closest)
     {
-      TargetPose = new Pose2d(S3,Rotation2d.fromDegrees(-126));
+      TargetPose = new Pose2d(S3,Rotation2d.fromDegrees(TargetRot));
       DogLog.log("Target slot", 3);
     }
     if (DistanceS4 == closest)
     {
-      TargetPose = new Pose2d(S4,Rotation2d.fromDegrees(-126));
+      TargetPose = new Pose2d(S4,Rotation2d.fromDegrees(TargetRot));
       DogLog.log("Target slot", 4);
     }
     if (DistanceS5 == closest)
     {
-      TargetPose = new Pose2d(S5,Rotation2d.fromDegrees(-126));
+      TargetPose = new Pose2d(S5,Rotation2d.fromDegrees(TargetRot));
       DogLog.log("Target slot", 5);
     }
     if (DistanceS6 == closest)
     {
-      TargetPose = new Pose2d(S6,Rotation2d.fromDegrees(-126));
+      TargetPose = new Pose2d(S6,Rotation2d.fromDegrees(TargetRot));
       DogLog.log("Target slot", 6);
     }
     if (DistanceS7 == closest)
     {
-      TargetPose = new Pose2d(S7,Rotation2d.fromDegrees(-126));
+      TargetPose = new Pose2d(S7,Rotation2d.fromDegrees(TargetRot));
       DogLog.log("Target slot", 7);
     }
     Feeder_X = TargetPose.getX();

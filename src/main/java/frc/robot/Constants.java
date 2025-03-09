@@ -120,6 +120,17 @@ public final class Constants
         
         public static final double maxVelocity = 0.01;
       }
+      public static class RightFlap{
+        public static final double kp = 0.01;
+        public static final double ki = 0;
+        public static final double kd = 0;
+      }
+      public static class LeftFlap{
+        public static final double kp = 0.01;
+        public static final double ki = 0;
+        public static final double kd = 0;
+      }
+      
     }
     public static class AlgaeIntake {
       public static final double kp = 0.01;
@@ -154,15 +165,18 @@ public final class Constants
       public static final int Elbow = 11;
       public static final int Wrist = 12;
       public static final int CoralIntake = 13;
+      public static final int CoralFlapRight = 21;
+      public static final int CoralFlapLeft = 20;
     }
 
-    public static class AlgaeIntake {
-      public static final int Pivot = 14;
-      public static final int BallIntake = 15;
+    public static class MitoCANdria {
+      public static final int Red = 14;
+      public static final int BlueGray = 15;
     }
 
     public static class Climber {
       public static final int Winch = 17;
+      public static final int Pivot = 19;
     }
 
     public static class Sensor {
@@ -201,11 +215,12 @@ public final class Constants
     public static class CoralElevator {
       public static final int ElbowAngle = CanIDs.CoralElevator.Elbow;
       public static final int WristAngle = CanIDs.CoralElevator.Wrist;
+
     }
 
-    public static class AlgaeIntake {
-      public static final int AlgaeAngle  = CanIDs.AlgaeIntake.Pivot;
-    }
+    //public static class AlgaeIntake {
+    //  public static final int AlgaeAngle  = CanIDs.AlgaeIntake.Pivot;
+    //}//
 
     public static class Climber {
       public static final int ClimberAngle  = CanIDs.Climber.Winch;
@@ -236,9 +251,9 @@ public final class Constants
   }
   public static class RobotPositions{
     public static class CoralStation {
-      public static final double wrist = 35; //degrees
-      public static final double elbow =10; //degrees
-      public static final double height = 0.42; //meters
+      public static final double wrist = 158; //degrees //-202
+      public static final double elbow =-7; //degrees
+      public static final double height = 0.1; //meters
   }
   public static class Level1 {
     public static final double wrist = 30; //degrees
@@ -260,6 +275,11 @@ public final class Constants
     public static final double elbow =175; //degrees
     public static final double height = 0.725; //meters
 }
+  public static class Level4_Far {
+    public static final double wrist = -25; //degrees
+    public static final double elbow =160; //degrees
+    public static final double height = 0.725; //meters
+  }
 public static class AlgaeLowApproach {
   public static final double wrist = 0; //degrees
   public static final double elbow =90; //degrees
@@ -301,6 +321,8 @@ public static class ArmNeutral {
       public static final double minHeight = 0;
       public static final double maxHeight = 0.75;
       public static final double offset = 0.04;
+      public static final double elevatorRedZoneUpperHeight = 0.55;
+      public static final double elevatorRedZoneLowerHeight = 0.36;
       
     }
 
@@ -317,13 +339,13 @@ public static class ArmNeutral {
 
   public static class RobotMotionLimits {
     public static class Elbow {
-      public static final double minAngle = 0;
+      public static final double minAngle = -5;
       public static final double maxAngle = 190;
     }
 
     public static class Wrist {
       public static final double minAngle = -90;
-      public static final double maxAngle = 90;
+      public static final double maxAngle = 180;
     }
 
     public static class Elevator {
@@ -344,7 +366,7 @@ public static class ArmNeutral {
 
     // positive x to the left, positive y up
     public static final Transform3d kRobotToGreyFeederCam =
-            new Transform3d(new Translation3d(Units.inchesToMeters(12.5), Units.inchesToMeters(-13), Units.inchesToMeters(34.625)), new Rotation3d(0, Units.degreesToRadians(314), 0)); //
+            new Transform3d(new Translation3d(Units.inchesToMeters(-2), Units.inchesToMeters(-13), Units.inchesToMeters(38)), new Rotation3d(0, Units.degreesToRadians(314), Units.degreesToRadians(180))); //
   public static final Transform3d kRobotToGreyReefCam =
             new Transform3d(new Translation3d(Units.inchesToMeters(12.5), Units.inchesToMeters(-13.5), Units.inchesToMeters(35.5)), new Rotation3d(0, Units.degreesToRadians(37), 0)); // 0.48
   public static final Transform3d kRobotToRedReefCam =

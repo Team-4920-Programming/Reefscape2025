@@ -30,10 +30,14 @@ import com.revrobotics.spark.SparkBase;
 import com.revrobotics.spark.SparkLimitSwitch;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkRelativeEncoder;
+import com.revrobotics.spark.SparkBase.PersistMode;
+import com.revrobotics.spark.SparkBase.ResetMode;
 
 import dev.doglog.DogLog;
 
 import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.revrobotics.spark.config.SparkMaxConfig;
+import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
 import frc.robot.Constants;
 import frc.robot.Constants.CanIDs;
@@ -44,22 +48,28 @@ import frc.robot.commands.swervedrive.drivebase.AbsoluteDrive;
 
 public class ClimberSubsystem extends SubsystemBase {
   private SparkMax climberMotor;
-
+  private SparkMax ClimberPivot;
+  private SparkMaxConfig ClimberMotorConfig;
+  private SparkMaxConfig ClimberPivotConfig;
   private DigitalInput cagePresenceSensor;
   private boolean cagePresent;
 
   private AbsoluteEncoder climberAngleEncoder;
   private double climberAngle;
 
-  PIDController ClimberPID = new PIDController(PIDs.Climber.kp, PIDs.Climber.ki, PIDs.Climber.kd);
+  //PIDController ClimberPID = new PIDController(PIDs.Climber.kp, PIDs.Climber.ki, PIDs.Climber.kd);
   double climberOutput;
-
-  public final Trigger atClimberMin = new Trigger(() -> !CanMoveClimberIn());
-  public final Trigger atClimberMax = new Trigger(() -> !CanMoveClimberOut());
+  boolean climberOut = false;
+  boolean ClimberIdle = false;
+  //public final Trigger atClimberMin = new Trigger(() -> !CanMoveClimberIn());
+ // public final Trigger atClimberMax = new Trigger(() -> !CanMoveClimberOut());
 
   /** Creates a new ClimberSubsystem. */
   public ClimberSubsystem() {
     climberMotor = new SparkMax(CanIDs.Climber.Winch, MotorType.kBrushless);
+    ClimberMotorConfig = new SparkMaxConfig();
+    ClimberPivot = new SparkMax(CanIDs.Climber.Pivot, MotorType.kBrushless);
+    ClimberPivotConfig = new SparkMaxConfig();
     cagePresenceSensor = new DigitalInput(DIO.Climber.CagePresence);
     climberAngleEncoder = climberMotor.getAbsoluteEncoder();
     
@@ -68,19 +78,65 @@ public class ClimberSubsystem extends SubsystemBase {
   @Override
   public void periodic() {
     ReadSensorValues();
-
-    climberOutput = ClimberPID.calculate(climberAngle);
+   // System.out.println(climberAngle);
+    if (climberOut)
+    {
+      //System.out.println("Climber Out");
+      if((climberAngle <160 || climberAngle> 300) && !ClimberIdle)
+      {
+        ClimberPivot.set(0.1);
+        //System.out.println("Climber Spd 0.05");
+      }
+      else 
+      {
+        ClimberPivot.set(0);
+      }
+    }
+      if (!climberOut)
+    {
+     // System.out.println("Climber In");
+      if(climberAngle >10 && climberAngle <170 && !ClimberIdle)
+      {
+        ClimberPivot.set(-0.1);
+        //System.out.println("Climber Spd -0.05");
+      }
+      else 
+      {
+        ClimberPivot.set(0);
+      }
+      
+    }
+    //climberOutput = ClimberPID.calculate(climberAngle);
     // climberMotor.set(climberOutput);
   }
-
+  public void ClimberOut()
+  {
+    ClimberPivotConfig.idleMode(IdleMode.kBrake);  
+    ClimberPivot.configure(ClimberPivotConfig, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
+    climberOut = true;
+  }
+  public void ClimberIn()
+  {
+    ClimberPivotConfig.idleMode(IdleMode.kCoast);
+    ClimberPivot.configure(ClimberPivotConfig, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
+    climberOut = false;
+  }
+  
   public void StopClimber(){
     climberMotor.set(0);
+    ClimberIdle = true;
   }
   public void RunClimberIn(double speed){
-    climberMotor.set(speed);
+   // System.out.println("RunClimberIn");
+    ClimberPivotConfig.idleMode(IdleMode.kCoast);
+    ClimberPivot.configure(ClimberPivotConfig, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
+    climberMotor.set(-speed);
+    ClimberIdle = true;
+    climberOut = false;
   }
   public void RunClimberOut(double speed){
-    climberMotor.set(-speed);
+    climberMotor.set(speed);
+    ClimberIdle = true;
   }
 
   private Boolean CanMoveClimberIn(){
@@ -89,15 +145,8 @@ public class ClimberSubsystem extends SubsystemBase {
   private Boolean CanMoveClimberOut(){
     return climberAngle < RobotLimits.Climber.maxAngle;
   }
-  public void SetClimberAngle(double angle)
-  {
-    if (angle > ClimberPID.getSetpoint() && CanMoveClimberIn()){
-      ClimberPID.setSetpoint(angle);
-    }
-    if (angle < ClimberPID.getSetpoint() && CanMoveClimberOut()){
-      ClimberPID.setSetpoint(angle);
-    }
-  }
+
+
   
 
 

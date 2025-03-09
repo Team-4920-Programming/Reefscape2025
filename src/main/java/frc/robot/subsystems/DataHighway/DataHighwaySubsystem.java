@@ -3,18 +3,31 @@
 // the WPILib BSD license file in the root directory of this project.
 package frc.robot.subsystems.DataHighway;
 
+import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.hal.PWMJNI;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.LEDPattern;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj.smartdashboard.FieldObject2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Robot;
 import frc.robot.subsystems.CoralElevator.CoralElevatorSubsystem;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import dev.doglog.*;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Transform2d;
 public class DataHighwaySubsystem extends SubsystemBase {
   /** Creates a new DataHighwaySubsystem. */
   AddressableLED m_led = new AddressableLED(0);
@@ -26,8 +39,18 @@ public class DataHighwaySubsystem extends SubsystemBase {
   private boolean InReefYellowZone = false;
   private boolean InCoralSationZone = false;
   private boolean AtCoralStation = false;
+  private boolean isRedAlliance = false;
+  private Pose3d LeftCoralStationPose;
+  private Pose3d RightCoralStationPose;
   private SwerveSubsystem Drive_SS;
   private CoralElevatorSubsystem Coral_SS;
+  private AprilTagFieldLayout atf;
+  private boolean inLeftCoralZone = false;
+  private boolean inRightCoralZone = false;
+  private Pose2d CurrentPose = new Pose2d();
+  private Pose2d ClosestReefSegment = new Pose2d();
+  private boolean isMatchSetupCompleted = false;
+  List<Pose2d> reefPoses1 = new ArrayList();
   public DataHighwaySubsystem(SwerveSubsystem DriveSS, CoralElevatorSubsystem CoralSS) {
     Drive_SS = DriveSS;
     Coral_SS = CoralSS;
@@ -36,12 +59,27 @@ public class DataHighwaySubsystem extends SubsystemBase {
     // Set the data
     m_led.setData(m_ledBuffer);
     m_led.start();
+    atf = AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded);
   }
 
   @Override
   public void periodic() {
-     double ReefRadius = Units.inchesToMeters(76.5)/2;
-    Pose2d  CurrentPose = Drive_SS.getPose();
+    // if(!isMatchSetupCompleted){
+    //   if ((DriverStation.isFMSAttached() || Robot.isSimulation()) && DriverStation.isDSAttached()){
+      SetupZonesCenter();
+      SetupReefPoses();
+      //     isMatchSetupCompleted = true;
+      // }
+    // }
+    // SetupZonesCenter();
+    CheckZones();
+    CalculateClosestReefSegment();
+    if (Robot.isSimulation())
+    {
+      sim();
+    }
+    double ReefRadius = Units.inchesToMeters(76.5)/2;
+    CurrentPose = Drive_SS.getPose();
     getDriveData();
     getCoralData();
     setDriveData();
@@ -54,6 +92,12 @@ public class DataHighwaySubsystem extends SubsystemBase {
     LEDPattern green = LEDPattern.solid(Color.kGreen);
     LEDPattern blue = LEDPattern.solid(Color.kBlue);
     LEDPattern CoralRainbow = LEDPattern.rainbow(255,128);
+
+    SmartDashboard.putBoolean("InLeftCoralZone", inLeftCoralZone);
+    SmartDashboard.putBoolean("InRightCoralZone", inRightCoralZone);
+    DogLog.log("Zones/LeftCoralPose",LeftCoralStationPose);
+    DogLog.log("Zones/RightCoralPose", RightCoralStationPose);
+    
     if (hasCoral){
       AtCoralStation = false;
       white.applyTo(m_ledBuffer);
@@ -86,6 +130,8 @@ public class DataHighwaySubsystem extends SubsystemBase {
     
     // TODO: redzone Coral Stations
     // 3.3m from 0 to 3.3m (on a 45)
+
+
    double BlueRightX = CurrentPose.getX();
    double BlueRightY = CurrentPose.getY();
     double BlueRightr = Math.sqrt(Math.pow(BlueRightX,2)+Math.pow(BlueRightY,2));
@@ -117,13 +163,18 @@ public class DataHighwaySubsystem extends SubsystemBase {
     ReefDistance = Drive_SS.DH_Out_ReefDistance;
     ReefSegment = Drive_SS.DH_Out_ReefSegment;   
     AtCoralStation = Drive_SS.DH_Out_AtCoralStation; 
+    isRedAlliance = Drive_SS.DH_OUT_isRedAlliance;
   }
   private void setDriveData(){
     Drive_SS.DH_In_HasCoral = hasCoral;
     Drive_SS.DH_In_InRedZone = InRedZone;
     Drive_SS.DH_In_CoralYellow = InReefYellowZone;
     Drive_SS.DH_InStationZone = InCoralSationZone;
-
+    Drive_SS.DH_In_InLeftCoralZone = inLeftCoralZone;
+    Drive_SS.DH_In_InRightCoralZone = inRightCoralZone;
+    Drive_SS.DH_In_LeftCoralPose = LeftCoralStationPose.toPose2d();
+    Drive_SS.DH_In_RightCoralPose = RightCoralStationPose.toPose2d();
+    Drive_SS.DH_In_ClosestReefSegment = ClosestReefSegment;
     
   }
   private void getCoralData(){
@@ -136,7 +187,124 @@ public class DataHighwaySubsystem extends SubsystemBase {
     Coral_SS.DH_In_YellowZone = InReefYellowZone;
     
   }
-    // This method will be called once per scheduler run
+
+  private void SetupZonesCenter(){
+    if (isRedAlliance){
+        LeftCoralStationPose = atf.getTagPose(1).get();
+        RightCoralStationPose = atf.getTagPose(2).get();
+    }
+    else{
+        LeftCoralStationPose = atf.getTagPose(13).get();
+        RightCoralStationPose = atf.getTagPose(12).get(); 
+    }
   }
+
+  private void SetupReefPoses(){
+    
+    Pose2d pos1;
+    Pose2d pos2;
+    Pose2d pos3;
+    Pose2d pos4;
+    Pose2d pos5;
+    Pose2d pos6;
+    if (isRedAlliance){
+    pos1 = atf.getTagPose(7).get().toPose2d();
+    pos2 = atf.getTagPose(6).get().toPose2d();
+    pos3 = atf.getTagPose(11).get().toPose2d();
+    pos4 = atf.getTagPose(10).get().toPose2d();
+    pos5 = atf.getTagPose(9).get().toPose2d();
+    pos6 = atf.getTagPose(8).get().toPose2d();
+        
+    }
+    else{
+      pos1 = atf.getTagPose(18).get().toPose2d();
+      pos2 = atf.getTagPose(19).get().toPose2d();
+      pos3 = atf.getTagPose(20).get().toPose2d();
+      pos4 = atf.getTagPose(21).get().toPose2d();
+      pos5 = atf.getTagPose(22).get().toPose2d();
+      pos6 = atf.getTagPose(17).get().toPose2d();
+         
+    }
+    reefPoses1.add(pos1);
+    reefPoses1.add(pos2);
+    reefPoses1.add(pos3);
+    reefPoses1.add(pos4);
+    reefPoses1.add(pos5);
+    reefPoses1.add(pos6);
+  }
+
+  private void CheckZones(){
+
+    inLeftCoralZone = WithinZone(LeftCoralStationPose.toPose2d(),CurrentPose, 3);
+    inRightCoralZone = WithinZone(RightCoralStationPose.toPose2d(),CurrentPose, 3);
+        
+  }
+
+  private void CalculateClosestReefSegment(){
+    List<Pose2d> reefPoses = new ArrayList();
+    Pose2d pos1;
+    Pose2d pos2;
+    Pose2d pos3;
+    Pose2d pos4;
+    Pose2d pos5;
+    Pose2d pos6;
+    if (isRedAlliance){
+    pos1 = atf.getTagPose(7).get().toPose2d();
+    pos2 = atf.getTagPose(6).get().toPose2d();
+    pos3 = atf.getTagPose(11).get().toPose2d();
+    pos4 = atf.getTagPose(10).get().toPose2d();
+    pos5 = atf.getTagPose(9).get().toPose2d();
+    pos6 = atf.getTagPose(8).get().toPose2d();
+        
+    }
+    else{
+      pos1 = atf.getTagPose(18).get().toPose2d();
+      pos2 = atf.getTagPose(19).get().toPose2d();
+      pos3 = atf.getTagPose(20).get().toPose2d();
+      pos4 = atf.getTagPose(21).get().toPose2d();
+      pos5 = atf.getTagPose(22).get().toPose2d();
+      pos6 = atf.getTagPose(17).get().toPose2d();
+         
+    }
+    reefPoses.add(pos1);
+    reefPoses.add(pos2);
+    reefPoses.add(pos3);
+    reefPoses.add(pos4);
+    reefPoses.add(pos5);
+    reefPoses.add(pos6);
+
+    ClosestReefSegment = CurrentPose.nearest(reefPoses);
+    
+  }
+
+  private Boolean WithinZone(Pose2d targetPose, Pose2d currentPose, double radius){
+
+    double targetX = targetPose.getX();
+    double targetY = targetPose.getY();
+    double currX = currentPose.getX();
+    double currY = currentPose.getY();
+
+    double distance = Math.sqrt(Math.pow(targetY-currY,2)+Math.pow(targetX-currX,2));
+
+    return distance <= radius;
+  }
+  private void sim()
+  {
+    if (Drive_SS.getCIntakeGamePiecesAmount()>0)
+    {
+      hasCoral = true;
+      Drive_SS.stopCIntake();
+    }
+    if (!hasCoral)
+      {
+        Drive_SS.startCIntake();
+      }
+
+    if (WithinZone(LeftCoralStationPose.toPose2d(),CurrentPose, 3) && !hasCoral){
+      hasCoral = true;
+    }
+  }
+  }
+    // This method will be called once per scheduler run
 
 

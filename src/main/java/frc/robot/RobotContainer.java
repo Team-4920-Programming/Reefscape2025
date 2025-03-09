@@ -31,12 +31,8 @@ import frc.robot.Constants.AbsoluteEncoderID.Climber;
 import frc.robot.commands.Cmd_SeqRemoveAlgea;
 import frc.robot.commands.Cmd_SeqScoreLeft;
 import frc.robot.commands.Cmd_SeqScoreRight;
-import frc.robot.commands.AlgaeIntake.TeleOp.CmdT_IntakeAlgae;
-import frc.robot.commands.AlgaeIntake.TeleOp.CmdT_OuttakeAlgae;
-import frc.robot.commands.AlgaeIntake.TeleOp.CmdT_IntakeToPosition;
 import frc.robot.commands.swervedrive.TeleOp.CmdT_DriveToFeederPosition;
 import frc.robot.commands.swervedrive.drivebase.AbsoluteDriveAdv;
-import frc.robot.subsystems.AlgaeIntake.AlgaeIntakeSubsystem;
 import frc.robot.subsystems.Climber.ClimberSubsystem;
 import frc.robot.subsystems.CoralElevator.CoralElevatorSubsystem;
 import frc.robot.subsystems.DataHighway.DataHighwaySubsystem;
@@ -46,6 +42,7 @@ import java.io.File;
 import frc.robot.commands.Elevator.TeleOp.*;
 import frc.robot.commands.swervedrive.TeleOp.CmdT_DriveToReefPosition;
 import swervelib.SwerveDriveTest;
+import frc.robot.commands.Climber.TeleOp.*;
 import swervelib.SwerveInputStream;
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a "declarative" paradigm, very
@@ -65,7 +62,7 @@ public class RobotContainer
                                                                                 "swerve/maxSwerve"));
   private final CoralElevatorSubsystem CoralElevatorSS = new CoralElevatorSubsystem();
   private final ClimberSubsystem ClimberSS = new ClimberSubsystem();
-  private final AlgaeIntakeSubsystem AlgaeIntakeSS = new AlgaeIntakeSubsystem();
+  //private final AlgaeIntakeSubsystem AlgaeIntakeSS = new AlgaeIntakeSubsystem();
   private final DataHighwaySubsystem DataHighwaySS = new DataHighwaySubsystem(drivebase,CoralElevatorSS);
   private final ReefSurveySubsystem ReefSurveySS = new ReefSurveySubsystem();
   // Applies deadbands and inverts controls because joysticks
@@ -189,6 +186,7 @@ public class RobotContainer
     {
       drivebase.setDefaultCommand(driveFieldOrientedAnglularVelocity); // Overrides drive command above!
       CoralElevatorSS.setDefaultCommand(new CmdT_Def_Elevator(CoralElevatorSS));
+      //ClimberSS.setDefaultCommand(CmdT_;
       // driverXbox.x().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
       // driverXbox.y().whileTrue(drivebase.driveToDistanceCommand(3.0, 0.2));
       //driverXbox.start().onTrue((Commands.runOnce(drivebase::zeroGyro)));
@@ -210,12 +208,16 @@ public class RobotContainer
       //Algae
 
       //driverXbox.a().whileTrue(AlgaeIntakeSS.sysIDPivotAll());
-      OperatorJoystick.button(1).whileTrue(new CmdT_IntakeToPosition(AlgaeIntakeSS, 0));
+     // OperatorJoystick.button(1).whileTrue(new CmdT_IntakeToPosition(AlgaeIntakeSS, 0));
    //Algae Intake
-      OperatorJoystick.button(2).whileTrue(new CmdT_OuttakeAlgae(AlgaeIntakeSS));
-      OperatorJoystick.button(3).whileTrue(new CmdT_IntakeToPosition(AlgaeIntakeSS, 60).
-        andThen(new CmdT_IntakeAlgae(AlgaeIntakeSS)).
-        andThen(new CmdT_IntakeToPosition(AlgaeIntakeSS, 25)));
+      //OperatorJoystick.button(2).whileTrue(new CmdT_OuttakeAlgae(AlgaeIntakeSS));
+      //OperatorJoystick.button(3).whileTrue(new CmdT_IntakeToPosition(AlgaeIntakeSS, 60).
+      //  andThen(new CmdT_IntakeAlgae(AlgaeIntakeSS)).
+      //  andThen(new CmdT_IntakeToPosition(AlgaeIntakeSS, 25)));
+      OperatorJoystick.button(1 ).whileTrue(new CmdT_ClimberIn(ClimberSS));
+      OperatorJoystick.button(2 ).whileTrue(new CmdT_ClimberOut(ClimberSS));
+      OperatorJoystick.button(3 ).whileTrue(new CmdT_RunClimberIn(ClimberSS));
+      
       OperatorJoystick.button(4).whileTrue(new CmdT_Level2(CoralElevatorSS));
       OperatorJoystick.button(5).whileTrue(new CmdT_Level3(CoralElevatorSS));
       OperatorJoystick.button(6).whileTrue(new CmdT_Level4(CoralElevatorSS));

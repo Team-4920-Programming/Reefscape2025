@@ -27,6 +27,7 @@ public class CmdT_DriveToReefPosition extends Command {
   PIDController XPID = new PIDController(2, 0, 0);
   PIDController YPID = new PIDController(2, 0, 0);
   PIDController RotPID = new PIDController(0.1,0,0);
+  boolean inter;
   public CmdT_DriveToReefPosition(SwerveSubsystem DriveSubsystem, int Side) {
     // Use addRequirements() here to declare subsystem dependencies.
     Reef_Side = Side;
@@ -37,7 +38,7 @@ public class CmdT_DriveToReefPosition extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-
+    inter = false;
     double CenterofReefX  = 4.481; //wall to wall
     double CenterofReefY = 4.0; //aliance Wall to Alliance Wall
     double ReefRadius = Units.inchesToMeters(65.5)/2;
@@ -118,6 +119,7 @@ public class CmdT_DriveToReefPosition extends Command {
     DriveSS.drive(new ChassisSpeeds(0,0,0));
     System.out.println("DrivetoReef Finished");
     System.out.println("interrupted"+interrupted);
+    inter = interrupted;
     
   }
 
@@ -125,5 +127,9 @@ public class CmdT_DriveToReefPosition extends Command {
   @Override
   public boolean isFinished() {
     return XPID.atSetpoint() & YPID.atSetpoint() & RotPID.atSetpoint();
+  }
+
+  public boolean wasInterrupted(){
+    return inter;
   }
 }

@@ -4,6 +4,7 @@
 
 package frc.robot.commands;
 
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.commands.Elevator.TeleOp.*;
 import frc.robot.commands.swervedrive.TeleOp.CmdT_DriveToReefPosition;
@@ -21,7 +22,7 @@ public class Cmd_SeqScoreRight extends SequentialCommandGroup {
     // addCommands(new FooCommand(), new BarCommand());
     //
     addCommands(new CmdT_MoveToLevel(Coral_SS),
-      new CmdT_DriveToReefPosition(Drive_SS,2),
+      new CmdT_DriveToReefPosition(Drive_SS,2).withTimeout(3),
       new CmdT_CoralOutTake(Coral_SS),
       new CmdT_DriveToReefPosition(Drive_SS,4),
       new CmdT_Station(Coral_SS)

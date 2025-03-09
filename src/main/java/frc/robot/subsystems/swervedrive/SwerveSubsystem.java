@@ -6,6 +6,7 @@ package frc.robot.subsystems.swervedrive;
 
 import static edu.wpi.first.units.Units.Meter;
 
+import com.ctre.phoenix6.ISerializable;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.pathplanner.lib.commands.PathfindingCommand;
@@ -105,9 +106,17 @@ public class SwerveSubsystem extends SubsystemBase
   public boolean DH_In_InRedZone = false;
   public boolean DH_In_CoralYellow =false;
   public boolean DH_InStationZone = false;
+  public boolean DH_In_InLeftCoralZone = false;
+  public boolean DH_In_InRightCoralZone = false;
+  public Pose2d DH_In_ClosestReefSegment;
   public int DH_Out_ReefSegment = 0;
   public double DH_Out_ReefDistance = 0;
+  public boolean DH_OUT_isBlueAlliance = false;
+  public boolean DH_OUT_isRedAlliance = false;
   public boolean DH_Out_AtCoralStation = false;
+
+  public Pose2d DH_In_LeftCoralPose;
+  public Pose2d DH_In_RightCoralPose;
 
   //Vision
   private Vision4920 GreyFeederCamera;
@@ -235,6 +244,8 @@ public class SwerveSubsystem extends SubsystemBase
 
     DH_Out_ReefSegment = getReefSegment();
     DH_Out_ReefDistance = getReefDistance();
+
+    DH_OUT_isRedAlliance = isRedAlliance();
   }
   public int getReefSegment()
 {
@@ -371,9 +382,9 @@ private void ProcessVision4920()
         Distance CWidth = Inches.of(5);
         Distance cExtension = Inches.of(12);
         CintakeSimulation = CintakeSimulation.OverTheBumperIntake(
-              "Algae", 
+              "Coral", 
               swerveDrive.getMapleSimDrive().get(), 
-              width, Extension, IntakeSimulation.IntakeSide.FRONT, 1);
+              width, Extension, IntakeSimulation.IntakeSide.BACK, 1);
         CintakeSimulation.register(SimulatedArena.getInstance());
   }
   public void setupSimulatedField()
@@ -764,12 +775,23 @@ private void ProcessVision4920()
          
 
       }
-      if (DH_In_HasCoral && !DH_InStationZone)
+      if (DH_In_HasCoral && !DH_In_InLeftCoralZone && !DH_In_InRightCoralZone)
       {
-      double RotVel = getRotationVelocity();
+      // double RotVel = getRotationVelocity();
+      double RotVel = getRotationVelocityToTarget(DH_In_ClosestReefSegment,180);
       speed.omegaRadiansPerSecond = RotVel;
       //swerveDrive.driveFieldOriented(speed);
     }
+      if(!DH_In_HasCoral && DH_In_InLeftCoralZone){
+        double RotVel = getRotationVelocityToTarget(DH_In_LeftCoralPose,0);
+      speed.omegaRadiansPerSecond = RotVel;
+      }
+      if(!DH_In_HasCoral && DH_In_InRightCoralZone){
+        double RotVel = getRotationVelocityToTarget(DH_In_RightCoralPose, 0);
+      speed.omegaRadiansPerSecond = RotVel;
+      }
+
+
     swerveDrive.driveFieldOriented(speed);
     });
   }
@@ -798,6 +820,24 @@ private void ProcessVision4920()
     double Reef_Rot = Reefrot +180;
 
     double RotVel = RotPID.calculate(CurrentRot,Reef_Rot);
+    RotVel = MathUtil.clamp(RotVel, -3, 3);
+
+    return RotVel;
+  }
+
+  private double getRotationVelocityToTarget(Pose2d target, double offset)
+  {
+
+    // Rotation2d targetPose = target.getRotation().minus(getPose().getRotation());
+
+    // double targetAngle = targetPose.getDegrees();
+
+
+  
+    RotPID.setTolerance(5);
+    RotPID.enableContinuousInput(-180, 180);
+
+    double RotVel = RotPID.calculate(getPose().getRotation().getDegrees(),target.getRotation().getDegrees()-offset);
     RotVel = MathUtil.clamp(RotVel, -3, 3);
 
     return RotVel;

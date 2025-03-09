@@ -37,7 +37,7 @@ public class CmdT_CoralOutTake extends Command {
                 
     }
   
-      CoralElevatorSS.setIntakeSpeed(-0.5);
+      CoralElevatorSS.setIntakeSpeed(-0.75);
    
   }
 
