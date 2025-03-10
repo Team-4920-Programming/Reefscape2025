@@ -358,10 +358,10 @@ public static class ArmNeutral {
   public static class Vision4920 {
     public static final String kGreyFeederCam = "GreyFeederCam";
     public static final String kReefGreyCam = "GreyReefCam";
-    public static final String kReefRedCam = "Arducam_OV9281_Right";
-    public static final String kGeneralRedCam = "Arducam_OV9281_Left";
-    public static final String kClimberBlueCam = "Arducam_5MP_Camera_Module";
-    public static final String kAlgaeBlueCam = "Arducam_5MP_Camera_Module";
+    public static final String kReefRedCam = "RedReefCam";
+    public static final String kGeneralRedCam = "RedGeneralCam";
+    public static final String kGeneralBlueCam = "BlueGeneralCam";
+    public static final String kFrontBlueCam = "BlueFrontCam";
     // Cam mounted facing forward, half a meter forward of center, half a meter up from center.
 
     // positive x to the left, positive y up
@@ -373,9 +373,9 @@ public static class ArmNeutral {
             new Transform3d(new Translation3d(Units.inchesToMeters(11), Units.inchesToMeters(-12.5), Units.inchesToMeters(19.875)), new Rotation3d(0, Units.degreesToRadians(324), 3*Math.PI/2)); // 0.48
   public static final Transform3d kRobotToGeneralRedCam =
             new Transform3d(new Translation3d(Units.inchesToMeters(11), Units.inchesToMeters(12.5), Units.inchesToMeters(19.875)), new Rotation3d(0, Units.degreesToRadians(326), Math.PI/2)); // 0.48
-  public static final Transform3d kRobotToClimberBlueCam =
+  public static final Transform3d kRobotToGeneralBlueCam =
             new Transform3d(new Translation3d(Units.inchesToMeters(11), Units.inchesToMeters(12.5), Units.inchesToMeters(19.875)), new Rotation3d(0, Units.degreesToRadians(326), Math.PI/2)); // 0.48
-    public static final Transform3d kRobotAlgaeBlueCam =
+    public static final Transform3d kRobottoFrontBlueCam =
             new Transform3d(new Translation3d(Units.inchesToMeters(11), Units.inchesToMeters(12.5), Units.inchesToMeters(19.875)), new Rotation3d(0, Units.degreesToRadians(326), Math.PI/2)); // 0.48
   
   public static final Transform3d ROBOT_TO_CAMERA_Front = kRobotToGreyFeederCam.inverse();

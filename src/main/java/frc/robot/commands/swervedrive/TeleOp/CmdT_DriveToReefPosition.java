@@ -5,6 +5,8 @@
 package frc.robot.commands.swervedrive.TeleOp;
 
 import dev.doglog.DogLog;
+import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -38,9 +40,15 @@ public class CmdT_DriveToReefPosition extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
+    
     inter = false;
-    double CenterofReefX  = 4.481; //wall to wall
-    double CenterofReefY = 4.0; //aliance Wall to Alliance Wall
+    double CenterofReefX = 4.481;
+    double CenterofReefY = 4.0;
+    if (DriveSS.DH_OUT_isRedAlliance)
+    {
+      CenterofReefX  = 17.5-4;
+    }
+    
     double ReefRadius = Units.inchesToMeters(65.5)/2;
     //onshape cordinates of blue 
     //y along alliance wall 

@@ -68,7 +68,7 @@ public class CmdT_DriveToFeederPosition extends Command {
     double RobotOffsetX = Units.inchesToMeters(8); //38.6cm
     double RobotOffsetY = Units.inchesToMeters(12.5);
     System.out.println("Initializing Drive to Feeder *****************");
-    if (CurrentLocation.getX() < 2.5 && CurrentLocation.getY() < 2.5)
+    if (CurrentLocation.getX() < 2.5 && CurrentLocation.getY() < 2.5 && DriveSS.DH_OUT_isBlueAlliance)
     {
       //At Tag 12 - Blue Alliance 
       //onshape cordinates -> World Co-ordinates (8.75-x, 4-y) -> Robot Cordinates (Wx+.386, Wy +.322)
@@ -100,17 +100,92 @@ public class CmdT_DriveToFeederPosition extends Command {
       //middle slot is at 0.834m,0.612m (1.22, .93) (Add .386, .322 to Slot Locations)
 
     }
-    if (CurrentLocation.getX() < 2.5 && CurrentLocation.getY() > 5.5)
+    if (CurrentLocation.getX() < 2.5 && CurrentLocation.getY() > 5.5 && DriveSS.DH_OUT_isBlueAlliance)
     {
+      double BlueRightOffsetX = 8;
+      StartingPositionOK = true;
+      s1x = BlueRightOffsetX - s1x - RobotOffsetX;
+      s1y =  s1y + RobotOffsetY;
+      //slot 2 -8.245, -3.15 -> 0.505, 0.85
+      s2x = BlueRightOffsetX -s2x - RobotOffsetX;
+      s2y =  s2y + RobotOffsetY;
+            //slot 3 -8.081, -3.269 -> 0.669, 0.731
+      s3x =  BlueRightOffsetX -s3x - RobotOffsetX;
+      s3y =  s3y + RobotOffsetY;
+      //Slot 4 -7.916, -3.388 -> 0.834, 0.612
+      s4x = BlueRightOffsetX -s4x - RobotOffsetX;
+      s4y =  s4y + RobotOffsetY;
+      //slot 5 -7.752, -3,508 -> 0.998, 0.492
+      s5x = BlueRightOffsetX -s5x - RobotOffsetX;
+      s5y =  s5y + RobotOffsetY;
+      //slot 6 -7.588, -3.627 -> 1.162, 0.373
+      s6x = BlueRightOffsetX -s6x - RobotOffsetX;
+      s6y =  s6y + RobotOffsetY;
+      //slot 7 -7.423, -3.747 -> 1.327, 0.253
+      s7x =  BlueRightOffsetX - s7x - RobotOffsetX;
+      s7y =  s7y + RobotOffsetY;
+      // TargetRot = -126;
+      TargetRot = 54+90;
       //At Tag 13 - Blue Alliance
     }
-    if (CurrentLocation.getX() > 15 && CurrentLocation.getY() < 2.5)
+    if (CurrentLocation.getX() > 15 && CurrentLocation.getY() < 2.5 && DriveSS.DH_OUT_isRedAlliance)
     {
       //At Tag 1 - Red Alliance
+      double OffsetX = 17.5;
+      double OffsetY = 0;
+      StartingPositionOK = true;
+      s1x = OffsetX - s1x - RobotOffsetX;
+      s1y = OffsetY - s1y + RobotOffsetY;
+      //slot 2 -8.245, -3.15 -> 0.505, 0.85
+      s2x = OffsetX - s2x - RobotOffsetX;
+      s2y = OffsetY - s2y + RobotOffsetY;
+            //slot 3 -8.081, -3.269 -> 0.669, 0.731
+      s3x =  OffsetX - s3x - RobotOffsetX;
+      s3y =  OffsetY - s3y + RobotOffsetY;
+      //Slot 4 -7.916, -3.388 -> 0.834, 0.612
+      s4x = OffsetX -s4x - RobotOffsetX;
+      s4y =  OffsetY - s4y + RobotOffsetY;
+      //slot 5 -7.752, -3,508 -> 0.998, 0.492
+      s5x = OffsetX -s5x - RobotOffsetX;
+      s5y =  OffsetY - s5y + RobotOffsetY;
+      //slot 6 -7.588, -3.627 -> 1.162, 0.373
+      s6x = OffsetX -s6x - RobotOffsetX;
+      s6y =  OffsetY - s6y + RobotOffsetY;
+      //slot 7 -7.423, -3.747 -> 1.327, 0.253
+      s7x =  OffsetX - s7x - RobotOffsetX;
+      s7y =  OffsetY - s7y + RobotOffsetY;
+      // TargetRot = -126;
+      TargetRot = 54+90;
+      
     }
-    if (CurrentLocation.getX() >15 && CurrentLocation.getY() > 5.5)
+    if (CurrentLocation.getX() >15 && CurrentLocation.getY() > 5.5 && DriveSS.DH_OUT_isRedAlliance)
     {
-      //At Tag 2 - Red Alliance
+     //At Tag 1 - Red Alliance
+     double OffsetX = 17.5;
+     double OffsetY = 8;
+     StartingPositionOK = true;
+     s1x = OffsetX - s1x - RobotOffsetX;
+     s1y = OffsetY - s1y + RobotOffsetY;
+     //slot 2 -8.245, -3.15 -> 0.505, 0.85
+     s2x = OffsetX - s2x - RobotOffsetX;
+     s2y = OffsetY - s2y + RobotOffsetY;
+           //slot 3 -8.081, -3.269 -> 0.669, 0.731
+     s3x =  OffsetX - s3x - RobotOffsetX;
+     s3y =  OffsetY - s3y + RobotOffsetY;
+     //Slot 4 -7.916, -3.388 -> 0.834, 0.612
+     s4x = OffsetX -s4x - RobotOffsetX;
+     s4y =  OffsetY - s4y + RobotOffsetY;
+     //slot 5 -7.752, -3,508 -> 0.998, 0.492
+     s5x = OffsetX -s5x - RobotOffsetX;
+     s5y =  OffsetY - s5y + RobotOffsetY;
+     //slot 6 -7.588, -3.627 -> 1.162, 0.373
+     s6x = OffsetX -s6x - RobotOffsetX;
+     s6y =  OffsetY - s6y + RobotOffsetY;
+     //slot 7 -7.423, -3.747 -> 1.327, 0.253
+     s7x =  OffsetX - s7x - RobotOffsetX;
+     s7y =  OffsetY - s7y + RobotOffsetY;
+     // TargetRot = -126;
+     TargetRot = 54+90; //At Tag 2 - Red Alliance
     }
 
     double CurrentX = CurrentLocation.getX();
