@@ -100,7 +100,7 @@ public class SwerveSubsystem extends SubsystemBase
 
   private     IntakeSimulation AintakeSimulation;
   private     IntakeSimulation CintakeSimulation;
-
+  private boolean AutoAimEnabled = true;
   // Datahighway information
   public boolean DH_In_HasCoral = false;
   public boolean DH_In_InRedZone = false;
@@ -121,9 +121,16 @@ public class SwerveSubsystem extends SubsystemBase
   //Vision
   private Vision4920 GreyFeederCamera;
   private Vision4920 GreyReefCamera;
+  private Vision4920 RedReefCamera;
+  private Vision4920 RedGeneralCamera;
+  private Vision4920 BlueGeneralCamera;
+  private Vision4920 BlueFrontCamera;
   public Pose3d GreyFeederCameraPose3d = new Pose3d();
   public Pose3d GreyReefCameraPose3d = new Pose3d();
-
+  public Pose3d RedReefCameraPose3d = new Pose3d();
+  public Pose3d RedGeneralCameraPose3d = new Pose3d();
+  public Pose3d BlueGeneralCameraPose3d = new Pose3d();
+  public Pose3d BlueFrontCameraPose3d = new Pose3d();
   private PIDController RotPID = new PIDController(0.1,0,0);
 
   /**
@@ -188,7 +195,13 @@ public class SwerveSubsystem extends SubsystemBase
 
     //4920 Vision
     GreyFeederCamera = new Vision4920(Constants.Vision4920.kGreyFeederCam, Constants.Vision4920.kRobotToGreyFeederCam);
-    GreyReefCamera = new Vision4920(Constants.Vision4920.kReefGreyCam, Constants.Vision4920.kRobotToGreyReefCam);
+    GreyReefCamera = new Vision4920(Constants.Vision4920.kGreyReefCam, Constants.Vision4920.kRobotToGreyReefCam);
+    RedReefCamera = new Vision4920(Constants.Vision4920.kRedReefCam, Constants.Vision4920.kRobotToRedReefCam);
+    RedGeneralCamera = new Vision4920(Constants.Vision4920.kRedGeneralCam, Constants.Vision4920.kRobotToRedGeneralCam);
+    BlueGeneralCamera = new Vision4920(Constants.Vision4920.kBlueGeneralCam, Constants.Vision4920.kRobotToBlueGeneralCam);
+    BlueFrontCamera = new Vision4920(Constants.Vision4920.kBlueFrontCam, Constants.Vision4920.kRobotToBlueFrontCam);
+
+
 
     setupPathPlanner();
     if (Robot.isSimulation())
@@ -198,7 +211,18 @@ public class SwerveSubsystem extends SubsystemBase
     }
     
   }
-
+  public void EnableAutoAim()
+  {
+    AutoAimEnabled = true;
+  }
+  public void DisableAutoAim()
+  {
+    AutoAimEnabled = false;
+  }
+  public boolean isAutoAim()
+  {
+    return AutoAimEnabled;
+  }
   /**
    * Construct the swerve drive.
    *
@@ -246,6 +270,7 @@ public class SwerveSubsystem extends SubsystemBase
     DH_Out_ReefDistance = getReefDistance();
 
     DH_OUT_isRedAlliance = isRedAlliance();
+    DH_OUT_isBlueAlliance = !isRedAlliance();
   }
   public int getReefSegment()
 {
@@ -350,7 +375,92 @@ private void ProcessVision4920()
       }
   
   }
+
+  Pose2d RedReefPose= new Pose2d(0.0 ,0.0, Rotation2d.fromDegrees(0.0));;
+  double RedReefVisionTimestamp;
+
+  if ( DriverStation.isDSAttached() && RedReefCamera != null)
+  {
+     var visionEst = RedReefCamera.getEstimatedGlobalPose();
+     SmartDashboard.putBoolean("RedReefCamera Present", RedReefCamera.isConnected());
+     
+      if (visionEst.isPresent()){
+          RedReefPose = visionEst.get().estimatedPose.toPose2d();
+          RedReefCameraPose3d = visionEst.get().estimatedPose;
+
+          
+          RedReefVisionTimestamp = visionEst.get().timestampSeconds;
+          DogLog.log("Red Reef Camera Pose", RedReefPose);
+          DogLog.log("Red Reef TimeStamp",RedReefVisionTimestamp);
+            VisionReading(RedReefPose, RedReefVisionTimestamp);
+      }
   
+  }
+
+  Pose2d RedGeneralPose= new Pose2d(0.0 ,0.0, Rotation2d.fromDegrees(0.0));;
+  double RedGeneralVisionTimestamp;
+
+  if ( DriverStation.isDSAttached() && RedGeneralCamera != null)
+  {
+     var visionEst = RedGeneralCamera.getEstimatedGlobalPose();
+     SmartDashboard.putBoolean("RedGeneralCamera Present", RedGeneralCamera.isConnected());
+     
+      if (visionEst.isPresent()){
+          RedGeneralPose = visionEst.get().estimatedPose.toPose2d();
+          RedGeneralCameraPose3d = visionEst.get().estimatedPose;
+
+          
+          RedGeneralVisionTimestamp = visionEst.get().timestampSeconds;
+          DogLog.log("Red General Camera Pose", RedGeneralPose);
+          DogLog.log("Red General TimeStamp",RedGeneralVisionTimestamp);
+         //   VisionReading(RedGeneralPose, RedGeneralVisionTimestamp);
+      }
+  
+  }
+
+  Pose2d BlueFrontPose= new Pose2d(0.0 ,0.0, Rotation2d.fromDegrees(0.0));;
+  double BlueFrontVisionTimestamp;
+
+  if ( DriverStation.isDSAttached() && BlueFrontCamera != null)
+  {
+     var visionEst = BlueFrontCamera.getEstimatedGlobalPose();
+     SmartDashboard.putBoolean("BlueFrontCamera Present", BlueFrontCamera.isConnected());
+     
+      if (visionEst.isPresent()){
+          BlueFrontPose = visionEst.get().estimatedPose.toPose2d();
+          BlueFrontCameraPose3d = visionEst.get().estimatedPose;
+
+          
+          BlueFrontVisionTimestamp = visionEst.get().timestampSeconds;
+          DogLog.log("Blue Front Camera Pose", BlueFrontPose);
+          DogLog.log("Blue Front TimeStamp",BlueFrontVisionTimestamp);
+         //   VisionReading(BlueFrontPose, BlueFrontVisionTimestamp);
+      }
+  
+  }
+  
+  Pose2d BlueGeneralPose= new Pose2d(0.0 ,0.0, Rotation2d.fromDegrees(0.0));;
+  double BlueGeneralVisionTimestamp;
+
+  if ( DriverStation.isDSAttached() && BlueGeneralCamera != null)
+  {
+     var visionEst = BlueGeneralCamera.getEstimatedGlobalPose();
+     SmartDashboard.putBoolean("BlueGeneralCamera Present", BlueGeneralCamera.isConnected());
+     
+      if (visionEst.isPresent()){
+          BlueGeneralPose = visionEst.get().estimatedPose.toPose2d();
+          BlueGeneralCameraPose3d = visionEst.get().estimatedPose;
+
+          
+          BlueGeneralVisionTimestamp = visionEst.get().timestampSeconds;
+          DogLog.log("Blue General Camera Pose", BlueGeneralPose);
+          DogLog.log("Blue General TimeStamp",BlueGeneralVisionTimestamp);
+         //   VisionReading(BlueGeneralPose, BlueGeneralVisionTimestamp);
+      }
+  
+  }
+
+
 }
 /*4920 modificaitons for simulation */
 
@@ -775,22 +885,26 @@ private void ProcessVision4920()
          
 
       }
-      if (DH_In_HasCoral && !DH_In_InLeftCoralZone && !DH_In_InRightCoralZone)
-      {
-      // double RotVel = getRotationVelocity();
-      double RotVel = getRotationVelocityToTarget(DH_In_ClosestReefSegment,180);
-      speed.omegaRadiansPerSecond = RotVel;
-      //swerveDrive.driveFieldOriented(speed);
-    }
-      if(!DH_In_HasCoral && DH_In_InLeftCoralZone){
-        double RotVel = getRotationVelocityToTarget(DH_In_LeftCoralPose,0);
-      speed.omegaRadiansPerSecond = RotVel;
-      }
-      if(!DH_In_HasCoral && DH_In_InRightCoralZone){
-        double RotVel = getRotationVelocityToTarget(DH_In_RightCoralPose, 0);
-      speed.omegaRadiansPerSecond = RotVel;
-      }
+      if (AutoAimEnabled){
 
+        
+
+        if (DH_In_HasCoral && !DH_In_InLeftCoralZone && !DH_In_InRightCoralZone)
+        {
+        // double RotVel = getRotationVelocity();
+        double RotVel = getRotationVelocityToTarget(DH_In_ClosestReefSegment,180);
+        speed.omegaRadiansPerSecond = RotVel;
+        //swerveDrive.driveFieldOriented(speed);
+      }
+        if(!DH_In_HasCoral && DH_In_InLeftCoralZone){
+          double RotVel = getRotationVelocityToTarget(DH_In_LeftCoralPose,0);
+        speed.omegaRadiansPerSecond = RotVel;
+        }
+        if(!DH_In_HasCoral && DH_In_InRightCoralZone){
+          double RotVel = getRotationVelocityToTarget(DH_In_RightCoralPose, 0);
+        speed.omegaRadiansPerSecond = RotVel;
+        }
+    }
 
     swerveDrive.driveFieldOriented(speed);
     });

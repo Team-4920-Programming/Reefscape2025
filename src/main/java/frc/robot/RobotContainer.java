@@ -17,6 +17,8 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.RobotBase;
+import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.XboxController.Axis;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -40,6 +42,7 @@ import frc.robot.subsystems.ReefSurvey.ReefSurveySubsystem;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 import java.io.File;
 import frc.robot.commands.Elevator.TeleOp.*;
+import frc.robot.commands.swervedrive.TeleOp.*;
 import frc.robot.commands.swervedrive.TeleOp.CmdT_DriveToReefPosition;
 import swervelib.SwerveDriveTest;
 import frc.robot.commands.Climber.TeleOp.*;
@@ -196,9 +199,12 @@ public class RobotContainer
         driverXbox.leftTrigger().whileTrue(new Cmd_SeqScoreLeft(CoralElevatorSS, drivebase));
         driverXbox.rightTrigger().whileTrue(new Cmd_SeqScoreRight(CoralElevatorSS, drivebase));
         driverXbox.a().whileTrue(new CmdT_DriveToFeederPosition(drivebase));
+        driverXbox.axisGreaterThan(4,0.1).onTrue(new CmdT_DisableAutoAim(drivebase));
+        driverXbox.rightBumper().onTrue(new CmdT_EnableAutoAim(drivebase));
+
         
       //********************* */
-      //SysID Nonsense (Comment out when done)
+      //SysID Nonsense (Comment out when done)  
 
       //DriveBase
       // driverXbox.a().whileTrue(drivebase.sysIdDriveMotorCommand());

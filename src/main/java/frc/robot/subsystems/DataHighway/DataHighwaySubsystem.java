@@ -137,7 +137,10 @@ public class DataHighwaySubsystem extends SubsystemBase {
     double BlueRightr = Math.sqrt(Math.pow(BlueRightX,2)+Math.pow(BlueRightY,2));
     InCoralSationZone = false;
     if (BlueRightr <2.5){
-      InRedZone = true;
+      if (CurrentPose.getRotation().getDegrees() > 150 || CurrentPose.getRotation().getDegrees() < -44){
+        InRedZone = true;
+      }
+     
       InCoralSationZone =true;
     }
     else

@@ -251,9 +251,9 @@ public final class Constants
   }
   public static class RobotPositions{
     public static class CoralStation {
-      public static final double wrist = 158; //degrees //-202
-      public static final double elbow =-7; //degrees
-      public static final double height = 0.1; //meters
+      public static final double wrist = 151; //degrees //-202
+      public static final double elbow =2; //degrees
+      public static final double height = 0.15; //meters
   }
   public static class Level1 {
     public static final double wrist = 30; //degrees
@@ -271,8 +271,8 @@ public final class Constants
       public static final double height = 0.12; //meters
   }
   public static class Level4 {
-    public static final double wrist = -30; //degrees
-    public static final double elbow =175; //degrees
+    public static final double wrist = -38; //degrees
+    public static final double elbow =185; //degrees
     public static final double height = 0.725; //meters
 }
   public static class Level4_Far {
@@ -357,31 +357,40 @@ public static class ArmNeutral {
   }
   public static class Vision4920 {
     public static final String kGreyFeederCam = "GreyFeederCam";
-    public static final String kReefGreyCam = "GreyReefCam";
-    public static final String kReefRedCam = "RedReefCam";
-    public static final String kGeneralRedCam = "RedGeneralCam";
-    public static final String kGeneralBlueCam = "BlueGeneralCam";
-    public static final String kFrontBlueCam = "BlueFrontCam";
+    public static final String kGreyReefCam = "GreyReefCam";
+    public static final String kRedReefCam = "RedReefCam";
+    public static final String kRedGeneralCam = "RedGeneralCam";
+    public static final String kBlueGeneralCam = "BlueGeneralCam";
+    public static final String kBlueFrontCam = "BlueFrontCam";
     // Cam mounted facing forward, half a meter forward of center, half a meter up from center.
 
     // positive x to the left, positive y up
     public static final Transform3d kRobotToGreyFeederCam =
-            new Transform3d(new Translation3d(Units.inchesToMeters(-2), Units.inchesToMeters(-13), Units.inchesToMeters(38)), new Rotation3d(0, Units.degreesToRadians(314), Units.degreesToRadians(180))); //
+            new Transform3d(new Translation3d(Units.inchesToMeters(-3.25), Units.inchesToMeters(-13), Units.inchesToMeters(38.25)), 
+            new Rotation3d(0, Units.degreesToRadians(314), Units.degreesToRadians(180))); //
   public static final Transform3d kRobotToGreyReefCam =
-            new Transform3d(new Translation3d(Units.inchesToMeters(12.5), Units.inchesToMeters(-13.5), Units.inchesToMeters(35.5)), new Rotation3d(0, Units.degreesToRadians(37), 0)); // 0.48
+            new Transform3d(new Translation3d(Units.inchesToMeters(11.25), Units.inchesToMeters(-14), Units.inchesToMeters(38.75)), 
+            new Rotation3d(0, Units.degreesToRadians(37), 0)); // 0.48
   public static final Transform3d kRobotToRedReefCam =
-            new Transform3d(new Translation3d(Units.inchesToMeters(11), Units.inchesToMeters(-12.5), Units.inchesToMeters(19.875)), new Rotation3d(0, Units.degreesToRadians(324), 3*Math.PI/2)); // 0.48
-  public static final Transform3d kRobotToGeneralRedCam =
-            new Transform3d(new Translation3d(Units.inchesToMeters(11), Units.inchesToMeters(12.5), Units.inchesToMeters(19.875)), new Rotation3d(0, Units.degreesToRadians(326), Math.PI/2)); // 0.48
-  public static final Transform3d kRobotToGeneralBlueCam =
-            new Transform3d(new Translation3d(Units.inchesToMeters(11), Units.inchesToMeters(12.5), Units.inchesToMeters(19.875)), new Rotation3d(0, Units.degreesToRadians(326), Math.PI/2)); // 0.48
-    public static final Transform3d kRobottoFrontBlueCam =
-            new Transform3d(new Translation3d(Units.inchesToMeters(11), Units.inchesToMeters(12.5), Units.inchesToMeters(19.875)), new Rotation3d(0, Units.degreesToRadians(326), Math.PI/2)); // 0.48
+            new Transform3d(new Translation3d(Units.inchesToMeters(11.25), Units.inchesToMeters(14), Units.inchesToMeters(38.75)), 
+            new Rotation3d(0, Units.degreesToRadians(37), 0)); // 0.48
+  public 
+  static final Transform3d kRobotToRedGeneralCam =
+            new Transform3d(new Translation3d(Units.inchesToMeters(3.25), Units.inchesToMeters(14.25), Units.inchesToMeters(36.5)), 
+            new Rotation3d(0, Units.degreesToRadians(350), Units.degreesToRadians(180))); // 0.48
+  
+  public static final Transform3d kRobotToBlueGeneralCam =
+            new Transform3d(new Translation3d(Units.inchesToMeters(0.75), Units.inchesToMeters(-14.25), Units.inchesToMeters(40.25)), 
+            new Rotation3d(Units.degreesToRadians(13), Units.degreesToRadians(0), Units.degreesToRadians(270))); // 0.48
+   
+            public static final Transform3d kRobotToBlueFrontCam =
+            new Transform3d(new Translation3d(Units.inchesToMeters(12.5), Units.inchesToMeters(-13), Units.inchesToMeters(34.5)), 
+            new Rotation3d(0, Units.degreesToRadians(350), 0)); // 0.48
   
   public static final Transform3d ROBOT_TO_CAMERA_Front = kRobotToGreyFeederCam.inverse();
   public static final Transform3d ROBOT_TO_CAMERA_Rear = kRobotToGreyReefCam.inverse();
   public static final Transform3d ROBOT_TO_CAMERA_Right = kRobotToRedReefCam .inverse();
-  public static final Transform3d ROBOT_TO_CAMERA_Left = kRobotToGeneralRedCam.inverse();
+  public static final Transform3d ROBOT_TO_CAMERA_Left = kRobotToRedGeneralCam.inverse();
   
         public static final AprilTagFieldLayout kTagLayout =
                 AprilTagFields.k2025ReefscapeWelded.loadAprilTagLayoutField();

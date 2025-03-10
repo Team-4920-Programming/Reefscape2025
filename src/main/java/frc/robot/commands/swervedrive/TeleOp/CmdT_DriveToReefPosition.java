@@ -42,11 +42,11 @@ public class CmdT_DriveToReefPosition extends Command {
   public void initialize() {
     
     inter = false;
-    double CenterofReefX = 4.481;
+    double CenterofReefX = 4.5;
     double CenterofReefY = 4.0;
     if (DriveSS.DH_OUT_isRedAlliance)
     {
-      CenterofReefX  = 17.5-4;
+      CenterofReefX  = 17.5-4.5;
     }
     
     double ReefRadius = Units.inchesToMeters(65.5)/2;

@@ -117,9 +117,10 @@ public class CoralElevatorSubsystem extends SubsystemBase {
   SparkMaxConfig elbowConfig = new SparkMaxConfig();
   SparkMax WristMotor = new SparkMax(CanIDs.CoralElevator.Wrist, MotorType.kBrushless);
   SparkMax CoralIntakeMotor = new SparkMax(CanIDs.CoralElevator.CoralIntake, MotorType.kBrushless);
-  SparkMax CoralFlapLeft = new SparkMax(CanIDs.CoralElevator.CoralFlapLeft, MotorType.kBrushless);
+  SparkMaxConfig CoralIntakeConfig = new SparkMaxConfig();
+ // SparkMax CoralFlapLeft = new SparkMax(CanIDs.CoralElevator.CoralFlapLeft, MotorType.kBrushless);
   SparkMax CoralFlapRight = new SparkMax(CanIDs.CoralElevator.CoralFlapRight, MotorType.kBrushless);
-  SparkMaxConfig CoralFlapLeftConfig = new SparkMaxConfig();
+ // SparkMaxConfig CoralFlapLeftConfig = new SparkMaxConfig();
   SparkMaxConfig coralFlapRightConfig = new SparkMaxConfig();
 
   // PIDs
@@ -132,7 +133,7 @@ public class CoralElevatorSubsystem extends SubsystemBase {
 
   PIDController WristPID = new PIDController(PIDs.CoralElevator.Wrist.kp, PIDs.CoralElevator.Wrist.ki, PIDs.CoralElevator.Wrist.kd);
   PIDController RightFlapPID = new PIDController(PIDs.CoralElevator.RightFlap.kp,PIDs.CoralElevator.RightFlap.ki,PIDs.CoralElevator.RightFlap.kd );
-  PIDController LeftFlapPID = new PIDController(PIDs.CoralElevator.LeftFlap.kp,PIDs.CoralElevator.LeftFlap.ki,PIDs.CoralElevator.LeftFlap.kd );
+ // PIDController LeftFlapPID = new PIDController(PIDs.CoralElevator.LeftFlap.kp,PIDs.CoralElevator.LeftFlap.ki,PIDs.CoralElevator.LeftFlap.kd );
   // Limit Switch
 
   DigitalInput ElevatorUpStop = new DigitalInput(DIO.CoralElevator.UpStop);
@@ -148,7 +149,7 @@ public class CoralElevatorSubsystem extends SubsystemBase {
   RelativeEncoder ElbowRelativeEncoder = ElbowMotor.getEncoder();
   AbsoluteEncoder WristAbsoluteEncoder = WristMotor.getAbsoluteEncoder();
   RelativeEncoder WristRelative = WristMotor.getEncoder();
-  AbsoluteEncoder CoralFlapLeftEncoder = CoralFlapLeft.getAbsoluteEncoder();
+ // AbsoluteEncoder CoralFlapLeftEncoder = CoralFlapLeft.getAbsoluteEncoder();
   AbsoluteEncoder CoralFlapRightEncoder = CoralFlapRight.getAbsoluteEncoder();
   // LaserCan
   private LaserCan LaserCan = new LaserCan(CanIDs.Sensor.LaserCAN);
@@ -203,7 +204,7 @@ public class CoralElevatorSubsystem extends SubsystemBase {
     
     ElbowPID.setTolerance(1);
     //ElbowPID.setSetpoint(5);
-    ElbowPID.enableContinuousInput(0, 360);
+   // ElbowPID.enableContinuousInput(0, 360);
 
     elbowConfig.idleMode(IdleMode.kBrake);
     elbowConfig.inverted(true);
@@ -230,21 +231,23 @@ public class CoralElevatorSubsystem extends SubsystemBase {
     // if robot.issimulation was here
     ElbowPID.setSetpoint(GetElbowAngle());
     ElevatorPID.setSetpoint(getFilteredElevatorHeight());
+    CoralIntakeConfig.inverted(true);
+    CoralIntakeMotor.configure(CoralIntakeConfig, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
     WristPID.setSetpoint(GetWristAngleWorldCoordinates());
     // WristPID.enableContinuousInput(-180, 180);
     // WristPID
     RightFlapPID.setSetpoint(GetRightFlap());
-    LeftFlapPID.setSetpoint(GetLeftFlap());
+   // LeftFlapPID.setSetpoint(GetLeftFlap());
     RightFlapPID.setTolerance(3);
-    LeftFlapPID.setTolerance(3);
+   // LeftFlapPID.setTolerance(3);
     RightFlapPID.enableContinuousInput(0, 360);
-    LeftFlapPID.enableContinuousInput(0, 360);
-    CoralFlapLeftConfig.absoluteEncoder.inverted(true);
-    CoralFlapLeftConfig.inverted(true);
-    coralFlapRightConfig.inverted(false);
-    CoralFlapLeftConfig.idleMode(IdleMode.kBrake);
+   // LeftFlapPID.enableContinuousInput(0, 360);
+    //CoralFlapLeftConfig.absoluteEncoder.inverted(true);
+   // CoralFlapLeftConfig.inverted(true);
+    coralFlapRightConfig.inverted(true);
+   // CoralFlapLeftConfig.idleMode(IdleMode.kBrake);
     coralFlapRightConfig.idleMode(IdleMode.kBrake);
-    CoralFlapLeft.configure(CoralFlapLeftConfig, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
+   // CoralFlapLeft.configure(CoralFlapLeftConfig, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
     CoralFlapRight.configure(coralFlapRightConfig, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
 
 
@@ -252,13 +255,13 @@ public class CoralElevatorSubsystem extends SubsystemBase {
 
   }
   //Flap Functions
-  public void SetLeftFlap(double Angle)
+  public void SetRightFlap(double Angle)
   {
     RightFlapPID.setSetpoint(Angle);
   }
-  public void SetRightFlap(double Angle)
+  public void SetLeftFlap(double Angle)
   {
-    LeftFlapPID.setSetpoint(Angle);
+   // LeftFlapPID.setSetpoint(Angle);
   }
   public double GetRightFlap()
   {
@@ -267,7 +270,7 @@ public class CoralElevatorSubsystem extends SubsystemBase {
 
   public double GetLeftFlap()
   {
-    return CoralFlapLeftEncoder.getPosition();
+    return 0;//CoralFlapLeftEncoder.getPosition();
   }
 
 
@@ -631,7 +634,7 @@ public class CoralElevatorSubsystem extends SubsystemBase {
     {
         // ElevatorPID.setSetpoint(getFilteredElevatorHeight());
     }
-    double leftFlapOutput = LeftFlapPID.calculate(GetLeftFlap());
+    //double leftFlapOutput = LeftFlapPID.calculate(GetLeftFlap());
     double rightFlapOutput = RightFlapPID.calculate(GetRightFlap());
     
     SmartDashboard.putNumber("Elevator PID Output", elevatorPIDValue);
@@ -649,7 +652,7 @@ public class CoralElevatorSubsystem extends SubsystemBase {
   
     //Elbow Data
     SmartDashboard.putNumber("ElbowAngle", GetElbowAngle());
-    SmartDashboard.putNumber("Elbow Output", elbowOutput);
+    
     SmartDashboard.putNumber("Elbow Setpoint", ElbowPID.getSetpoint());
     SmartDashboard.putBoolean("CanIncElbow", CanMoveElbowInc());
     SmartDashboard.putBoolean("CanDecElbow", CanMoveElbowDec());
@@ -676,10 +679,10 @@ public class CoralElevatorSubsystem extends SubsystemBase {
           EleveFF = 0.01;
 
         EmotorSpd = elevatorOutput + EleveFF;
-        if (EmotorSpd < 0.03 && EmotorSpd>0)
-          EmotorSpd = 0.03;
-        if (EmotorSpd > -0.03 && EmotorSpd<0)
-          EmotorSpd = -0.03;  
+        if (EmotorSpd < 0.05 && EmotorSpd>0)
+          EmotorSpd = 0.05;
+        if (EmotorSpd > -0.05 && EmotorSpd<0)
+          EmotorSpd = -0.05;  
         ElevatorStageMotor.set(EmotorSpd); 
       
       }
@@ -688,6 +691,10 @@ public class CoralElevatorSubsystem extends SubsystemBase {
         EmotorSpd = 0;
       }
       SmartDashboard.putNumber("Elevator Output", EmotorSpd);
+
+
+
+      SmartDashboard.putNumber("Elbow Output", elbowOutput);
       if (ElbowPID.getSetpoint() > GetElbowAngle()){
         elbowOutput = MathUtil.clamp(elbowOutput,-.75,.0);
         
@@ -697,8 +704,12 @@ public class CoralElevatorSubsystem extends SubsystemBase {
         
       }
       if (!ElbowPID.atSetpoint() && ((CanMoveElbowDec() && elbowOutput > 0) || (CanMoveElbowInc() && elbowOutput < 0))) 
-          ElbowMotor.set(elbowOutput);
+      {
+        SmartDashboard.putString("Elbow Allowed to move", "true") ; 
+        ElbowMotor.set(elbowOutput);
+      }
         else{
+          SmartDashboard.putString("Elbow Allowed to move", "false") ;
           ElbowMotor.set(0);
         } 
         
@@ -727,13 +738,13 @@ public class CoralElevatorSubsystem extends SubsystemBase {
   
     // Datahighway
     SmartDashboard.putNumber("LeftFlapPos", GetLeftFlap());
-    leftFlapOutput = -MathUtil.clamp(leftFlapOutput, -.1, .1);
+    //leftFlapOutput = -MathUtil.clamp(leftFlapOutput, -.1, .1);
     rightFlapOutput = -MathUtil.clamp(rightFlapOutput, -.1, .1);
-    SmartDashboard.putNumber("LeftFlapOut", leftFlapOutput);
-    SmartDashboard.putNumber("LeftSetpoint", LeftFlapPID.getSetpoint());
-    CoralFlapLeft.set(-leftFlapOutput);
-      CoralFlapRight.set(-rightFlapOutput);
-      
+    //SmartDashboard.putNumber("LeftFlapOut", leftFlapOutput);
+   // SmartDashboard.putNumber("LeftSetpoint", LeftFlapPID.getSetpoint());
+    //CoralFlapLeft.set(-leftFlapOutput);
+      //CoralFlapRight.set(-rightFlapOutput);
+      CoralFlapRight.set(0); //move to climber SS and only PID if we are setting up for a climb
 
     DH_Out_HasCoral = isCoralPresent();
 
