@@ -73,6 +73,7 @@ import swervelib.parser.SwerveDriveConfiguration;
 import swervelib.parser.SwerveParser;
 import swervelib.telemetry.SwerveDriveTelemetry;
 import swervelib.telemetry.SwerveDriveTelemetry.TelemetryVerbosity;
+import edu.wpi.first.math.Matrix;
 import frc.robot.Vision4920;
 
 import static edu.wpi.first.units.Units.Degrees;
@@ -349,7 +350,7 @@ private void ProcessVision4920()
           GreyFeederVisionTimestamp = visionEst.get().timestampSeconds;
           DogLog.log("Grey Feeder Camera Pose", GreyFeederPose);
           DogLog.log("Grey Feeder TimeStamp",GreyFeederVisionTimestamp);
-            VisionReading(GreyFeederPose, GreyFeederVisionTimestamp);
+            VisionReading(GreyFeederPose, GreyFeederVisionTimestamp, GreyFeederCamera.confidenceCalculator(visionEst.get()));
       }
   
   }
@@ -371,7 +372,7 @@ private void ProcessVision4920()
           GreyReefVisionTimestamp = visionEst.get().timestampSeconds;
           DogLog.log("Grey Reef Camera Pose", GreyReefPose);
           DogLog.log("Grey Reef TimeStamp",GreyReefVisionTimestamp);
-            VisionReading(GreyReefPose, GreyReefVisionTimestamp);
+            VisionReading(GreyReefPose, GreyReefVisionTimestamp, GreyReefCamera.confidenceCalculator(visionEst.get()));
       }
   
   }
@@ -392,7 +393,7 @@ private void ProcessVision4920()
           RedReefVisionTimestamp = visionEst.get().timestampSeconds;
           DogLog.log("Red Reef Camera Pose", RedReefPose);
           DogLog.log("Red Reef TimeStamp",RedReefVisionTimestamp);
-            VisionReading(RedReefPose, RedReefVisionTimestamp);
+            VisionReading(RedReefPose, RedReefVisionTimestamp, RedReefCamera.confidenceCalculator(visionEst.get()));
       }
   
   }
@@ -413,7 +414,7 @@ private void ProcessVision4920()
           RedGeneralVisionTimestamp = visionEst.get().timestampSeconds;
           DogLog.log("Red General Camera Pose", RedGeneralPose);
           DogLog.log("Red General TimeStamp",RedGeneralVisionTimestamp);
-         //   VisionReading(RedGeneralPose, RedGeneralVisionTimestamp);
+            VisionReading(RedGeneralPose, RedGeneralVisionTimestamp, RedGeneralCamera.confidenceCalculator(visionEst.get()));
       }
   
   }
@@ -434,7 +435,7 @@ private void ProcessVision4920()
           BlueFrontVisionTimestamp = visionEst.get().timestampSeconds;
           DogLog.log("Blue Front Camera Pose", BlueFrontPose);
           DogLog.log("Blue Front TimeStamp",BlueFrontVisionTimestamp);
-         //   VisionReading(BlueFrontPose, BlueFrontVisionTimestamp);
+            VisionReading(BlueFrontPose, BlueFrontVisionTimestamp, BlueFrontCamera.confidenceCalculator(visionEst.get()));
       }
   
   }
@@ -455,7 +456,7 @@ private void ProcessVision4920()
           BlueGeneralVisionTimestamp = visionEst.get().timestampSeconds;
           DogLog.log("Blue General Camera Pose", BlueGeneralPose);
           DogLog.log("Blue General TimeStamp",BlueGeneralVisionTimestamp);
-         //   VisionReading(BlueGeneralPose, BlueGeneralVisionTimestamp);
+          VisionReading(BlueGeneralPose, BlueGeneralVisionTimestamp, BlueGeneralCamera.confidenceCalculator(visionEst.get()));
       }
   
   }
@@ -1185,9 +1186,10 @@ private void ProcessVision4920()
   {
     swerveDrive.addVisionMeasurement(new Pose2d(3, 3, Rotation2d.fromDegrees(65)), Timer.getFPGATimestamp());
   }
-  public void VisionReading(Pose2d visionPose,double Timestamp)
+  public void VisionReading(Pose2d visionPose,double Timestamp, Matrix<N3, N1> visionMeasurementStdDevs)
   {
-    swerveDrive.addVisionMeasurement(visionPose, Timestamp);
+   
+    swerveDrive.addVisionMeasurement(visionPose, Timestamp, visionMeasurementStdDevs);
   }
   /**
    * Gets the swerve drive object.
