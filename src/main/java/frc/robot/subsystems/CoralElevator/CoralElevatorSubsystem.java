@@ -184,7 +184,7 @@ public class CoralElevatorSubsystem extends SubsystemBase {
   boolean SetFlapClimb = false;
 
 
-  private int ScoreSelection;
+  private int ScoreSelection = 4; //default score level is 4
 
   public final Trigger atElevatorMin = new Trigger(() -> !CanMoveElevatorDown());
   public final Trigger atElevatorMax = new Trigger(() -> !CanMoveElevatorUp());
@@ -251,7 +251,7 @@ public class CoralElevatorSubsystem extends SubsystemBase {
     CoralFlapRight.configure(coralFlapRightConfig, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
 
 
-    ScoreSelection = 0;
+    ScoreSelection = 4; //default to level 4
 
   }
   //Flap Functions
