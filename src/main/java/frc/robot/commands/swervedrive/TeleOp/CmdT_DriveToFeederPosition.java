@@ -66,7 +66,7 @@ public class CmdT_DriveToFeederPosition extends Command {
   
     double TargetRot=0;
     double RobotOffsetX = Units.inchesToMeters(8); //38.6cm
-    double RobotOffsetY = Units.inchesToMeters(12.5);
+    double RobotOffsetY = Units.inchesToMeters(10.5);
     System.out.println("Initializing Drive to Feeder *****************");
     System.out.println("blue Alliance"+ DriveSS.DH_OUT_isBlueAlliance);
 

@@ -21,18 +21,18 @@ import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class CmdT_DriveToReefPosition extends Command {
 
-  Integer Reef_Side;
+  Integer Reef_Position;
  
   SwerveSubsystem DriveSS;
   Pose2d ReefPose;
 
-  PIDController XPID = new PIDController(2, 0, 0);
-  PIDController YPID = new PIDController(2, 0, 0);
+  PIDController XPID = new PIDController(2, 0, 0.01);
+  PIDController YPID = new PIDController(2, 0, 0.01);
   PIDController RotPID = new PIDController(0.1,0,0);
   boolean inter;
-  public CmdT_DriveToReefPosition(SwerveSubsystem DriveSubsystem, int Side) {
+  public CmdT_DriveToReefPosition(SwerveSubsystem DriveSubsystem, int Position) {
     // Use addRequirements() here to declare subsystem dependencies.
-    Reef_Side = Side;
+    Reef_Position = Position;
       DriveSS = DriveSubsystem;
     addRequirements(DriveSS);
   }
@@ -61,13 +61,13 @@ public class CmdT_DriveToReefPosition extends Command {
     System.out.println("Initializing Drive to Reef *****************");
     int ReefSegment = DriveSS.getReefSegment();
     System.out.println("ReefSegment" + ReefSegment);
-    if (Reef_Side ==1)
+    if (Reef_Position ==1)
       offsetAng = LeftOffsetAng;
-    if (Reef_Side == 2)
+    if (Reef_Position == 2)
       offsetAng = RightOFfsetAng;
-    if (Reef_Side == 3 || Reef_Side == 4)
+    if (Reef_Position == 3 || Reef_Position == 4)
       offsetAng = 0; // algae position
-    if ( Reef_Side == 4)
+    if ( Reef_Position == 4)
         RobotOffset = RobotOffset +1; // move 1 meter further if removeing algae
 
         

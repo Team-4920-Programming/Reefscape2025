@@ -119,9 +119,9 @@ public class CoralElevatorSubsystem extends SubsystemBase {
   SparkMax CoralIntakeMotor = new SparkMax(CanIDs.CoralElevator.CoralIntake, MotorType.kBrushless);
   SparkMaxConfig CoralIntakeConfig = new SparkMaxConfig();
  // SparkMax CoralFlapLeft = new SparkMax(CanIDs.CoralElevator.CoralFlapLeft, MotorType.kBrushless);
-  SparkMax CoralFlapRight = new SparkMax(CanIDs.CoralElevator.CoralFlapRight, MotorType.kBrushless);
+
  // SparkMaxConfig CoralFlapLeftConfig = new SparkMaxConfig();
-  SparkMaxConfig coralFlapRightConfig = new SparkMaxConfig();
+  
 
   // PIDs
 
@@ -132,7 +132,7 @@ public class CoralElevatorSubsystem extends SubsystemBase {
   PIDController ElbowPID = new PIDController(PIDs.CoralElevator.Elbow.kp, PIDs.CoralElevator.Elbow.ki, PIDs.CoralElevator.Elbow.kd);
 
   PIDController WristPID = new PIDController(PIDs.CoralElevator.Wrist.kp, PIDs.CoralElevator.Wrist.ki, PIDs.CoralElevator.Wrist.kd);
-  PIDController RightFlapPID = new PIDController(PIDs.CoralElevator.RightFlap.kp,PIDs.CoralElevator.RightFlap.ki,PIDs.CoralElevator.RightFlap.kd );
+  
  // PIDController LeftFlapPID = new PIDController(PIDs.CoralElevator.LeftFlap.kp,PIDs.CoralElevator.LeftFlap.ki,PIDs.CoralElevator.LeftFlap.kd );
   // Limit Switch
 
@@ -150,7 +150,7 @@ public class CoralElevatorSubsystem extends SubsystemBase {
   AbsoluteEncoder WristAbsoluteEncoder = WristMotor.getAbsoluteEncoder();
   RelativeEncoder WristRelative = WristMotor.getEncoder();
  // AbsoluteEncoder CoralFlapLeftEncoder = CoralFlapLeft.getAbsoluteEncoder();
-  AbsoluteEncoder CoralFlapRightEncoder = CoralFlapRight.getAbsoluteEncoder();
+ 
   // LaserCan
   private LaserCan LaserCan = new LaserCan(CanIDs.Sensor.LaserCAN);
   int elevatorHeightMM = 0;
@@ -236,37 +236,18 @@ public class CoralElevatorSubsystem extends SubsystemBase {
     WristPID.setSetpoint(GetWristAngleWorldCoordinates());
     // WristPID.enableContinuousInput(-180, 180);
     // WristPID
-    RightFlapPID.setSetpoint(GetRightFlap());
-   // LeftFlapPID.setSetpoint(GetLeftFlap());
-    RightFlapPID.setTolerance(3);
-   // LeftFlapPID.setTolerance(3);
-    RightFlapPID.enableContinuousInput(0, 360);
-   // LeftFlapPID.enableContinuousInput(0, 360);
-    //CoralFlapLeftConfig.absoluteEncoder.inverted(true);
-   // CoralFlapLeftConfig.inverted(true);
-    coralFlapRightConfig.inverted(true);
-   // CoralFlapLeftConfig.idleMode(IdleMode.kBrake);
-    coralFlapRightConfig.idleMode(IdleMode.kBrake);
-   // CoralFlapLeft.configure(CoralFlapLeftConfig, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
-    CoralFlapRight.configure(coralFlapRightConfig, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
-
+    
 
     ScoreSelection = 4; //default to level 4
 
   }
   //Flap Functions
-  public void SetRightFlap(double Angle)
-  {
-    RightFlapPID.setSetpoint(Angle);
-  }
+  
   public void SetLeftFlap(double Angle)
   {
    // LeftFlapPID.setSetpoint(Angle);
   }
-  public double GetRightFlap()
-  {
-    return CoralFlapRightEncoder.getPosition();
-  }
+
 
   public double GetLeftFlap()
   {
@@ -627,7 +608,7 @@ public class CoralElevatorSubsystem extends SubsystemBase {
       elevatorOutput = MathUtil.clamp(elevatorPIDValue,-1,1);
       elbowOutput = ElbowPID.calculate(GetElbowAngle());
       elbowOutput = -elbowOutput;
-      elbowOutput = MathUtil.clamp(elbowOutput, -0.5, 0.5);
+      elbowOutput = MathUtil.clamp(elbowOutput, -0.7, 0.7);//was -.5 and .5
       wristOutput = WristPID.calculate(GetWristAngleWorldCoordinates());
     }
     else
@@ -635,7 +616,7 @@ public class CoralElevatorSubsystem extends SubsystemBase {
         // ElevatorPID.setSetpoint(getFilteredElevatorHeight());
     }
     //double leftFlapOutput = LeftFlapPID.calculate(GetLeftFlap());
-    double rightFlapOutput = RightFlapPID.calculate(GetRightFlap());
+    
     
     SmartDashboard.putNumber("Elevator PID Output", elevatorPIDValue);
     SmartDashboard.putNumber("Elevator Output", elevatorOutput);
@@ -665,7 +646,7 @@ public class CoralElevatorSubsystem extends SubsystemBase {
     SmartDashboard.putBoolean("CanDecWrist", CanMoveWristDec());
 
     SmartDashboard.putNumber("LeftFlap", GetLeftFlap());
-    SmartDashboard.putNumber("RightFlap", GetRightFlap());
+    
     
 
     SmartDashboard.putBoolean("HasCoral", isCoralPresent());
@@ -739,12 +720,12 @@ public class CoralElevatorSubsystem extends SubsystemBase {
     // Datahighway
     SmartDashboard.putNumber("LeftFlapPos", GetLeftFlap());
     //leftFlapOutput = -MathUtil.clamp(leftFlapOutput, -.1, .1);
-    rightFlapOutput = -MathUtil.clamp(rightFlapOutput, -.1, .1);
+  
     //SmartDashboard.putNumber("LeftFlapOut", leftFlapOutput);
    // SmartDashboard.putNumber("LeftSetpoint", LeftFlapPID.getSetpoint());
     //CoralFlapLeft.set(-leftFlapOutput);
       //CoralFlapRight.set(-rightFlapOutput);
-      CoralFlapRight.set(0); //move to climber SS and only PID if we are setting up for a climb
+      
 
     DH_Out_HasCoral = isCoralPresent();
 

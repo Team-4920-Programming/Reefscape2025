@@ -131,22 +131,30 @@ public class DataHighwaySubsystem extends SubsystemBase {
     // TODO: redzone Coral Stations
     // 3.3m from 0 to 3.3m (on a 45)
 
+    double CurX = CurrentPose.getX();
+   double CurY = CurrentPose.getY();
+   double CurR = CurrentPose.getRotation().getDegrees();
+    //double BlueRightr = Math.sqrt(Math.pow(CurX,2)+Math.pow(CurY,2));
+    //double BlueLeftr = Math.sqrt (Math.pow())
 
-   double BlueRightX = CurrentPose.getX();
-   double BlueRightY = CurrentPose.getY();
-    double BlueRightr = Math.sqrt(Math.pow(BlueRightX,2)+Math.pow(BlueRightY,2));
     InCoralSationZone = false;
-    if (BlueRightr <2.5){
-      if (CurrentPose.getRotation().getDegrees() > 150 || CurrentPose.getRotation().getDegrees() < -44){
+    if (inRightCoralZone){
+      double RightRot = RightCoralStationPose.toPose2d().getRotation().getDegrees();
+      //Right blue tag has a 54 degree pose, we set our robot to be between +90 and -90 from that pose
+      if (CurR > RightRot +90  || CurR < RightRot -90){
         InRedZone = true;
       }
      
       InCoralSationZone =true;
     }
-    else
-    {
-      InCoralSationZone = false;
-      AtCoralStation = false;
+    if (inLeftCoralZone){
+      double LeftRot = LeftCoralStationPose.toPose2d().getRotation().getDegrees();
+      //left blue tag has a -54 degree pose, we set our robot to be between +90 and -90 from that pose
+      if (CurR > LeftRot +90  || CurR < LeftRot -90){
+        InRedZone = true;
+      }
+     
+      InCoralSationZone =true;
     }
     
     if (InRedZone)

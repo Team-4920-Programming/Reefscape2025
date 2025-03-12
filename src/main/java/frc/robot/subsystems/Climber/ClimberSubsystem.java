@@ -11,11 +11,13 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Config;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.units.measure.MutAngle;
 import edu.wpi.first.units.measure.MutAngularVelocity;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.DegreesPerSecond;
@@ -56,11 +58,14 @@ public class ClimberSubsystem extends SubsystemBase {
 
   private AbsoluteEncoder climberAngleEncoder;
   private double climberAngle;
-
+  SparkMax CoralFlapRight = new SparkMax(CanIDs.CoralElevator.CoralFlapRight, MotorType.kBrushless);
+    SparkMaxConfig coralFlapRightConfig = new SparkMaxConfig();
   //PIDController ClimberPID = new PIDController(PIDs.Climber.kp, PIDs.Climber.ki, PIDs.Climber.kd);
   double climberOutput;
   boolean climberOut = false;
   boolean ClimberIdle = false;
+  PIDController RightFlapPID = new PIDController(0.1, 0, 0);
+  AbsoluteEncoder CoralFlapRightEncoder = CoralFlapRight.getAbsoluteEncoder();
   //public final Trigger atClimberMin = new Trigger(() -> !CanMoveClimberIn());
  // public final Trigger atClimberMax = new Trigger(() -> !CanMoveClimberOut());
 
@@ -73,11 +78,30 @@ public class ClimberSubsystem extends SubsystemBase {
     cagePresenceSensor = new DigitalInput(DIO.Climber.CagePresence);
     climberAngleEncoder = climberMotor.getAbsoluteEncoder();
     
+  
+   // PIDController RightFlapPID = new PIDController(PIDs.CoralElevator.RightFlap.kp,PIDs.CoralElevator.RightFlap.ki,PIDs.CoralElevator.RightFlap.kd );
+  RightFlapPID.setSetpoint(GetRightFlap());
+  // LeftFlapPID.setSetpoint(GetLeftFlap());
+   RightFlapPID.setTolerance(3);
+  // LeftFlapPID.setTolerance(3);
+
+  // LeftFlapPID.enableContinuousInput(0, 360);
+   //CoralFlapLeftConfig.absoluteEncoder.inverted(true);
+  // CoralFlapLeftConfig.inverted(true);
+   coralFlapRightConfig.inverted(true);
+  // CoralFlapLeftConfig.idleMode(IdleMode.kBrake);
+   coralFlapRightConfig.idleMode(IdleMode.kBrake);
+  // CoralFlapLeft.configure(CoralFlapLeftConfig, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
+   CoralFlapRight.configure(coralFlapRightConfig, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
   }
 
   @Override
   public void periodic() {
     ReadSensorValues();
+    double rightFlapOutput = RightFlapPID.calculate(GetRightFlap());
+    SmartDashboard.putNumber("RightFlap", GetRightFlap());
+      rightFlapOutput = -MathUtil.clamp(rightFlapOutput, -.1, .1);
+    CoralFlapRight.set(0); //move to climber SS and only PID if we are setting up for a climb
    // System.out.println(climberAngle);
     if (climberOut)
     {
@@ -145,8 +169,14 @@ public class ClimberSubsystem extends SubsystemBase {
   private Boolean CanMoveClimberOut(){
     return climberAngle < RobotLimits.Climber.maxAngle;
   }
-
-
+  public void SetRightFlap(double Angle)
+  {
+    RightFlapPID.setSetpoint(Angle);
+  }
+  public double GetRightFlap()
+  {
+    return CoralFlapRightEncoder.getPosition();
+  }
   
 
 

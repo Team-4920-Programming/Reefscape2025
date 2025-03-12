@@ -348,7 +348,7 @@ private void ProcessVision4920()
 
           
           GreyFeederVisionTimestamp = visionEst.get().timestampSeconds;
-          DogLog.log("Grey Feeder Camera Pose", GreyFeederPose);
+          DogLog.log("Grey Feeder Camera Pose", GreyFeederCameraPose3d);
           DogLog.log("Grey Feeder TimeStamp",GreyFeederVisionTimestamp);
             VisionReading(GreyFeederPose, GreyFeederVisionTimestamp, GreyFeederCamera.confidenceCalculator(visionEst.get()));
       }
@@ -370,7 +370,7 @@ private void ProcessVision4920()
 
           
           GreyReefVisionTimestamp = visionEst.get().timestampSeconds;
-          DogLog.log("Grey Reef Camera Pose", GreyReefPose);
+          DogLog.log("Grey Reef Camera Pose", GreyReefCameraPose3d);
           DogLog.log("Grey Reef TimeStamp",GreyReefVisionTimestamp);
             VisionReading(GreyReefPose, GreyReefVisionTimestamp, GreyReefCamera.confidenceCalculator(visionEst.get()));
       }
@@ -412,9 +412,9 @@ private void ProcessVision4920()
 
           
           RedGeneralVisionTimestamp = visionEst.get().timestampSeconds;
-          DogLog.log("Red General Camera Pose", RedGeneralPose);
+          DogLog.log("Red General Camera Pose", RedGeneralCameraPose3d);
           DogLog.log("Red General TimeStamp",RedGeneralVisionTimestamp);
-            VisionReading(RedGeneralPose, RedGeneralVisionTimestamp, RedGeneralCamera.confidenceCalculator(visionEst.get()));
+          VisionReading(RedGeneralPose, RedGeneralVisionTimestamp, RedGeneralCamera.confidenceCalculator(visionEst.get()));
       }
   
   }
@@ -433,7 +433,7 @@ private void ProcessVision4920()
 
           
           BlueFrontVisionTimestamp = visionEst.get().timestampSeconds;
-          DogLog.log("Blue Front Camera Pose", BlueFrontPose);
+          DogLog.log("Blue Front Camera Pose", BlueFrontCameraPose3d);
           DogLog.log("Blue Front TimeStamp",BlueFrontVisionTimestamp);
             VisionReading(BlueFrontPose, BlueFrontVisionTimestamp, BlueFrontCamera.confidenceCalculator(visionEst.get()));
       }
@@ -454,7 +454,7 @@ private void ProcessVision4920()
 
           
           BlueGeneralVisionTimestamp = visionEst.get().timestampSeconds;
-          DogLog.log("Blue General Camera Pose", BlueGeneralPose);
+          DogLog.log("Blue General Camera Pose", BlueGeneralCameraPose3d);
           DogLog.log("Blue General TimeStamp",BlueGeneralVisionTimestamp);
           VisionReading(BlueGeneralPose, BlueGeneralVisionTimestamp, BlueGeneralCamera.confidenceCalculator(visionEst.get()));
       }

@@ -30,7 +30,8 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Config;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.Constants.AbsoluteEncoderID.Climber;
-import frc.robot.commands.Cmd_SeqRemoveAlgea;
+import frc.robot.commands.Cmd_SeqRemoveLowAlgea;
+import frc.robot.commands.Cmd_SeqRemoveHighAlgea;
 import frc.robot.commands.Cmd_SeqScoreLeft;
 import frc.robot.commands.Cmd_SeqScoreRight;
 import frc.robot.commands.swervedrive.TeleOp.CmdT_DriveToFeederPosition;
@@ -220,19 +221,20 @@ public class RobotContainer
       //OperatorJoystick.button(3).whileTrue(new CmdT_IntakeToPosition(AlgaeIntakeSS, 60).
       //  andThen(new CmdT_IntakeAlgae(AlgaeIntakeSS)).
       //  andThen(new CmdT_IntakeToPosition(AlgaeIntakeSS, 25)));
-      OperatorJoystick.button(1 ).whileTrue(new CmdT_ClimberIn(ClimberSS));
+    
       OperatorJoystick.button(2 ).whileTrue(new CmdT_ClimberOut(ClimberSS));
       OperatorJoystick.button(3 ).whileTrue(new CmdT_RunClimberIn(ClimberSS));
+      OperatorJoystick.button(4).whileTrue(new CmdT_Station(CoralElevatorSS));
+      OperatorJoystick.button(5).whileTrue(new CmdT_Level4(CoralElevatorSS));
+      OperatorJoystick.button(6).whileTrue(new CmdT_Level3(CoralElevatorSS));
+      OperatorJoystick.button(8).whileTrue(new CmdT_Level2(CoralElevatorSS));
+      OperatorJoystick.button(9).whileTrue(new CmdT_Level1(CoralElevatorSS));
       
-      OperatorJoystick.button(4).whileTrue(new CmdT_Level2(CoralElevatorSS));
-      OperatorJoystick.button(5).whileTrue(new CmdT_Level3(CoralElevatorSS));
-      OperatorJoystick.button(6).whileTrue(new CmdT_Level4(CoralElevatorSS));
-      OperatorJoystick.button(7).whileTrue(new CmdT_Station(CoralElevatorSS));
-      OperatorJoystick.button(8).whileTrue(new CmdT_Level1(CoralElevatorSS));
-      OperatorJoystick.button(9).whileTrue(new CmdT_ArmNeutral(CoralElevatorSS));
-      OperatorJoystick.button(13).whileTrue(new CmdT_AlgaeLowApproach(CoralElevatorSS));
-      OperatorJoystick.button(14).whileTrue(new CmdT_AlgaeLowRetract(CoralElevatorSS));
-      OperatorJoystick.button(15).whileTrue(new Cmd_SeqRemoveAlgea(CoralElevatorSS, drivebase));
+      OperatorJoystick.button(11).whileTrue(new Cmd_SeqRemoveHighAlgea(CoralElevatorSS, drivebase));
+      OperatorJoystick.button(12).whileTrue(new Cmd_SeqRemoveLowAlgea(CoralElevatorSS, drivebase));
+      
+
+      
       
       ReefJoystick.button(1).whileTrue(new CmdT_LevelSelect(CoralElevatorSS, 1));
       ReefJoystick.button(2).whileTrue(new CmdT_LevelSelect(CoralElevatorSS, 2));
@@ -241,9 +243,9 @@ public class RobotContainer
       //ReefJoystick.button(5).onTrue(new CmdT_MoveToLevel(CoralElevatorSS));
      // ReefJoystick.button(5).whileTrue(new Cmd_SeqScoreLeft(CoralElevatorSS, drivebase));
    //  ReefJoystick.button(5).whileTrue(new Cmd_SeqRemoveAlgea(CoralElevatorSS, drivebase));
-   ReefJoystick.button(5).whileTrue(new Cmd_SeqScoreLeft(CoralElevatorSS, drivebase));
+   //ReefJoystick.button(5).whileTrue(new Cmd_SeqScoreLeft(CoralElevatorSS, drivebase));
        
-     ReefJoystick.button(6).whileTrue(new Cmd_SeqScoreRight(CoralElevatorSS, drivebase));
+     //ReefJoystick.button(6).whileTrue(new Cmd_SeqScoreRight(CoralElevatorSS, drivebase));
       //ReefJoystick.button(6).whileTrue(new CmdT_DriveToReefPosition(drivebase,2));
       // driverXbox.leftBumper().whileTrue(new CmdT_IntakeToPosition(AlgaeIntakeSS, 30));
       // driverXbox.rightBumper().whileTrue(new CmdT_IntakeToPosition(AlgaeIntakeSS, 80));
@@ -262,19 +264,11 @@ public class RobotContainer
       //driverXbox.rightTrigger().whileTrue(new MoveElbowToAngle(CoralElevatorSS, 5));
  
 
-      //Wrist
-
-      // driverXbox.a().whileTrue(CoralElevatorSS.sysIDWristAll());
-      //driverXbox.a().whileTrue(new MoveWristToAngle(CoralElevatorSS, 90));
-     // driverXbox.b().whileTrue(new MoveWristToAngle(CoralElevatorSS, 5));
+      
       driverXbox.x().whileTrue(new CmdT_CoralIntake(CoralElevatorSS ));
       driverXbox.y().whileTrue(new CmdT_CoralOutTake(CoralElevatorSS ));
-      //Climber
 
-      // driverXbox.a().whileTrue(ClimberSS.sysIDClimberAll());
-
-      //Drive Subssystem
-      OperatorJoystick.button(10).whileTrue(new CmdT_DriveToFeederPosition(drivebase));
+      //OperatorJoystick.button(10).whileTrue(new CmdT_DriveToFeederPosition(drivebase));
       
 
       //Scoring Buttons
@@ -285,18 +279,18 @@ public class RobotContainer
 
     } else
     {
-      driverXbox.a().onTrue((Commands.runOnce(drivebase::zeroGyro)));
-      driverXbox.x().onTrue(Commands.runOnce(drivebase::addFakeVisionReading));
-      driverXbox.b().whileTrue(
-          drivebase.driveToPose(
-              new Pose2d(new Translation2d(4, 4), Rotation2d.fromDegrees(0)))
-                              );
-      //driverXbox.y().whileTrue(drivebase.aimAtSpeaker(2));
+      // driverXbox.a().onTrue((Commands.runOnce(drivebase::zeroGyro)));
+      // driverXbox.x().onTrue(Commands.runOnce(drivebase::addFakeVisionReading));
+      // driverXbox.b().whileTrue(
+      //     drivebase.driveToPose(
+      //         new Pose2d(new Translation2d(4, 4), Rotation2d.fromDegrees(0)))
+      //                         );
+      // //driverXbox.y().whileTrue(drivebase.aimAtSpeaker(2));
       
-      driverXbox.start().whileTrue(Commands.none());
-      driverXbox.back().whileTrue(Commands.none());
-      driverXbox.leftBumper().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
-      // driverXbox.rightBumper().onTrue(Commands.none());
+      // driverXbox.start().whileTrue(Commands.none());
+      // driverXbox.back().whileTrue(Commands.none());
+      // driverXbox.leftBumper().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
+      // // driverXbox.rightBumper().onTrue(Commands.none());
     }
 
   }
