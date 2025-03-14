@@ -393,6 +393,7 @@ private void ProcessVision4920()
           RedReefVisionTimestamp = visionEst.get().timestampSeconds;
           DogLog.log("Red Reef Camera Pose", RedReefPose);
           DogLog.log("Red Reef TimeStamp",RedReefVisionTimestamp);
+          
             VisionReading(RedReefPose, RedReefVisionTimestamp, RedReefCamera.confidenceCalculator(visionEst.get()));
       }
   
@@ -414,6 +415,7 @@ private void ProcessVision4920()
           RedGeneralVisionTimestamp = visionEst.get().timestampSeconds;
           DogLog.log("Red General Camera Pose", RedGeneralCameraPose3d);
           DogLog.log("Red General TimeStamp",RedGeneralVisionTimestamp);
+          if (!DriverStation.isAutonomous())
           VisionReading(RedGeneralPose, RedGeneralVisionTimestamp, RedGeneralCamera.confidenceCalculator(visionEst.get()));
       }
   
@@ -435,6 +437,7 @@ private void ProcessVision4920()
           BlueFrontVisionTimestamp = visionEst.get().timestampSeconds;
           DogLog.log("Blue Front Camera Pose", BlueFrontCameraPose3d);
           DogLog.log("Blue Front TimeStamp",BlueFrontVisionTimestamp);
+          if(!DriverStation.isAutonomous())
             VisionReading(BlueFrontPose, BlueFrontVisionTimestamp, BlueFrontCamera.confidenceCalculator(visionEst.get()));
       }
   
@@ -456,6 +459,7 @@ private void ProcessVision4920()
           BlueGeneralVisionTimestamp = visionEst.get().timestampSeconds;
           DogLog.log("Blue General Camera Pose", BlueGeneralCameraPose3d);
           DogLog.log("Blue General TimeStamp",BlueGeneralVisionTimestamp);
+          if (!DriverStation.isAutonomous())
           VisionReading(BlueGeneralPose, BlueGeneralVisionTimestamp, BlueGeneralCamera.confidenceCalculator(visionEst.get()));
       }
   
@@ -577,7 +581,7 @@ private void ProcessVision4920()
               // Rotation PID constants
           ),
           config,
-          // The robot configuration
+          // The robot configuration  
           () -> {
             // Boolean supplier that controls when the path will be mirrored for the red alliance
             // This will flip the path being followed to the red side of the field.
@@ -886,7 +890,7 @@ private void ProcessVision4920()
          
 
       }
-      if (AutoAimEnabled){
+      if (AutoAimEnabled && !DriverStation.isAutonomous()){
 
         
 

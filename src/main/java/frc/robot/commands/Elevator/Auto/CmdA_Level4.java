@@ -2,20 +2,24 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.robot.commands.Climber.TeleOp;
+package frc.robot.commands.Elevator.Auto;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.Climber.ClimberSubsystem;
+import frc.robot.subsystems.CoralElevator.CoralElevatorSubsystem;
+import frc.robot.Constants.RobotPositions;
+import frc.robot.Constants.RobotPositions.Level2;
+import frc.robot.Constants.RobotPositions.Level3;
+import frc.robot.Constants.RobotPositions.Level4;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
-public class CmdT_ClimberOut extends Command {
-  /** Creates a new CmdT_ClimberOut. */
-  ClimberSubsystem Climber_SS;
-  public CmdT_ClimberOut(ClimberSubsystem Climber) {
-    Climber_SS = Climber;
-    addRequirements(Climber_SS);
-   
+public class CmdA_Level4 extends Command {
+  /** Creates a new CmdT_Level1. */
+  CoralElevatorSubsystem m_ElevatorSubsystem;
+  public CmdA_Level4(CoralElevatorSubsystem elevatorSS) {
     // Use addRequirements() here to declare subsystem dependencies.
+    m_ElevatorSubsystem = elevatorSS;
+    addRequirements(m_ElevatorSubsystem);
+
   }
 
   // Called when the command is initially scheduled.
@@ -25,9 +29,9 @@ public class CmdT_ClimberOut extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    Climber_SS.ClimberOut();
-    Climber_SS.SetRightFlap(60);
-  }
+
+        m_ElevatorSubsystem.setArmPosition(Level4.height, Level4.elbow, Level4.wrist);
+      }
 
   // Called once the command ends or is interrupted.
   @Override
@@ -36,6 +40,6 @@ public class CmdT_ClimberOut extends Command {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return true;
+    return (Math.abs(m_ElevatorSubsystem.getHeightLaserMeters() - Level4.height) < 0.1) && (Math.abs(m_ElevatorSubsystem.GetElbowAngle() - Level4.elbow) < 5) && (Math.abs(m_ElevatorSubsystem.GetWristAngleWorldCoordinates() - Level4.wrist) < 5) ;
   }
 }

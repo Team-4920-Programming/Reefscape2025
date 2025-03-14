@@ -38,7 +38,7 @@ public class CmdT_CoralIntake extends Command {
     }
     if(!CoralElevatorSS.isCoralPresent())
     {
-      CoralElevatorSS.setIntakeSpeed(0.5);
+      CoralElevatorSS.setIntakeSpeed(1.0);
     }
   }
 
@@ -59,6 +59,6 @@ public class CmdT_CoralIntake extends Command {
         PresentTimer.stop();
         PresentTimer.reset();
     }
-    return (PresentTimer.hasElapsed(.5));
+    return (PresentTimer.hasElapsed(.15));
   }
 }

@@ -11,78 +11,52 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.subsystems.DataHighway.DataHighwaySubsystem;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
-public class CmdT_DriveToReefPosition extends Command {
+public class CmdT_DriveToPose extends Command {
 
-  Integer Reef_Position;
+  Integer branch;
  
   SwerveSubsystem DriveSS;
-  Pose2d ReefPose;
-
+  DataHighwaySubsystem DataSS;
+  Pose2d target;
+  double maxZoom;
   PIDController XPID = new PIDController(2, 0, 0.01);
   PIDController YPID = new PIDController(2, 0, 0.01);
-  PIDController RotPID = new PIDController(0.1,0,0);
+  PIDController RotPID = new PIDController(0.125,0,0);
   boolean inter;
-  public CmdT_DriveToReefPosition(SwerveSubsystem DriveSubsystem, int Position) {
+  public CmdT_DriveToPose(SwerveSubsystem DriveSubsystem, Pose2d targetPose, double maxSpeed) {
     // Use addRequirements() here to declare subsystem dependencies.
-    Reef_Position = Position;
-      DriveSS = DriveSubsystem;
+    target = targetPose;
+    DriveSS = DriveSubsystem;
     addRequirements(DriveSS);
+    maxZoom = maxSpeed;
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    
-    inter = false;
-    double CenterofReefX = 4.5;
-    double CenterofReefY = 4.0;
-    if (DriveSS.DH_OUT_isRedAlliance)
-    {
-      CenterofReefX  = 17.5-4.5;
-    }
-    
-    double ReefRadius = Units.inchesToMeters(65.5)/2;
-    //onshape cordinates of blue 
-    //y along alliance wall 
-    //x from blue to red
-    double LeftOffsetAng=-8;
-    double RightOffsetAng=8;
-    double RobotOffset = Units.inchesToMeters(15); 
-    
-    double offsetAng = 0;
-    System.out.println("Initializing Drive to Reef *****************");
-    int ReefSegment = DriveSS.getReefSegment();
-    System.out.println("ReefSegment" + ReefSegment);
-    if (Reef_Position ==1)
-      offsetAng = LeftOffsetAng;
-    if (Reef_Position == 2)
-      offsetAng = RightOffsetAng;
-    if (Reef_Position == 3 || Reef_Position == 4)
-      offsetAng = 0; // algae position
-    if ( Reef_Position == 4)
-        RobotOffset = RobotOffset +1; // move 1 meter further if removeing algae
+    DriveSS.DisableAutoAim();
 
-        
-    double x = (ReefRadius + RobotOffset) * Math.cos(Units.degreesToRadians((ReefSegment *60)+offsetAng)) + CenterofReefX;
-    double y = (ReefRadius + RobotOffset) * Math.sin(Units.degreesToRadians((ReefSegment *60)+offsetAng)) + CenterofReefY;
-    double rot = ReefSegment * 60;
-    ReefPose = new Pose2d(x,y, Rotation2d.fromDegrees(rot));
-    DogLog.log ("ReefScore/ReefPose", ReefPose);
+ 
+   
+    DogLog.log ("ReefScore/ReefPose", target);
 
 
     
     
-    XPID.setTolerance(0.1);
-    YPID.setTolerance(0.1);
-    RotPID.setTolerance(5);
+    XPID.setTolerance(0.05);
+    YPID.setTolerance(0.05);
+    RotPID.setTolerance(2);
     RotPID.enableContinuousInput(-180, 180);
   }
 
@@ -92,25 +66,23 @@ public class CmdT_DriveToReefPosition extends Command {
     double CurrentX = DriveSS.getPose().getX();
     double CurrentY = DriveSS.getPose().getY();
     double CurrentRot = DriveSS.getPose().getRotation().getDegrees();
-    double Reef_X = ReefPose.getX();
-    double Reef_Y = ReefPose.getY();
-    double Reef_Rot = ReefPose.getRotation().getDegrees()+180;
+  //   double Reef_X = ReefPose.getX();
+  //   double Reef_Y = ReefPose.getY();
+  //   double Reef_Rot = ReefPose.getRotation().getDegrees()+180;
     double XVel = 0;  
     double YVel =0;
-    if (RotPID.atSetpoint()){
-      XVel = XPID.calculate(CurrentX, Reef_X);
-      YVel = YPID.calculate(CurrentY, Reef_Y);
-    }
-    double RotVel = RotPID.calculate(CurrentRot,Reef_Rot);
-    XVel = MathUtil.clamp(XVel, -2, 2);
-    YVel = MathUtil.clamp(YVel, -2,2);
+    // if (RotPID.atSetpoint()){
+      
+      XVel = XPID.calculate(CurrentX, target.getX());
+      YVel = YPID.calculate(CurrentY, target.getY());
+    // }
+    double RotVel = RotPID.calculate(CurrentRot,target.getRotation().getDegrees());
+    XVel = MathUtil.clamp(XVel, -maxZoom, maxZoom);
+    YVel = MathUtil.clamp(YVel, -maxZoom,maxZoom);
     RotVel = MathUtil.clamp(RotVel, -3, 3);
-  //  if (XVel >0 && XVel < .5) XVel = 0.5;
-   // if (YVel >0 && YVel < .5) YVel = 0.5;
-   // if (XVel <0 && XVel > -.5) XVel = -0.5;
-   // if (YVel <0 && YVel < -.5) YVel = -0.5;
 
     DriveSS.drive(new Translation2d(XVel,YVel),RotVel,true);
+
     DogLog.log("ReefScore/Xvel",XVel);
     DogLog.log("ReefScore/Yvel",YVel);
     DogLog.log("ReefScore/Rotvel",RotVel);
@@ -118,7 +90,7 @@ public class CmdT_DriveToReefPosition extends Command {
     DogLog.log("Reef YPID current", CurrentY);
     
    
-    System.out.println("Driving toReef");
+    System.out.println("We be climbin'");
   }
 
   // Called once the command ends or is interrupted.

@@ -64,7 +64,7 @@ public class ClimberSubsystem extends SubsystemBase {
   double climberOutput;
   boolean climberOut = false;
   boolean ClimberIdle = false;
-  PIDController RightFlapPID = new PIDController(0.1, 0, 0);
+  PIDController RightFlapPID = new PIDController(0.0075, 0, 0);
   AbsoluteEncoder CoralFlapRightEncoder = CoralFlapRight.getAbsoluteEncoder();
   //public final Trigger atClimberMin = new Trigger(() -> !CanMoveClimberIn());
  // public final Trigger atClimberMax = new Trigger(() -> !CanMoveClimberOut());
@@ -82,7 +82,8 @@ public class ClimberSubsystem extends SubsystemBase {
    // PIDController RightFlapPID = new PIDController(PIDs.CoralElevator.RightFlap.kp,PIDs.CoralElevator.RightFlap.ki,PIDs.CoralElevator.RightFlap.kd );
   RightFlapPID.setSetpoint(GetRightFlap());
   // LeftFlapPID.setSetpoint(GetLeftFlap());
-   RightFlapPID.setTolerance(3);
+   RightFlapPID.setTolerance(5);
+   RightFlapPID.enableContinuousInput(0, 360);
   // LeftFlapPID.setTolerance(3);
 
   // LeftFlapPID.enableContinuousInput(0, 360);
@@ -100,8 +101,9 @@ public class ClimberSubsystem extends SubsystemBase {
     ReadSensorValues();
     double rightFlapOutput = RightFlapPID.calculate(GetRightFlap());
     SmartDashboard.putNumber("RightFlap", GetRightFlap());
+    SmartDashboard.putNumber("ClimberEncoder", climberAngleEncoder.getPosition());
       rightFlapOutput = -MathUtil.clamp(rightFlapOutput, -.1, .1);
-    CoralFlapRight.set(0); //move to climber SS and only PID if we are setting up for a climb
+    CoralFlapRight.set(rightFlapOutput); //move to climber SS and only PID if we are setting up for a climb
    // System.out.println(climberAngle);
     if (climberOut)
     {
@@ -183,6 +185,10 @@ public class ClimberSubsystem extends SubsystemBase {
   private void ReadSensorValues() {
     climberAngle = climberAngleEncoder.getPosition();
     cagePresent = cagePresenceSensor.get();
+  }
+
+  public double GetClimberEncoder(){
+    return climberAngleEncoder.getPosition();
   }
 
 

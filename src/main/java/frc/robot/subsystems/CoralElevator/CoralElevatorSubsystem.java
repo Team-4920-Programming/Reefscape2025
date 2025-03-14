@@ -230,7 +230,7 @@ public class CoralElevatorSubsystem extends SubsystemBase {
     WristPID.setTolerance(3);
     // if robot.issimulation was here
     ElbowPID.setSetpoint(GetElbowAngle());
-    ElevatorPID.setSetpoint(getFilteredElevatorHeight());
+    ElevatorPID.setSetpoint(Math.max(getFilteredElevatorHeight(),0.16));
     CoralIntakeConfig.inverted(true);
     CoralIntakeMotor.configure(CoralIntakeConfig, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
     WristPID.setSetpoint(GetWristAngleWorldCoordinates());
@@ -608,7 +608,7 @@ public class CoralElevatorSubsystem extends SubsystemBase {
       elevatorOutput = MathUtil.clamp(elevatorPIDValue,-1,1);
       elbowOutput = ElbowPID.calculate(GetElbowAngle());
       elbowOutput = -elbowOutput;
-      elbowOutput = MathUtil.clamp(elbowOutput, -0.7, 0.7);//was -.5 and .5
+      elbowOutput = MathUtil.clamp(elbowOutput, -1.0, 1.0);//was -.5 and .5
       wristOutput = WristPID.calculate(GetWristAngleWorldCoordinates());
     }
     else

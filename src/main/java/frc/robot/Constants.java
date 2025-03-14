@@ -266,19 +266,34 @@ public final class Constants
         public static final double height = 0.5; //meters
     }
     public static class Level3 {
-      public static final double wrist = -35; //degrees
-      public static final double elbow =170; //degrees
-      public static final double height = 0.12; //meters
+      public static final double wrist = 0; //degrees -35
+      public static final double elbow =0; //degrees 170
+      public static final double height = 0.725; //meters 0.12
   }
   public static class Level4 {
-    public static final double wrist = -38; //degrees
-    public static final double elbow =185; //degrees
+    public static final double wrist = -32; //degrees-38
+    public static final double elbow =187; //degrees 185
     public static final double height = 0.725; //meters
 }
   public static class Level4_Far {
     public static final double wrist = -25; //degrees
     public static final double elbow =160; //degrees
     public static final double height = 0.725; //meters
+  }
+  public static class AlgaeL3{
+
+    public static final double wrist = 0 ; //degrees
+    public static final double elbow =45; //degrees
+    public static final double height = 0.625; //meters
+
+  }
+
+  public static class AlgaeL2{
+
+    public static final double wrist = 0 ; //degrees
+    public static final double elbow =45; //degrees
+    public static final double height = 0.1; //meters
+
   }
 public static class AlgaeLowApproach {
   public static final double wrist = 0; //degrees
@@ -320,7 +335,7 @@ public static class ArmNeutral {
   public static class RobotLimits {
     public static class Elbow {
       public static final double minAngle = -10;
-      public static final double maxAngle = 190;
+      public static final double maxAngle = 195; // was 190
     }
 
     public static class Wrist {

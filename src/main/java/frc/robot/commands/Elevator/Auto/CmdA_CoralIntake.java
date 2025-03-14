@@ -10,19 +10,18 @@ import frc.robot.BoltLog;
 import frc.robot.Robot;
 import frc.robot.subsystems.CoralElevator.CoralElevatorSubsystem;
 
-
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
-public class CmdA_CoralOutTake extends Command {
+public class CmdA_CoralIntake extends Command {
   /** Creates a new Cmd_Shoot_TeleOp. */
   CoralElevatorSubsystem CoralElevatorSS; 
+  
+  private Timer PresentTimer = new Timer();
+  
     private final BoltLog BoltLogger = new BoltLog();
-    private Timer PresentTimer = new Timer();
   boolean CoralOut = false;
-  public CmdA_CoralOutTake(CoralElevatorSubsystem CoralElevator_Subsystem) {
+  public CmdA_CoralIntake(CoralElevatorSubsystem CoralElevator_Subsystem) {
     // Use addRequirements() here to declare subsystem dependencies.
     CoralElevatorSS = CoralElevator_Subsystem;
-     
-    addRequirements(CoralElevatorSS);
   }
 
   // Called when the command is initially scheduled.
@@ -36,9 +35,10 @@ public class CmdA_CoralOutTake extends Command {
     if (Robot.isSimulation()){
                 
     }
-  
-      CoralElevatorSS.setIntakeSpeed(-0.75);
-   
+    if(!CoralElevatorSS.isCoralPresent())
+    {
+      CoralElevatorSS.setIntakeSpeed(0.5);
+    }
   }
 
   // Called once the command ends or is interrupted.
@@ -51,9 +51,9 @@ public class CmdA_CoralOutTake extends Command {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    if (!CoralElevatorSS.isCoralPresent() && !PresentTimer.isRunning())
+    if (CoralElevatorSS.isCoralPresent() && !PresentTimer.isRunning())
         PresentTimer.start();
-    if (CoralElevatorSS.isCoralPresent())
+    if (!CoralElevatorSS.isCoralPresent())
     {
         PresentTimer.stop();
         PresentTimer.reset();

@@ -1,0 +1,130 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "L3P blue start - 3l #1"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "CmdA_Level4"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 0.0
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "CmdA_DriveToReefPositionL"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 0.0
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "CmdA_CoralOutTake"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 0.0
+          }
+        },
+        {
+          "type": "deadline",
+          "data": {
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "CmdA_CoralIntake"
+                }
+              },
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "L3P 3l - ls9 #2"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 0.0
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "L3P  ls9 - 2l #3"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "CmdA_Level4"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 0.0
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "CmdA_DriveToReefPositionL"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 0.0
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "CmdA_CoralOutTake"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": "Humber",
+  "choreoAuto": false
+}

@@ -3,41 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 1.0,
-        "y": 6.0
+        "x": 7.097914292549709,
+        "y": 0.5363858854192471
       },
       "prevControl": null,
       "nextControl": {
-        "x": 1.8378160012479041,
-        "y": 6.0325623931641905
+        "x": 6.949904886175426,
+        "y": 0.7440925501196256
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 5.742110655737705,
-        "y": 6.104866803278688
+        "x": 6.042074745326151,
+        "y": 2.048500183769546
       },
       "prevControl": {
-        "x": 4.493625313182605,
-        "y": 6.207083746674903
-      },
-      "nextControl": {
-        "x": 6.990595998292804,
-        "y": 6.002649859882474
-      },
-      "isLocked": false,
-      "linkedName": null
-    },
-    {
-      "anchor": {
-        "x": 7.240573770491803,
-        "y": 3.7432889344262295
-      },
-      "prevControl": {
-        "x": 9.507132015539845,
-        "y": 3.3445370201051707
+        "x": 6.184531499563272,
+        "y": 1.8430590165896827
       },
       "nextControl": null,
       "isLocked": false,
@@ -57,14 +41,14 @@
     "unlimited": false
   },
   "goalEndState": {
-    "velocity": 0,
-    "rotation": 0.0
+    "velocity": 0.5,
+    "rotation": 122.811
   },
   "reversed": false,
-  "folder": null,
+  "folder": "Humber",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 0.0
+    "rotation": 89.45163947891362
   },
   "useDefaultConstraints": true
 }

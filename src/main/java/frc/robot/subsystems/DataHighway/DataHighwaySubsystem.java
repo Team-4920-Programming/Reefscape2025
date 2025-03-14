@@ -101,7 +101,7 @@ public class DataHighwaySubsystem extends SubsystemBase {
     if (hasCoral){
       AtCoralStation = false;
       white.applyTo(m_ledBuffer);
-      if (distancefromReefWall < 2 & distancefromReefWall > 1.25){
+      if (distancefromReefWall < 2 & distancefromReefWall > 0.75){
         yellow.applyTo(m_ledBuffer);
         InReefYellowZone = true;
       }
@@ -110,14 +110,14 @@ public class DataHighwaySubsystem extends SubsystemBase {
     }
     else
       green.applyTo(m_ledBuffer);
-      if (distancefromReefWall < 2 & distancefromReefWall > 1.25){
+      if (distancefromReefWall < 2 & distancefromReefWall > 0.75){
         yellow.applyTo(m_ledBuffer);
         InReefYellowZone = true;
       }
 
     //red zone - reduced speed - no elevator functions
     InRedZone = false;  
-    if (distancefromReefWall < 1.25 & distancefromReefWall > 0.0)
+    if (distancefromReefWall < 0.75 & distancefromReefWall > 0.0)
     {
       
       InRedZone = true;
@@ -190,6 +190,9 @@ public class DataHighwaySubsystem extends SubsystemBase {
   }
   private void getCoralData(){
     hasCoral = Coral_SS.DH_Out_HasCoral;
+  }
+  public Pose2d getClosestReefSegment(){
+    return ClosestReefSegment;
   }
   private void setCoralData(){
     Coral_SS.DH_In_CoralZone = InCoralSationZone;

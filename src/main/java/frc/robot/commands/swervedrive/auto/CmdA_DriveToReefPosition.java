@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.robot.commands.swervedrive.TeleOp;
+package frc.robot.commands.swervedrive.auto;
 
 import dev.doglog.DogLog;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
@@ -19,7 +19,7 @@ import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
-public class CmdT_DriveToReefPosition extends Command {
+public class CmdA_DriveToReefPosition extends Command {
 
   Integer Reef_Position;
  
@@ -28,9 +28,9 @@ public class CmdT_DriveToReefPosition extends Command {
 
   PIDController XPID = new PIDController(2, 0, 0.01);
   PIDController YPID = new PIDController(2, 0, 0.01);
-  PIDController RotPID = new PIDController(0.1,0,0);
+  PIDController RotPID = new PIDController(0.125,0,0);
   boolean inter;
-  public CmdT_DriveToReefPosition(SwerveSubsystem DriveSubsystem, int Position) {
+  public CmdA_DriveToReefPosition(SwerveSubsystem DriveSubsystem, int Position) {
     // Use addRequirements() here to declare subsystem dependencies.
     Reef_Position = Position;
       DriveSS = DriveSubsystem;
@@ -97,10 +97,10 @@ public class CmdT_DriveToReefPosition extends Command {
     double Reef_Rot = ReefPose.getRotation().getDegrees()+180;
     double XVel = 0;  
     double YVel =0;
-    if (RotPID.atSetpoint()){
+    // if (RotPID.atSetpoint()){
       XVel = XPID.calculate(CurrentX, Reef_X);
       YVel = YPID.calculate(CurrentY, Reef_Y);
-    }
+    // }
     double RotVel = RotPID.calculate(CurrentRot,Reef_Rot);
     XVel = MathUtil.clamp(XVel, -2, 2);
     YVel = MathUtil.clamp(YVel, -2,2);

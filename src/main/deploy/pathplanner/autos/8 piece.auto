@@ -1,0 +1,149 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "Copy of blue start - 5r #1"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "CmdA_Level4"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 3.0
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "CmdA_DriveToReefPositionR"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 1.0
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "CmdA_CoralOutTake"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 1.0
+          }
+        },
+        {
+          "type": "deadline",
+          "data": {
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "CmdA_CoralIntake"
+                }
+              },
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "5r - rs9 #2"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 1.0
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "rs9 - 6r #3"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "CmdA_Level4"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "CmdA_CoralOutTake"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 1.0
+          }
+        },
+        {
+          "type": "deadline",
+          "data": {
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "CmdA_CoralIntake"
+                }
+              },
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "6r - rs9 #4"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 1.0
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "rs9 - 6l #5"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": "Humber",
+  "choreoAuto": false
+}

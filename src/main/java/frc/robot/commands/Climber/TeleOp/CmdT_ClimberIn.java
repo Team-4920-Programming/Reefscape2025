@@ -25,6 +25,7 @@ public class CmdT_ClimberIn extends Command {
   @Override
   public void execute() {
     Climber_SS.ClimberIn();
+    Climber_SS.SetRightFlap(0);
   }
 
   // Called once the command ends or is interrupted.
