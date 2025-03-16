@@ -14,17 +14,19 @@ public class Reef_MarkOurs extends Command {
   int Rseg = 0;
   int Rside = 0;
   int Rlevel = 0;
-  public Reef_MarkOurs(ReefSurveySubsystem  reefss,int Segment, int side, int level) {
+  public Reef_MarkOurs(ReefSurveySubsystem  reefss, int side) {
     // Use addRequirements() here to declare subsystem dependencies.
     Reef_SS = reefss;
-    Rseg = Segment;
+    
     Rside = side;
-    Rlevel = level;
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
+    Rlevel = Reef_SS.DH_In_ScoreSelection;
+    Rseg = Reef_SS.DH_In_ReefSegment;
+
     int pos = Rside + Rseg *6;
     if (pos < 12 && Rlevel < 3)
    {

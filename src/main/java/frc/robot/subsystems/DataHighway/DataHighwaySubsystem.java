@@ -19,6 +19,7 @@ import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Robot;
 import frc.robot.subsystems.CoralElevator.CoralElevatorSubsystem;
+import frc.robot.subsystems.ReefSurvey.ReefSurveySubsystem;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 
 import static edu.wpi.first.units.Units.Rotation;
@@ -40,6 +41,7 @@ public class DataHighwaySubsystem extends SubsystemBase {
   private boolean hasCoral = false;
   private double ReefDistance = 0;
   private int ReefSegment = 0;
+  private int scoreSelection = 0;
   private boolean InRedZone = true;
   private boolean inReefRedZone = true;
   private boolean inStationRedZone = true;
@@ -56,6 +58,7 @@ public class DataHighwaySubsystem extends SubsystemBase {
   private Pose2d ReefPose = new Pose2d();
   private SwerveSubsystem Drive_SS;
   private CoralElevatorSubsystem Coral_SS;
+  private ReefSurveySubsystem Survey_SS;
   private AprilTagFieldLayout atf;
   private boolean inLeftCoralZone = false;
   private boolean inRightCoralZone = false;
@@ -65,9 +68,10 @@ public class DataHighwaySubsystem extends SubsystemBase {
   private boolean isMatchSetupCompleted = false;
   List<Pose2d> reefPoses = new ArrayList();
   List<Pose2d> feederStationPoses = new ArrayList<>();
-  public DataHighwaySubsystem(SwerveSubsystem DriveSS, CoralElevatorSubsystem CoralSS) {
+  public DataHighwaySubsystem(SwerveSubsystem DriveSS, CoralElevatorSubsystem CoralSS, ReefSurveySubsystem SurveySS) {
     Drive_SS = DriveSS;
     Coral_SS = CoralSS;
+    Survey_SS = SurveySS;
     m_ledBuffer = new AddressableLEDBuffer(142);
     m_led.setLength(m_ledBuffer.getLength());
     // Set the data
@@ -104,6 +108,7 @@ public class DataHighwaySubsystem extends SubsystemBase {
     getCoralData();
     setDriveData();
     setCoralData();
+    setSurveyData();
     double distancefromReefWall = ReefDistance- ReefRadius;
     DogLog.log ("DistanceToReefWall", distancefromReefWall);
     LEDPattern red = LEDPattern.solid(Color.kRed);
@@ -238,6 +243,12 @@ public class DataHighwaySubsystem extends SubsystemBase {
   }
   private void getCoralData(){
     hasCoral = Coral_SS.DH_Out_HasCoral;
+    scoreSelection = Coral_SS.DH_Out_ScoreSelection;
+  }
+
+  private void setSurveyData(){
+    Survey_SS.DH_In_ScoreSelection = scoreSelection;
+    Survey_SS.DH_In_ReefSegment = ReefSegment;
   }
   public Pose2d getClosestReefSegment(){
     return ClosestReefSegment;

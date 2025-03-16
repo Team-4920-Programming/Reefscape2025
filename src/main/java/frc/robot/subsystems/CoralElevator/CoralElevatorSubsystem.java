@@ -107,6 +107,7 @@ public class CoralElevatorSubsystem extends SubsystemBase {
   public boolean DH_In_YellowZone = false;
   public boolean DH_In_CoralZone = false;
   public boolean OverrideRedZone = false; //set from the algae commands
+  public int DH_Out_ScoreSelection = 1;
 
   /** Physical Robot Init START**/
   
@@ -740,6 +741,7 @@ public class CoralElevatorSubsystem extends SubsystemBase {
       
 
     DH_Out_HasCoral = isCoralPresent();
+    DH_Out_ScoreSelection = GetScoreSelection();
 
 
   }

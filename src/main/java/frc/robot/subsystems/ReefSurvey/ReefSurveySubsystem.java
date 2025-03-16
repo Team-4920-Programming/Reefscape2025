@@ -20,6 +20,8 @@ public class ReefSurveySubsystem extends SubsystemBase {
 
   public int[][] ReefScoreTracker = new int[3][12];
   private int scorethreshold = 1;
+  public int DH_In_ReefSegment = 0;
+  public int DH_In_ScoreSelection = 0;
   /** Creates a new ReefSurvey. */
   public ReefSurveySubsystem() {
 

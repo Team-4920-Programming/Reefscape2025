@@ -24,6 +24,7 @@ public class CmdT_ClimberIn extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
+    Climber_SS.StopClimber();
     Climber_SS.ClimberIn();
     Climber_SS.SetRightFlap(3.15);
   }
