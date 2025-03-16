@@ -5,8 +5,15 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
+
 import frc.robot.commands.Elevator.TeleOp.*;
+import frc.robot.commands.swervedrive.TeleOp.CmdT_DriveToAlgaeRemoval;
+import frc.robot.commands.swervedrive.TeleOp.CmdT_DriveToPose;
+import frc.robot.commands.swervedrive.TeleOp.CmdT_DriveToPoseRelative;
 import frc.robot.commands.swervedrive.TeleOp.CmdT_DriveToReefPosition;
+import frc.robot.commands.swervedrive.TeleOp.CmdT_StopDrive;
 import frc.robot.subsystems.CoralElevator.CoralElevatorSubsystem;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 import swervelib.SwerveDrive;
@@ -19,11 +26,10 @@ public class Cmd_SeqRemoveLowAlgea extends SequentialCommandGroup {
   public Cmd_SeqRemoveLowAlgea(CoralElevatorSubsystem Coral_SS, SwerveSubsystem Drive_SS) {
     // Add your commands in the addCommands() call, e.g.
     // addCommands(new FooCommand(), new BarCommand());
-
-    addCommands(new CmdT_AlgaeLowApproach(Coral_SS),
-      new CmdT_DriveToReefPosition(Drive_SS,3),
-      new CmdT_AlgaeLowRetract(Coral_SS),
-      new CmdT_DriveToReefPosition(Drive_SS,4)
+    addCommands(new CmdT_StopDrive(Drive_SS),
+      new ParallelDeadlineGroup(new CmdT_DriveToAlgaeRemoval(Drive_SS,4),new CmdT_AlgaeL2(Coral_SS)),
+      new CmdT_DriveToPoseRelative(Drive_SS,4,0,15.5,0.0).withTimeout(1.5),
+      new CmdT_DriveToPoseRelative(Drive_SS,4,-36,0.0,0.0).withTimeout(2.0)
 
       );
   }

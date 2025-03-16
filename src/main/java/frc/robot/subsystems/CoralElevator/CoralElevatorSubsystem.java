@@ -76,6 +76,7 @@ import frc.robot.Constants.CanIDs.CoralElevator;
 import frc.robot.Constants.PIDs.CoralElevator.Elevator;
 import frc.robot.Constants.PIDs.CoralElevator.LeftFlap;
 import frc.robot.Constants.PIDs.CoralElevator.RightFlap;
+import frc.robot.Constants.RobotPositions.CoralStation;
 import frc.robot.Constants.CanIDs;
 import frc.robot.Constants.DIO;
 import frc.robot.Constants.PIDs;
@@ -153,11 +154,11 @@ public class CoralElevatorSubsystem extends SubsystemBase {
  
   // LaserCan
   private LaserCan LaserCan = new LaserCan(CanIDs.Sensor.LaserCAN);
-  int elevatorHeightMM = 0;
+  int elevatorHeightMM = 15;
 
   //Elevator Low Pass Filter
   LinearFilter elevatorFilter = LinearFilter.singlePoleIIR(0.1, 0.02);
-  double filteredelevatorHeight;
+  double filteredelevatorHeight = 0.15;
 
   //MotorOutputs
 
@@ -195,6 +196,7 @@ public class CoralElevatorSubsystem extends SubsystemBase {
   
   public CoralElevatorSubsystem() {
 
+
     ElevatorPID.setTolerance(0.01);
     //ElevatorPID.setSetpoint(Constants.RobotLimits.Elevator.offset);
     // ElevatorPID.setGoal(new State(Constants.RobotLimits.Elevator.offset, 0));
@@ -202,7 +204,7 @@ public class CoralElevatorSubsystem extends SubsystemBase {
     elevatorConfig.inverted(false);
     ElevatorStageMotor.configure(elevatorConfig, SparkBase.ResetMode.kResetSafeParameters, SparkBase.PersistMode.kPersistParameters);
     
-    ElbowPID.setTolerance(1);
+    ElbowPID.setTolerance(3);
     //ElbowPID.setSetpoint(5);
    // ElbowPID.enableContinuousInput(0, 360);
 
@@ -285,10 +287,10 @@ public class CoralElevatorSubsystem extends SubsystemBase {
   public boolean IsElevatorAtSetpoint(){
     return ElevatorPID.atSetpoint();
   }
-  public boolean iSWristAtSetpoint(){
+  public boolean IsWristAtSetpoint(){
     return WristPID.atSetpoint();
   }
-  public boolean iSElbowAtSetpoint(){
+  public boolean IsElbowAtSetpoint(){
     return ElbowPID.atSetpoint();
   }
   
@@ -423,6 +425,15 @@ public class CoralElevatorSubsystem extends SubsystemBase {
     CoralIntakeMotor.set(speed);
     SmartDashboard.putNumber("IntakeSpeedCmd", speed);
   }
+
+  public void MatchSetup(){
+      if(!DH_In_RedZone){
+      ElevatorPID.setSetpoint(CoralStation.height);
+      }
+      else{
+      ElevatorPID.setSetpoint(getHeightLaserMeters());
+      }
+    }
 
   public void setArmPosition(double height, double elbow, double wrist){
   
@@ -566,6 +577,7 @@ public class CoralElevatorSubsystem extends SubsystemBase {
     // getElevatorHeightMM();
     // readSensorValues();
     // elevatorOutput = ElevatorPID.calculate(elevatorHeightMM) + ElevFF.calculate(PIDs.CoralElevator.Elevator.maxVelocity)/RobotController.getBatteryVoltage();
+    
     DistanceSensor.setAutomaticMode(true);
     DistanceSensor.setEnabled(true);
     if (DistanceSensor.isRangeValid())
@@ -588,7 +600,7 @@ public class CoralElevatorSubsystem extends SubsystemBase {
       SetpointsFrozen = false;
     }
 
-    if ((isElevatorPassingThroughRedZone() || isElevatorInRedZone()) && (ElbowPID.getSetpoint() <= 0 || WristPID.getSetpoint() >= 90)){
+    if ((isElevatorPassingThroughRedZone() || isElevatorInRedZone()) && (ElbowPID.getSetpoint() < 0 || WristPID.getSetpoint() >= 90)){
         if (tmpElbowSetpointHolder == 999){
           tmpElbowSetpointHolder = ElbowPID.getSetpoint();
           ElbowPID.setSetpoint(35);
@@ -692,7 +704,7 @@ public class CoralElevatorSubsystem extends SubsystemBase {
         else{
           SmartDashboard.putString("Elbow Allowed to move", "false") ;
           ElbowMotor.set(0);
-        } 
+        }
         
       //wristOutput = - wristOutput;
       if (WristPID.getSetpoint() > GetWristAngleWorldCoordinates()){

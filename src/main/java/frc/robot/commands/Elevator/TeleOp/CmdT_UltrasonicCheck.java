@@ -48,6 +48,6 @@ public class CmdT_UltrasonicCheck extends Command {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return css.IsElevatorAtSetpoint() && css.iSWristAtSetpoint() && css.iSElbowAtSetpoint();
+    return css.IsElevatorAtSetpoint() && css.IsWristAtSetpoint() && css.IsElbowAtSetpoint();
   }
 }

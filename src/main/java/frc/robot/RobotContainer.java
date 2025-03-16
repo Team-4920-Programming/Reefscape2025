@@ -48,10 +48,12 @@ import frc.robot.commands.Elevator.Auto.CmdA_CoralOutTake;
 import frc.robot.commands.Elevator.Auto.CmdA_Level4;
 import frc.robot.commands.Elevator.Auto.CmdA_Station;
 import frc.robot.commands.Elevator.TeleOp.*;
+import frc.robot.commands.ReefSurvey.AddToReefTest;
 import frc.robot.commands.swervedrive.auto.CmdA_DriveToReefPosition;
 import frc.robot.commands.swervedrive.auto.CmdA_DriveToReefPositionV2;
 import frc.robot.commands.swervedrive.TeleOp.*;
 import swervelib.SwerveDriveTest;
+import frc.robot.commands.Climber.Auto.CmdA_BridgeOut;
 import frc.robot.commands.Climber.TeleOp.*;
 import swervelib.SwerveInputStream;
 /**
@@ -160,12 +162,13 @@ public class RobotContainer
     configureBindings();
     DriverStation.silenceJoystickConnectionWarning(true);
     NamedCommands.registerCommand("test", Commands.print("I EXIST"));
+    NamedCommands.registerCommand("CmdA_RobotStartConfig", new CmdA_BridgeOut (ClimberSS));
     NamedCommands.registerCommand("CmdA_Level4", new CmdA_Level4 (CoralElevatorSS));
     NamedCommands.registerCommand("CmdA_Station", new CmdA_Station (CoralElevatorSS));
     NamedCommands.registerCommand("CmdA_CoralOutTake", new CmdA_CoralOutTake (CoralElevatorSS));
     NamedCommands.registerCommand("CmdA_CoralIntake", new CmdA_CoralIntake (CoralElevatorSS));
-    NamedCommands.registerCommand("CmdA_DriveToReefPositionR", new CmdA_DriveToReefPositionV2(drivebase,DataHighwaySS, 2));
-    NamedCommands.registerCommand("CmdA_DriveToReefPositionL", new CmdA_DriveToReefPositionV2(drivebase,DataHighwaySS, 1));
+    NamedCommands.registerCommand("CmdA_DriveToReefPositionR", new CmdA_DriveToReefPositionV2(drivebase, 2));
+    NamedCommands.registerCommand("CmdA_DriveToReefPositionL", new CmdA_DriveToReefPositionV2(drivebase, 1));
 
 
     if (Robot.isSimulation()) 
@@ -210,12 +213,12 @@ public class RobotContainer
       // driverXbox.back().whileTrue(drivebase.centerModulesCommand());
       // driverXbox.leftBumper().onTrue(Commands.none());
       // driverXbox.rightBumper().onTrue(Commands.none());
-        driverXbox.leftTrigger().whileTrue(new Cmd_SeqScoreLeft(CoralElevatorSS, drivebase,DataHighwaySS));
-        driverXbox.rightTrigger().whileTrue(new Cmd_SeqScoreRight(CoralElevatorSS, drivebase,DataHighwaySS));
-        driverXbox.a().whileTrue(new CmdT_DriveToFeederPosition(drivebase));
-        driverXbox.axisGreaterThan(4,0.1).onTrue(new CmdT_DisableAutoAim(drivebase));
-        driverXbox.axisGreaterThan(4,-0.1).onTrue(new CmdT_DisableAutoAim(drivebase));
-        driverXbox.rightBumper().onTrue(new CmdT_EnableAutoAim(drivebase));
+      driverXbox.leftTrigger().whileTrue(new Cmd_SeqScoreLeft(CoralElevatorSS, drivebase));
+      driverXbox.rightTrigger().whileTrue(new Cmd_SeqScoreRight(CoralElevatorSS, drivebase));
+      driverXbox.a().whileTrue(new CmdT_DriveToFeederPosition(drivebase));
+      driverXbox.axisGreaterThan(4,0.1).onTrue(new CmdT_DisableAutoAim(drivebase));
+      driverXbox.axisGreaterThan(4,-0.1).onTrue(new CmdT_DisableAutoAim(drivebase));
+      driverXbox.rightBumper().onTrue(new CmdT_EnableAutoAim(drivebase));
 
         
       //********************* */
@@ -246,9 +249,10 @@ public class RobotContainer
       OperatorJoystick.button(9).whileTrue(new CmdT_Level1(CoralElevatorSS));
       
       // OperatorJoystick.button(11).whileTrue(new Cmd_SeqRemoveHighAlgea(CoralElevatorSS, drivebase));
-      OperatorJoystick.button(12).whileTrue(new Cmd_SeqRemoveLowAlgea(CoralElevatorSS, drivebase));
-      OperatorJoystick.button(7).whileTrue(new CmdT_AlgaeTest(CoralElevatorSS));
-      OperatorJoystick.button(11).whileTrue(new CmdT_AlgaeTestUp(CoralElevatorSS));
+      OperatorJoystick.button(11).whileTrue(new Cmd_SeqRemoveLowAlgea(CoralElevatorSS, drivebase));
+      OperatorJoystick.button(7).whileTrue(new CmdT_AlgaeL3(CoralElevatorSS));
+      // OperatorJoystick.button(11).whileTrue(new CmdT_AlgaeTestLow(CoralElevatorSS));
+      // OperatorJoystick.button(11).whileTrue(new Cmd_SeqRemoveHighAlgea(CoralElevatorSS, drivebase));
 
       
       
@@ -295,18 +299,100 @@ public class RobotContainer
 
     } else
     {
-      // driverXbox.a().onTrue((Commands.runOnce(drivebase::zeroGyro)));
-      // driverXbox.x().onTrue(Commands.runOnce(drivebase::addFakeVisionReading));
-      // driverXbox.b().whileTrue(
-      //     drivebase.driveToPose(
-      //         new Pose2d(new Translation2d(4, 4), Rotation2d.fromDegrees(0)))
-      //                         );
-      // //driverXbox.y().whileTrue(drivebase.aimAtSpeaker(2));
+      drivebase.setDefaultCommand(driveFieldOrientedAnglularVelocity); // Overrides drive command above!
+      CoralElevatorSS.setDefaultCommand(new CmdT_Def_Elevator(CoralElevatorSS));
+      //ClimberSS.setDefaultCommand(CmdT_;
+      // driverXbox.x().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
+      // driverXbox.y().whileTrue(drivebase.driveToDistanceCommand(3.0, 0.2));
+      //driverXbox.start().onTrue((Commands.runOnce(drivebase::zeroGyro)));
+      // driverXbox.back().whileTrue(drivebase.centerModulesCommand());
+      // driverXbox.leftBumper().onTrue(Commands.none());
+      // driverXbox.rightBumper().onTrue(Commands.none());
+      driverXbox.leftTrigger().whileTrue(new Cmd_SeqScoreLeft(CoralElevatorSS, drivebase));
+      driverXbox.rightTrigger().whileTrue(new Cmd_SeqScoreRight(CoralElevatorSS, drivebase));
+      driverXbox.a().whileTrue(new CmdT_DriveToFeederPosition(drivebase));
+      driverXbox.axisGreaterThan(4,0.1).onTrue(new CmdT_DisableAutoAim(drivebase));
+      driverXbox.axisGreaterThan(4,-0.1).onTrue(new CmdT_DisableAutoAim(drivebase));
+      driverXbox.rightBumper().onTrue(new CmdT_EnableAutoAim(drivebase));
+
+        
+      //********************* */
+      //SysID Nonsense (Comment out when done)  
+
+      //DriveBase
+      // driverXbox.a().whileTrue(drivebase.sysIdDriveMotorCommand());
+      // driverXbox.b().whileTrue(drivebase.sysIdAngleMotorCommand());
+ 
       
-      // driverXbox.start().whileTrue(Commands.none());
-      // driverXbox.back().whileTrue(Commands.none());
-      // driverXbox.leftBumper().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
-      // // driverXbox.rightBumper().onTrue(Commands.none());
+      //Algae
+
+      //driverXbox.a().whileTrue(AlgaeIntakeSS.sysIDPivotAll());
+     // OperatorJoystick.button(1).whileTrue(new CmdT_IntakeToPosition(AlgaeIntakeSS, 0));
+   //Algae Intake
+      //OperatorJoystick.button(2).whileTrue(new CmdT_OuttakeAlgae(AlgaeIntakeSS));
+      //OperatorJoystick.button(3).whileTrue(new CmdT_IntakeToPosition(AlgaeIntakeSS, 60).
+      //  andThen(new CmdT_IntakeAlgae(AlgaeIntakeSS)).
+      //  andThen(new CmdT_IntakeToPosition(AlgaeIntakeSS, 25)));
+      OperatorJoystick.button(1 ).whileTrue(new Cmd_SeqClimb(drivebase,ClimberSS));
+      // OperatorJoystick.button(1 ).whileTrue(new CmdT_ClimberIn(ClimberSS));
+      OperatorJoystick.button(2 ).whileTrue(new CmdT_ClimberIn(ClimberSS));
+      OperatorJoystick.button(3 ).whileTrue(new CmdT_RunClimberIn(ClimberSS));
+      OperatorJoystick.button(4).whileTrue(new CmdT_Station(CoralElevatorSS));
+      OperatorJoystick.button(5).whileTrue(new CmdT_Level4(CoralElevatorSS));
+      OperatorJoystick.button(6).whileTrue(new CmdT_Level3(CoralElevatorSS));
+      OperatorJoystick.button(8).whileTrue(new CmdT_Level2(CoralElevatorSS));
+      OperatorJoystick.button(9).whileTrue(new CmdT_Level1(CoralElevatorSS));
+      
+      // OperatorJoystick.button(11).whileTrue(new Cmd_SeqRemoveHighAlgea(CoralElevatorSS, drivebase));
+      OperatorJoystick.button(12).whileTrue(new Cmd_SeqRemoveLowAlgea(CoralElevatorSS, drivebase));
+      OperatorJoystick.button(7).whileTrue(new CmdT_AlgaeL3(CoralElevatorSS));
+      // OperatorJoystick.button(11).whileTrue(new CmdT_AlgaeTestLow(CoralElevatorSS));
+      OperatorJoystick.button(11).whileTrue(new Cmd_SeqRemoveHighAlgea(CoralElevatorSS, drivebase));
+      
+      
+      ReefJoystick.button(1).whileTrue(new CmdT_LevelSelect(CoralElevatorSS, 1));
+      ReefJoystick.button(2).whileTrue(new CmdT_LevelSelect(CoralElevatorSS, 2));
+      ReefJoystick.button(3).whileTrue(new CmdT_LevelSelect(CoralElevatorSS, 3));
+      ReefJoystick.button(4).whileTrue(new CmdT_LevelSelect(CoralElevatorSS, 4));
+      //ReefJoystick.button(5).onTrue(new CmdT_MoveToLevel(CoralElevatorSS));
+     // ReefJoystick.button(5).whileTrue(new Cmd_SeqScoreLeft(CoralElevatorSS, drivebase));
+   //  ReefJoystick.button(5).whileTrue(new Cmd_SeqRemoveAlgea(CoralElevatorSS, drivebase));
+   //ReefJoystick.button(5).whileTrue(new Cmd_SeqScoreLeft(CoralElevatorSS, drivebase));
+       
+     //ReefJoystick.button(6).whileTrue(new Cmd_SeqScoreRight(CoralElevatorSS, drivebase));
+      //ReefJoystick.button(6).whileTrue(new CmdT_DriveToReefPosition(drivebase,2));
+      // driverXbox.leftBumper().whileTrue(new CmdT_IntakeToPosition(AlgaeIntakeSS, 30));
+      // driverXbox.rightBumper().whileTrue(new CmdT_IntakeToPosition(AlgaeIntakeSS, 80));
+      
+      //Elevator
+
+      // driverXbox.a().whileTrue(CoralElevatorSS.sysIDElevatorAll());
+
+      //driverXbox.leftBumper().whileTrue(new MoveElevatorToPosition(CoralElevatorSS, 0.03));
+      //driverXbox.rightBumper().whileTrue(new MoveElevatorToPosition(CoralElevatorSS, 0.725));
+     
+      //Elbow
+
+      // driverXbox.a().whileTrue(CoralElevatorSS.sysIDElbowAll());
+      //driverXbox.leftTrigger().whileTrue(new MoveElbowToAngle(CoralElevatorSS, 185));
+      //driverXbox.rightTrigger().whileTrue(new MoveElbowToAngle(CoralElevatorSS, 5));
+ 
+
+      
+      driverXbox.x().whileTrue(new CmdT_CoralIntake(CoralElevatorSS ));
+      driverXbox.y().whileTrue(new CmdT_CoralOutTake(CoralElevatorSS ));
+
+      driverXbox.b().onTrue(new AddToReefTest(ReefSurveySS));
+
+      //OperatorJoystick.button(10).whileTrue(new CmdT_DriveToFeederPosition(drivebase));
+      
+
+      //Scoring Buttons
+      //OperatorJoystick.button(14).onTrue(CoralElevatorSubsystem().SetScoreSelection(2));
+      //OperatorJoystick.button(15).onTrue(new CoralElevatorSubsystem().SetScoreSelection(3));
+      //OperatorJoystick.button(16).onTrue(new CoralElevatorSubsystem().SetScoreSelection(4));
+      
+
     }
 
   }
@@ -330,5 +416,17 @@ public class RobotContainer
   public void setMotorBrake(boolean brake)
   {
     drivebase.setMotorBrake(brake);
+  }
+  
+  public void StartUpConfig(){
+    DataHighwaySS.StartUp();
+    CoralElevatorSS.MatchSetup();
+  }
+
+  public boolean IsSetupCompleted(){
+    return DataHighwaySS.IsSetupCompleted();
+  }
+  public void ResetSetup(){
+    DataHighwaySS.ResetSetup();
   }
 }

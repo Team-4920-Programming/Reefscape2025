@@ -138,13 +138,13 @@ public class ClimberSubsystem extends SubsystemBase {
   public void ClimberOut()
   {
     ClimberPivotConfig.idleMode(IdleMode.kBrake);  
-    ClimberPivot.configure(ClimberPivotConfig, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
+    ClimberPivot.configure(ClimberPivotConfig, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
     climberOut = true;
   }
   public void ClimberIn()
   {
     ClimberPivotConfig.idleMode(IdleMode.kCoast);
-    ClimberPivot.configure(ClimberPivotConfig, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
+    ClimberPivot.configure(ClimberPivotConfig, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
     climberOut = false;
   }
   
@@ -155,7 +155,7 @@ public class ClimberSubsystem extends SubsystemBase {
   public void RunClimberIn(double speed){
    // System.out.println("RunClimberIn");
     ClimberPivotConfig.idleMode(IdleMode.kCoast);
-    ClimberPivot.configure(ClimberPivotConfig, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
+    ClimberPivot.configure(ClimberPivotConfig, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
     climberMotor.set(-speed);
     ClimberIdle = true;
     climberOut = false;

@@ -4,51 +4,42 @@
     {
       "anchor": {
         "x": 5.4,
-        "y": 5.225
+        "y": 5.27
       },
       "prevControl": null,
       "nextControl": {
-        "x": 5.17725,
-        "y": 6.58925
+        "x": 5.45896195489341,
+        "y": 5.9483012619436195
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 1.4410423391469127,
-        "y": 7.127
+        "x": 1.5612391500104994,
+        "y": 7.088244967195764
       },
       "prevControl": {
-        "x": 2.1255,
-        "y": 5.84825
+        "x": 2.3753215689662,
+        "y": 6.804161878233521
       },
       "nextControl": null,
       "isLocked": false,
       "linkedName": null
     }
   ],
-  "rotationTargets": [],
-  "constraintZones": [
+  "rotationTargets": [
     {
-      "name": "Constraints Zone",
-      "minWaypointRelativePos": 0.6563133018230929,
-      "maxWaypointRelativePos": 1.0,
-      "constraints": {
-        "maxVelocity": 2.0,
-        "maxAcceleration": 2.0,
-        "maxAngularVelocity": 540.0,
-        "maxAngularAcceleration": 720.0,
-        "nominalVoltage": 12.0,
-        "unlimited": false
-      }
+      "waypointRelativePos": 0.0823529411764695,
+      "rotationDegrees": -54.0
     }
   ],
+  "constraintZones": [],
   "pointTowardsZones": [],
   "eventMarkers": [
     {
       "name": "StationLevel",
-      "waypointRelativePos": 0.08635235732009972,
+      "waypointRelativePos": 0.11883862255232779,
       "endWaypointRelativePos": null,
       "command": {
         "type": "named",
@@ -59,8 +50,8 @@
     }
   ],
   "globalConstraints": {
-    "maxVelocity": 3.0,
-    "maxAcceleration": 2.0,
+    "maxVelocity": 3.5,
+    "maxAcceleration": 1.5,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0,
     "nominalVoltage": 12.0,
@@ -71,10 +62,10 @@
     "rotation": -54.0
   },
   "reversed": false,
-  "folder": "Humber",
+  "folder": "Humber 4 - L - 2pc",
   "idealStartingState": {
     "velocity": 0,
     "rotation": -119.99999999999999
   },
-  "useDefaultConstraints": false
+  "useDefaultConstraints": true
 }

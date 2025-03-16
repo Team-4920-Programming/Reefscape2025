@@ -2,16 +2,16 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.robot.commands.Climber.TeleOp;
+package frc.robot.commands.Climber.Auto;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.Climber.ClimberSubsystem;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
-public class CmdT_ClimberIn extends Command {
+public class CmdA_BridgeOut extends Command {
   /** Creates a new CmdT_ClimberOut. */
   ClimberSubsystem Climber_SS;
-  public CmdT_ClimberIn(ClimberSubsystem Climber) {
+  public CmdA_BridgeOut(ClimberSubsystem Climber) {
     // Use addRequirements() here to declare subsystem dependencies.
   Climber_SS = Climber;
   addRequirements(Climber_SS);
@@ -24,7 +24,6 @@ public class CmdT_ClimberIn extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    Climber_SS.ClimberIn();
     Climber_SS.SetRightFlap(3.15);
   }
 

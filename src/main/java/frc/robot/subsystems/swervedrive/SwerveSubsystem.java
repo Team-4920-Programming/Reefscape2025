@@ -132,6 +132,7 @@ public class SwerveSubsystem extends SubsystemBase
   public Pose3d RedGeneralCameraPose3d = new Pose3d();
   public Pose3d BlueGeneralCameraPose3d = new Pose3d();
   public Pose3d BlueFrontCameraPose3d = new Pose3d();
+  public Pose2d ClosestReefSegment = new Pose2d();
   private PIDController RotPID = new PIDController(0.1,0,0);
 
   /**
@@ -223,6 +224,9 @@ public class SwerveSubsystem extends SubsystemBase
   public boolean isAutoAim()
   {
     return AutoAimEnabled;
+  }
+  public Pose2d GetClosestReefSegment(){
+    return DH_In_ClosestReefSegment;
   }
   /**
    * Construct the swerve drive.
@@ -391,7 +395,7 @@ private void ProcessVision4920()
 
           
           RedReefVisionTimestamp = visionEst.get().timestampSeconds;
-          DogLog.log("Red Reef Camera Pose", RedReefPose);
+          DogLog.log("Red Reef Camera Pose", RedReefCameraPose3d);
           DogLog.log("Red Reef TimeStamp",RedReefVisionTimestamp);
           
             VisionReading(RedReefPose, RedReefVisionTimestamp, RedReefCamera.confidenceCalculator(visionEst.get()));

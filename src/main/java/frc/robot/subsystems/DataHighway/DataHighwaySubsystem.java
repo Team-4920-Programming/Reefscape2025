@@ -23,10 +23,12 @@ import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Observable;
 
 import dev.doglog.*;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 public class DataHighwaySubsystem extends SubsystemBase {
   /** Creates a new DataHighwaySubsystem. */
@@ -36,12 +38,17 @@ public class DataHighwaySubsystem extends SubsystemBase {
   private double ReefDistance = 0;
   private int ReefSegment = 0;
   private boolean InRedZone = true;
+  private boolean inReefRedZone = true;
+  private boolean inStationRedZone = true;
+  private boolean inCageRedZone = true;
+  private boolean inReefYellowZone = false;
   private boolean InReefYellowZone = false;
   private boolean InCoralSationZone = false;
   private boolean AtCoralStation = false;
   private boolean isRedAlliance = false;
-  private Pose3d LeftCoralStationPose;
-  private Pose3d RightCoralStationPose;
+  private Pose3d LeftCoralStationPose = new Pose3d();
+  private Pose3d RightCoralStationPose = new Pose3d();
+  private Pose2d ReefPose = new Pose2d();
   private SwerveSubsystem Drive_SS;
   private CoralElevatorSubsystem Coral_SS;
   private AprilTagFieldLayout atf;
@@ -50,7 +57,7 @@ public class DataHighwaySubsystem extends SubsystemBase {
   private Pose2d CurrentPose = new Pose2d();
   private Pose2d ClosestReefSegment = new Pose2d();
   private boolean isMatchSetupCompleted = false;
-  List<Pose2d> reefPoses1 = new ArrayList();
+  List<Pose2d> reefPoses = new ArrayList();
   public DataHighwaySubsystem(SwerveSubsystem DriveSS, CoralElevatorSubsystem CoralSS) {
     Drive_SS = DriveSS;
     Coral_SS = CoralSS;
@@ -60,18 +67,18 @@ public class DataHighwaySubsystem extends SubsystemBase {
     m_led.setData(m_ledBuffer);
     m_led.start();
     atf = AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded);
+    reefPoses.add(new Pose2d().kZero);
   }
 
   @Override
   public void periodic() {
     // if(!isMatchSetupCompleted){
     //   if ((DriverStation.isFMSAttached() || Robot.isSimulation()) && DriverStation.isDSAttached()){
-      SetupZonesCenter();
-      SetupReefPoses();
       //     isMatchSetupCompleted = true;
       // }
     // }
     // SetupZonesCenter();
+    // SetupReefPoses();
     CheckZones();
     CalculateClosestReefSegment();
     if (Robot.isSimulation())
@@ -101,7 +108,7 @@ public class DataHighwaySubsystem extends SubsystemBase {
     if (hasCoral){
       AtCoralStation = false;
       white.applyTo(m_ledBuffer);
-      if (distancefromReefWall < 2 & distancefromReefWall > 0.75){
+      if (distancefromReefWall < 2 & distancefromReefWall > 0.85){
         yellow.applyTo(m_ledBuffer);
         InReefYellowZone = true;
       }
@@ -110,14 +117,14 @@ public class DataHighwaySubsystem extends SubsystemBase {
     }
     else
       green.applyTo(m_ledBuffer);
-      if (distancefromReefWall < 2 & distancefromReefWall > 0.75){
+      if (distancefromReefWall < 2 & distancefromReefWall > 0.85){
         yellow.applyTo(m_ledBuffer);
         InReefYellowZone = true;
       }
 
     //red zone - reduced speed - no elevator functions
-    InRedZone = false;  
-    if (distancefromReefWall < 0.75 & distancefromReefWall > 0.0)
+    InRedZone = false; 
+    if (distancefromReefWall < 0.85 & distancefromReefWall > 0.0)
     {
       
       InRedZone = true;
@@ -203,59 +210,39 @@ public class DataHighwaySubsystem extends SubsystemBase {
   }
 
   private void SetupZonesCenter(){
+
     if (isRedAlliance){
+        Pose2d tmp1 = atf.getTagPose(10).get().toPose2d();
+        Pose2d tmp2 = atf.getTagPose(7).get().toPose2d();;
         LeftCoralStationPose = atf.getTagPose(1).get();
         RightCoralStationPose = atf.getTagPose(2).get();
+        ReefPose = new Pose2d((tmp1.getX() + tmp2.getX())/2,tmp1.getY(),new Rotation2d().kZero);
     }
     else{
+        Pose2d tmp1 = atf.getTagPose(18).get().toPose2d();
+        Pose2d tmp2 = atf.getTagPose(21).get().toPose2d();;
         LeftCoralStationPose = atf.getTagPose(13).get();
-        RightCoralStationPose = atf.getTagPose(12).get(); 
+        RightCoralStationPose = atf.getTagPose(12).get();
+        ReefPose = new Pose2d((tmp1.getX() + tmp2.getX())/2,tmp1.getY(),new Rotation2d().kZero);
     }
+  }
+  public void StartUp(){
+    reefPoses.clear();
+    SetupZonesCenter();
+    SetupReefPoses();
+    isMatchSetupCompleted = true;
+
+  }
+  public boolean IsSetupCompleted(){
+    return isMatchSetupCompleted;
+  }
+
+  public void ResetSetup(){
+    isMatchSetupCompleted = false;
   }
 
   private void SetupReefPoses(){
     
-    Pose2d pos1;
-    Pose2d pos2;
-    Pose2d pos3;
-    Pose2d pos4;
-    Pose2d pos5;
-    Pose2d pos6;
-    if (isRedAlliance){
-    pos1 = atf.getTagPose(7).get().toPose2d();
-    pos2 = atf.getTagPose(6).get().toPose2d();
-    pos3 = atf.getTagPose(11).get().toPose2d();
-    pos4 = atf.getTagPose(10).get().toPose2d();
-    pos5 = atf.getTagPose(9).get().toPose2d();
-    pos6 = atf.getTagPose(8).get().toPose2d();
-        
-    }
-    else{
-      pos1 = atf.getTagPose(18).get().toPose2d();
-      pos2 = atf.getTagPose(19).get().toPose2d();
-      pos3 = atf.getTagPose(20).get().toPose2d();
-      pos4 = atf.getTagPose(21).get().toPose2d();
-      pos5 = atf.getTagPose(22).get().toPose2d();
-      pos6 = atf.getTagPose(17).get().toPose2d();
-         
-    }
-    reefPoses1.add(pos1);
-    reefPoses1.add(pos2);
-    reefPoses1.add(pos3);
-    reefPoses1.add(pos4);
-    reefPoses1.add(pos5);
-    reefPoses1.add(pos6);
-  }
-
-  private void CheckZones(){
-
-    inLeftCoralZone = WithinZone(LeftCoralStationPose.toPose2d(),CurrentPose, 3);
-    inRightCoralZone = WithinZone(RightCoralStationPose.toPose2d(),CurrentPose, 3);
-        
-  }
-
-  private void CalculateClosestReefSegment(){
-    List<Pose2d> reefPoses = new ArrayList();
     Pose2d pos1;
     Pose2d pos2;
     Pose2d pos3;
@@ -286,12 +273,59 @@ public class DataHighwaySubsystem extends SubsystemBase {
     reefPoses.add(pos4);
     reefPoses.add(pos5);
     reefPoses.add(pos6);
+  }
+
+  private void CheckZones(){
+
+    inLeftCoralZone = WithinZone(LeftCoralStationPose.toPose2d(),CurrentPose, 3, 0, 90);
+    inRightCoralZone = WithinZone(RightCoralStationPose.toPose2d(),CurrentPose, 3, 0, 90);
+
+    if(hasCoral){
+      inReefRedZone = WithinZone(ReefPose, CurrentPose, Units.inchesToMeters(41.25)+0.75, 0, 60) || WithinZone(ReefPose, CurrentPose, Units.inchesToMeters(41.25)+0.25, 0, 180) ;
+    }
+
+    inReefYellowZone = WithinZone(ReefPose, CurrentPose, Units.inchesToMeters(41.25)+2, 0, 180) && !inReefRedZone;
+        
+  }
+
+  private void CalculateClosestReefSegment(){
+    // List<Pose2d> reefPoses = new ArrayList();
+    // Pose2d pos1;
+    // Pose2d pos2;
+    // Pose2d pos3;
+    // Pose2d pos4;
+    // Pose2d pos5;
+    // Pose2d pos6;
+    // if (isRedAlliance){
+    // pos1 = atf.getTagPose(7).get().toPose2d();
+    // pos2 = atf.getTagPose(6).get().toPose2d();
+    // pos3 = atf.getTagPose(11).get().toPose2d();
+    // pos4 = atf.getTagPose(10).get().toPose2d();
+    // pos5 = atf.getTagPose(9).get().toPose2d();
+    // pos6 = atf.getTagPose(8).get().toPose2d();
+        
+    // }
+    // else{
+    //   pos1 = atf.getTagPose(18).get().toPose2d();
+    //   pos2 = atf.getTagPose(19).get().toPose2d();
+    //   pos3 = atf.getTagPose(20).get().toPose2d();
+    //   pos4 = atf.getTagPose(21).get().toPose2d();
+    //   pos5 = atf.getTagPose(22).get().toPose2d();
+    //   pos6 = atf.getTagPose(17).get().toPose2d();
+         
+    // }
+    // reefPoses.add(pos1);
+    // reefPoses.add(pos2);
+    // reefPoses.add(pos3);
+    // reefPoses.add(pos4);
+    // reefPoses.add(pos5);
+    // reefPoses.add(pos6);
 
     ClosestReefSegment = CurrentPose.nearest(reefPoses);
     
   }
 
-  private Boolean WithinZone(Pose2d targetPose, Pose2d currentPose, double radius){
+  private Boolean WithinZone(Pose2d targetPose, Pose2d currentPose, double radius, double headingOffset, double impactedHeading){
 
     double targetX = targetPose.getX();
     double targetY = targetPose.getY();
@@ -299,8 +333,10 @@ public class DataHighwaySubsystem extends SubsystemBase {
     double currY = currentPose.getY();
 
     double distance = Math.sqrt(Math.pow(targetY-currY,2)+Math.pow(targetX-currX,2));
-
-    return distance <= radius;
+    double robotHeading = currentPose.getRotation().getDegrees() + headingOffset;
+    double targetHeading = targetPose.getRotation().getDegrees();
+    double headingDiff = Math.abs(robotHeading - targetHeading);
+    return distance <= radius && headingDiff <= impactedHeading;
   }
   private void sim()
   {
@@ -314,7 +350,7 @@ public class DataHighwaySubsystem extends SubsystemBase {
         Drive_SS.startCIntake();
       }
 
-    if (WithinZone(LeftCoralStationPose.toPose2d(),CurrentPose, 3) && !hasCoral){
+    if (WithinZone(LeftCoralStationPose.toPose2d(),CurrentPose, 3, 0, 90) && !hasCoral){
       hasCoral = true;
     }
   }

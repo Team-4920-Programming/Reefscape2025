@@ -37,7 +37,7 @@ public class CmdA_CoralOutTake extends Command {
                 
     }
   
-      CoralElevatorSS.setIntakeSpeed(-0.75);
+      CoralElevatorSS.setIntakeSpeed(-1.0);
    
   }
 
@@ -58,6 +58,6 @@ public class CmdA_CoralOutTake extends Command {
         PresentTimer.stop();
         PresentTimer.reset();
     }
-    return (PresentTimer.hasElapsed(.5));
+    return (PresentTimer.hasElapsed(.1));
   }
 }

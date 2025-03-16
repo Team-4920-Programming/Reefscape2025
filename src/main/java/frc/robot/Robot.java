@@ -79,6 +79,8 @@ public class Robot extends TimedRobot
   @Override
   public void disabledInit()
   {
+    m_robotContainer.ResetSetup();
+
     m_robotContainer.setMotorBrake(true);
     disabledTimer.reset();
     disabledTimer.start();
@@ -101,6 +103,10 @@ public class Robot extends TimedRobot
   @Override
   public void autonomousInit()
   {
+    if(!m_robotContainer.IsSetupCompleted())
+    {
+      m_robotContainer.StartUpConfig();
+    }
     m_robotContainer.setMotorBrake(true);
     m_autonomousCommand = m_robotContainer.getAutonomousCommand();
 
@@ -109,6 +115,7 @@ public class Robot extends TimedRobot
     {
       m_autonomousCommand.schedule();
     }
+
   }
 
   /**
@@ -126,6 +133,10 @@ public class Robot extends TimedRobot
     // teleop starts running. If you want the autonomous to
     // continue until interrupted by another command, remove
     // this line or comment it out.
+    if(!m_robotContainer.IsSetupCompleted())
+    {
+      m_robotContainer.StartUpConfig();
+    }
     if (m_autonomousCommand != null)
     {
       m_autonomousCommand.cancel();
@@ -148,6 +159,10 @@ public class Robot extends TimedRobot
   @Override
   public void testInit()
   {
+    if(!m_robotContainer.IsSetupCompleted())
+    {
+      m_robotContainer.StartUpConfig();
+    }
     // Cancels all running commands at the start of test mode.
     CommandScheduler.getInstance().cancelAll();
     m_robotContainer.setDriveMode();

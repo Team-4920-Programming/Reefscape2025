@@ -11,7 +11,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "Copy of blue start - 5r #1"
+                  "pathName": "H3 - R - 1 - Start to 5R"
                 }
               },
               {
@@ -19,100 +19,20 @@
                 "data": {
                   "name": "CmdA_Level4"
                 }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "CmdA_RobotStartConfig"
+                }
               }
             ]
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 0.0
           }
         },
         {
           "type": "named",
           "data": {
             "name": "CmdA_DriveToReefPositionR"
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 0.0
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "CmdA_CoralOutTake"
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 0.0
-          }
-        },
-        {
-          "type": "deadline",
-          "data": {
-            "commands": [
-              {
-                "type": "named",
-                "data": {
-                  "name": "CmdA_CoralIntake"
-                }
-              },
-              {
-                "type": "path",
-                "data": {
-                  "pathName": "Copy of 5r - rs9 #2"
-                }
-              }
-            ]
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 0.0
-          }
-        },
-        {
-          "type": "parallel",
-          "data": {
-            "commands": [
-              {
-                "type": "path",
-                "data": {
-                  "pathName": "Copy of rs9 - 6r #3"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "CmdA_Level4"
-                }
-              }
-            ]
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 0.0
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "CmdA_DriveToReefPositionR"
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 0.0
           }
         },
         {
@@ -134,16 +54,10 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "6r - rs9 #4"
+                  "pathName": "H3 - R - 2 - 5R to F9"
                 }
               }
             ]
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 0.0
           }
         },
         {
@@ -153,7 +67,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "Copy of rs9 - 6l #5"
+                  "pathName": "H3 - R - 3 - F9 to 6R"
                 }
               },
               {
@@ -166,27 +80,34 @@
           }
         },
         {
-          "type": "wait",
-          "data": {
-            "waitTime": 0.0
-          }
-        },
-        {
           "type": "named",
           "data": {
-            "name": "CmdA_DriveToReefPositionL"
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 0.0
+            "name": "CmdA_DriveToReefPositionR"
           }
         },
         {
           "type": "named",
           "data": {
             "name": "CmdA_CoralOutTake"
+          }
+        },
+        {
+          "type": "deadline",
+          "data": {
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "CmdA_CoralIntake"
+                }
+              },
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "H3 - R - 4 - 6R to F9"
+                }
+              }
+            ]
           }
         }
       ]

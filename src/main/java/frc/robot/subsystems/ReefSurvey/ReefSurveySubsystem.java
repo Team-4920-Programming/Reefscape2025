@@ -19,7 +19,7 @@ import frc.robot.LimelightHelpers.RawDetection;
 public class ReefSurveySubsystem extends SubsystemBase {
 
   public int[][] ReefScoreTracker = new int[3][12];
-  private int scorethreshold = 3;
+  private int scorethreshold = 1;
   /** Creates a new ReefSurvey. */
   public ReefSurveySubsystem() {
 
@@ -108,7 +108,8 @@ public class ReefSurveySubsystem extends SubsystemBase {
         ReefChar[35]= getReefDataScoredChar(2,11); // set 6 Level 4R
 
         String reefDataString = String.valueOf(ReefChar);
-        SmartDashboard.putString("ReefString", reefDataString); //publish so Driverstation can read
+        SmartDashboard.putString("ReefString", reefDataString);
+        DogLog.log("ReefString", reefDataString); //publish so Driverstation can read
        
   }
 

@@ -3,29 +3,29 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 9.403210227272726,
-        "y": 4.578423295454545
+        "x": 1.726,
+        "y": 0.828
       },
       "prevControl": null,
       "nextControl": {
-        "x": 8.189172471222811,
-        "y": 4.540447126614419
+        "x": 3.3175466399317073,
+        "y": 2.123757666116575
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 6.221618852459016,
-        "y": 4.210809426229508
+        "x": 3.643413897591901,
+        "y": 2.3684093164027593
       },
       "prevControl": {
-        "x": 7.825620431482756,
-        "y": 4.21474902268684
+        "x": 3.2993500126919497,
+        "y": 2.075120163102996
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "Reef_G"
+      "linkedName": null
     }
   ],
   "rotationTargets": [],
@@ -33,22 +33,22 @@
   "pointTowardsZones": [],
   "eventMarkers": [],
   "globalConstraints": {
-    "maxVelocity": 3.0,
-    "maxAcceleration": 3.0,
+    "maxVelocity": 3.25,
+    "maxAcceleration": 1.501,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0,
     "nominalVoltage": 12.0,
     "unlimited": false
   },
   "goalEndState": {
-    "velocity": 0,
-    "rotation": 180.0
+    "velocity": 1.0,
+    "rotation": 59.99999999999999
   },
   "reversed": false,
-  "folder": null,
+  "folder": "Humber 3 - R - 2pc",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 180.0
+    "rotation": 54.0
   },
   "useDefaultConstraints": false
 }

@@ -18,6 +18,7 @@ public class CmdT_CoralOutTake extends Command {
     private final BoltLog BoltLogger = new BoltLog();
     private Timer PresentTimer = new Timer();
   boolean CoralOut = false;
+  double speed = 0.0;
   public CmdT_CoralOutTake(CoralElevatorSubsystem CoralElevator_Subsystem) {
     // Use addRequirements() here to declare subsystem dependencies.
     CoralElevatorSS = CoralElevator_Subsystem;
@@ -32,12 +33,17 @@ public class CmdT_CoralOutTake extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    BoltLogger.Log(BoltLogger.HighLog, getSubsystem(), getName(), "execute", "Executing", true);
-    if (Robot.isSimulation()){
-                
-    }
+      BoltLogger.Log(BoltLogger.HighLog, getSubsystem(), getName(), "execute", "Executing", true);
+      int i = CoralElevatorSS.GetScoreSelection();
+
+      if (i == 1){
+        speed = 0.35;
+      }
+      else{
+        speed = 1.0;
+      }
   
-      CoralElevatorSS.setIntakeSpeed(-1.0);
+      CoralElevatorSS.setIntakeSpeed(-speed);
    
   }
 

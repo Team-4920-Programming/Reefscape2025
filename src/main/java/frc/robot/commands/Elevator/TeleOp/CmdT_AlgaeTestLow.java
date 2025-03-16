@@ -10,10 +10,10 @@ import frc.robot.Constants.RobotPositions;
 import frc.robot.Constants.RobotPositions.*;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
-public class CmdT_AlgaeTest extends Command {
+public class CmdT_AlgaeTestLow extends Command {
   /** Creates a new CmdT_Level1. */
   CoralElevatorSubsystem m_ElevatorSubsystem;
-  public CmdT_AlgaeTest(CoralElevatorSubsystem elevatorSS) {
+  public CmdT_AlgaeTestLow(CoralElevatorSubsystem elevatorSS) {
     // Use addRequirements() here to declare subsystem dependencies.
     m_ElevatorSubsystem = elevatorSS;
     addRequirements(m_ElevatorSubsystem);
@@ -28,8 +28,9 @@ public class CmdT_AlgaeTest extends Command {
   @Override
   public void execute() {
 
-        m_ElevatorSubsystem.setArmPosition(AlgaeL3.height, AlgaeL3.elbow, AlgaeL3.wrist);
+        m_ElevatorSubsystem.setArmPosition(AlgaeL2.height, AlgaeL2.elbow, AlgaeL2.wrist);
          m_ElevatorSubsystem.OverrideRedZone = true;
+         m_ElevatorSubsystem.setIntakeSpeed(0);
       }
 
   // Called once the command ends or is interrupted.

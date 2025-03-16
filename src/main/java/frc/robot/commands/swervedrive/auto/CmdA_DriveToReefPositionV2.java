@@ -27,18 +27,17 @@ public class CmdA_DriveToReefPositionV2 extends Command {
   Integer branch;
  
   SwerveSubsystem DriveSS;
-  DataHighwaySubsystem DataSS;
   Pose2d ReefPose;
   Pose2d targetPose;
-  PIDController XPID = new PIDController(2, 0, 0.01);
-  PIDController YPID = new PIDController(2, 0, 0.01);
-  PIDController RotPID = new PIDController(0.125,0,0);
+  PIDController XPID = new PIDController(2.0, 0, 0.02);
+  PIDController YPID = new PIDController(2.0, 0, 0.02);
+  PIDController RotPID = new PIDController(0.15,0,0);
+  double minSpeed = 0.3;
   boolean inter;
-  public CmdA_DriveToReefPositionV2(SwerveSubsystem DriveSubsystem, DataHighwaySubsystem data, int Position) {
+  public CmdA_DriveToReefPositionV2(SwerveSubsystem DriveSubsystem, int Position) {
     // Use addRequirements() here to declare subsystem dependencies.
     branch = Position;
     DriveSS = DriveSubsystem;
-    DataSS = data;
     addRequirements(DriveSS);
   }
 
@@ -46,10 +45,10 @@ public class CmdA_DriveToReefPositionV2 extends Command {
   @Override
   public void initialize() {
 
-    double branchoffset = Units.inchesToMeters(6.75);
-    double distanceFromFace = Units.inchesToMeters(15.625);
+    double branchoffset = Units.inchesToMeters(7.825);
+    double distanceFromFace = Units.inchesToMeters(19);
     inter = false;
-    Pose2d targetAprilTagPose = DataSS.getClosestReefSegment();
+    Pose2d targetAprilTagPose = DriveSS.GetClosestReefSegment();
 
     // double CenterofReefX = 4.5;
     // double CenterofReefY = 4.0;
@@ -115,9 +114,9 @@ public class CmdA_DriveToReefPositionV2 extends Command {
 
     
     
-    XPID.setTolerance(0.05);
-    YPID.setTolerance(0.05);
-    RotPID.setTolerance(1);
+    XPID.setTolerance(0.02);
+    YPID.setTolerance(0.02);
+    RotPID.setTolerance(0.75);
     RotPID.enableContinuousInput(-180, 180);
   }
 
@@ -138,9 +137,32 @@ public class CmdA_DriveToReefPositionV2 extends Command {
       YVel = YPID.calculate(CurrentY, targetPose.getY());
   //   // }
     double RotVel = RotPID.calculate(CurrentRot,targetPose.getRotation().getDegrees() + 180);
-    XVel = MathUtil.clamp(XVel, -2, 2);
-    YVel = MathUtil.clamp(YVel, -2,2);
+    XVel = MathUtil.clamp(XVel, -3, 3);
+    YVel = MathUtil.clamp(YVel, -3,3);
     RotVel = MathUtil.clamp(RotVel, -3, 3);
+
+    if (!XPID.atSetpoint()){
+      if (XVel > 0 ){
+        XVel = Math.max(XVel, minSpeed);
+      }
+      else if (XVel < 0 ){
+        XVel = Math.min(XVel, -minSpeed);
+      }
+    }
+    if (XPID.atSetpoint()){
+      XVel = XPID.calculate(CurrentX, targetPose.getX());
+    }
+    if (YPID.atSetpoint()){
+      YVel = YPID.calculate(CurrentY, targetPose.getY());
+    }
+    if (!YPID.atSetpoint()){
+      if (  YVel > 0 ){
+        YVel = Math.max(YVel, minSpeed);
+      }
+      else if (YVel < 0 ){
+        YVel = Math.min(YVel, -minSpeed);
+      }
+    }
 
     DriveSS.drive(new Translation2d(XVel,YVel),RotVel,true);
 
@@ -167,7 +189,7 @@ public class CmdA_DriveToReefPositionV2 extends Command {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return XPID.atSetpoint() & YPID.atSetpoint() & RotPID.atSetpoint();
+    return XPID.atSetpoint() && YPID.atSetpoint() && RotPID.atSetpoint();
   }
 
   public boolean wasInterrupted(){

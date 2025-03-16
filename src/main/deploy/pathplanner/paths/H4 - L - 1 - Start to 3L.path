@@ -3,25 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 7.097914292549709,
-        "y": 0.5363858854192471
+        "x": 7.117,
+        "y": 7.525
       },
       "prevControl": null,
       "nextControl": {
-        "x": 6.949904886175426,
-        "y": 0.7440925501196256
+        "x": 6.851435692528978,
+        "y": 7.041640612199976
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 6.042074745326151,
-        "y": 2.048500183769546
+        "x": 5.567565883747642,
+        "y": 5.568796725567495
       },
       "prevControl": {
-        "x": 6.184531499563272,
-        "y": 1.8430590165896827
+        "x": 6.723458990990444,
+        "y": 7.144486161355563
       },
       "nextControl": null,
       "isLocked": false,
@@ -33,22 +33,22 @@
   "pointTowardsZones": [],
   "eventMarkers": [],
   "globalConstraints": {
-    "maxVelocity": 3.0,
-    "maxAcceleration": 2.0,
+    "maxVelocity": 3.5,
+    "maxAcceleration": 1.5,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0,
     "nominalVoltage": 12.0,
     "unlimited": false
   },
   "goalEndState": {
-    "velocity": 0.5,
-    "rotation": 122.811
+    "velocity": 1.0,
+    "rotation": -119.99999999999999
   },
   "reversed": false,
-  "folder": "Humber",
+  "folder": "Humber 4 - L - 2pc",
   "idealStartingState": {
-    "velocity": 0,
-    "rotation": 89.45163947891362
+    "velocity": 0.0,
+    "rotation": -90.0
   },
   "useDefaultConstraints": true
 }

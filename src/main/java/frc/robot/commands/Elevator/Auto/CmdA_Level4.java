@@ -40,6 +40,6 @@ public class CmdA_Level4 extends Command {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return (Math.abs(m_ElevatorSubsystem.getHeightLaserMeters() - Level4.height) < 0.1) && (Math.abs(m_ElevatorSubsystem.GetElbowAngle() - Level4.elbow) < 5) && (Math.abs(m_ElevatorSubsystem.GetWristAngleWorldCoordinates() - Level4.wrist) < 5) ;
+    return m_ElevatorSubsystem.IsElbowAtSetpoint() && m_ElevatorSubsystem.IsElevatorAtSetpoint() && m_ElevatorSubsystem.IsWristAtSetpoint() ;
   }
 }

@@ -7,16 +7,13 @@ package frc.robot.commands.Elevator.TeleOp;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.CoralElevator.CoralElevatorSubsystem;
 import frc.robot.Constants.RobotPositions;
-import frc.robot.Constants.RobotPositions.Level2;
-import frc.robot.Constants.RobotPositions.Level3;
-import frc.robot.Constants.RobotPositions.Level4;
-import frc.robot.Constants.RobotPositions.Level4_Far;
+import frc.robot.Constants.RobotPositions.*;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
-public class CmdT_Level4_Far extends Command {
+public class CmdT_AlgaeL2 extends Command {
   /** Creates a new CmdT_Level1. */
   CoralElevatorSubsystem m_ElevatorSubsystem;
-  public CmdT_Level4_Far(CoralElevatorSubsystem elevatorSS) {
+  public CmdT_AlgaeL2(CoralElevatorSubsystem elevatorSS) {
     // Use addRequirements() here to declare subsystem dependencies.
     m_ElevatorSubsystem = elevatorSS;
     addRequirements(m_ElevatorSubsystem);
@@ -31,16 +28,20 @@ public class CmdT_Level4_Far extends Command {
   @Override
   public void execute() {
 
-        m_ElevatorSubsystem.setArmPosition(Level4_Far.height, Level4_Far.elbow, Level4_Far.wrist);
+        m_ElevatorSubsystem.setArmPosition(AlgaeL2.height, AlgaeL2.elbow, AlgaeL2.wrist);
+         m_ElevatorSubsystem.OverrideRedZone = true;
+         m_ElevatorSubsystem.setIntakeSpeed(0);
       }
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {}
+  public void end(boolean interrupted) {
+    m_ElevatorSubsystem.OverrideRedZone = false;
+  }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return (m_ElevatorSubsystem.IsElevatorAtSetpoint() && m_ElevatorSubsystem.IsWristAtSetpoint() && m_ElevatorSubsystem.IsElbowAtSetpoint());
+    return (m_ElevatorSubsystem.IsElevatorAtSetpoint() && m_ElevatorSubsystem.IsWristAtSetpoint() && m_ElevatorSubsystem.IsElbowAtSetpoint()) ;
   }
 }

@@ -3,13 +3,14 @@
   "robotLength": 0.914,
   "holonomicMode": true,
   "pathFolders": [
-    "Humber"
+    "Humber 3 - R - 2pc",
+    "Humber 4 - L - 2pc"
   ],
   "autoFolders": [
     "Humber"
   ],
-  "defaultMaxVel": 3.0,
-  "defaultMaxAccel": 2.0,
+  "defaultMaxVel": 3.5,
+  "defaultMaxAccel": 1.5,
   "defaultMaxAngVel": 540.0,
   "defaultMaxAngAccel": 720.0,
   "defaultNominalVoltage": 12.0,
