@@ -110,6 +110,7 @@ public class SwerveSubsystem extends SubsystemBase
   public boolean DH_In_InLeftCoralZone = false;
   public boolean DH_In_InRightCoralZone = false;
   public Pose2d DH_In_ClosestReefSegment;
+  public Pose2d DH_In_ReefPose;
   public int DH_Out_ReefSegment = 0;
   public double DH_Out_ReefDistance = 0;
   public boolean DH_OUT_isBlueAlliance = false;
