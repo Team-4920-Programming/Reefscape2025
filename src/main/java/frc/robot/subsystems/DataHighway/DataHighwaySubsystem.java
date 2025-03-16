@@ -84,6 +84,7 @@ public class DataHighwaySubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
+
     // if(!isMatchSetupCompleted){
     //   if ((DriverStation.isFMSAttached() || Robot.isSimulation()) && DriverStation.isDSAttached()){
       //     isMatchSetupCompleted = true;
@@ -239,6 +240,7 @@ public class DataHighwaySubsystem extends SubsystemBase {
     Drive_SS.DH_In_RightCoralPose = RightCoralStationPose.toPose2d();
     Drive_SS.DH_In_ClosestReefSegment = ClosestReefSegment;
     Drive_SS.DH_In_ReefPose = ReefPose;
+    Drive_SS.DH_In_ClosestPickupSlot = getClosestPickupSlot();
     
   }
   private void getCoralData(){
@@ -265,6 +267,7 @@ public class DataHighwaySubsystem extends SubsystemBase {
     Coral_SS.DH_In_DistanceFromReef = ReefDistance;
     Coral_SS.DH_In_RedZone = inReefRedZone || inCoralStationRedZone || inCageRedZone;
     Coral_SS.DH_In_YellowZone = inReefYellowZone;
+    Coral_SS.DH_In_RobotPose = CurrentPose;
     
   }
 
@@ -359,7 +362,7 @@ public class DataHighwaySubsystem extends SubsystemBase {
     inLeftCoralZone = WithinZone("LeftCoralStationZone",LeftCoralStationPose.toPose2d(),CurrentPose, 3, 0, 180);
     inRightCoralZone = WithinZone("RightCoralStationZone",RightCoralStationPose.toPose2d(),CurrentPose, 3, 0, 180);
     inCoralStationRedZone = WithinZone("LeftCoralStationRedZone",LeftCoralStationPose.toPose2d(),CurrentPose, 2, 0, 90) || WithinZone("RightCoralStationRedZone",RightCoralStationPose.toPose2d(),CurrentPose, 2, 0, 90);
-    inReefRedZone = WithinZone("ReefRedZone_ClosestTag",ClosestReefSegment, CurrentPose, 1.25, 0, 45) || WithinZone("ReefRedZone_MainBorder",ReefPose, CurrentPose, 1.8, 0, 180) ;
+    inReefRedZone = WithinZone("ReefRedZone_ClosestTag",ClosestReefSegment, CurrentPose, 1.1, 0, 45) || WithinZone("ReefRedZone_MainBorder",ReefPose, CurrentPose, 1.65, 0, 180) ;
     inReefYellowZone = WithinZone("ReefYelloZone",ReefPose, CurrentPose, Units.inchesToMeters(38.25)+2, 0, 180) && !inReefRedZone;
     if(inLeftCoralZone){
       inCoralStationPickupZone = WithinZone("LeftCoralStationPickupZone",ClosestPickupSlot,CurrentPose, 0.6, 180, 15);

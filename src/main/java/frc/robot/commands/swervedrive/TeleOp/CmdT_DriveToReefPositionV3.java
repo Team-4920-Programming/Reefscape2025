@@ -9,6 +9,9 @@ import static edu.wpi.first.units.Units.DegreesPerSecondPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecondPerSecond;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.pathplanner.lib.trajectory.PathPlannerTrajectory;
 
 import dev.doglog.DogLog;
@@ -46,6 +49,7 @@ public class CmdT_DriveToReefPositionV3 extends Command {
   boolean inter;
   Trajectory trajectory;
   HolonomicDriveController controller;
+  List<Translation2d> waypoints;
   private Timer DriveTimer = new Timer();
   public CmdT_DriveToReefPositionV3(SwerveSubsystem DriveSubsystem, int Position) {
     // Use addRequirements() here to declare subsystem dependencies.
@@ -62,8 +66,8 @@ public class CmdT_DriveToReefPositionV3 extends Command {
     double distanceFromFace = Units.inchesToMeters(19);
     inter = false;
     Pose2d targetAprilTagPose = DriveSS.GetClosestReefSegment();
-
-    targetPose = new Pose2d();
+    waypoints = new ArrayList<Translation2d>();
+    // targetPose = new Pose2d();
     targetPose = targetAprilTagPose;
     if (branch == 1){
 
@@ -90,8 +94,8 @@ public class CmdT_DriveToReefPositionV3 extends Command {
     }
 
     controller = new HolonomicDriveController(
-    new PIDController(2, 0, 0.02), new PIDController(2, 0, 0.02),
-    new ProfiledPIDController(0.15, 0, 0,
+    new PIDController(0.1, 0, 0.0), new PIDController(0.1, 0, 0.0),
+    new ProfiledPIDController(1, 0, 0,
     new TrapezoidProfile.Constraints(
       RadiansPerSecond.convertFrom(360, DegreesPerSecond), 
       RadiansPerSecondPerSecond.convertFrom(180,RadiansPerSecondPerSecond))));
@@ -100,9 +104,16 @@ public class CmdT_DriveToReefPositionV3 extends Command {
 
         TrajectoryConfig config = new TrajectoryConfig(3.5, 1);
         config.setReversed(false);
+        config.setKinematics(DriveSS.getKinematics());  
+        
+        for (int i = 1; i <= 20; i ++){
+          waypoints.add(DriveSS.getPose().interpolate(targetPose, 0.05*i).getTranslation());
+        }
+        
+        
 
-    var trajectory = TrajectoryGenerator.generateTrajectory(
-        DriveSS.getPose(), null,targetPose,
+        trajectory = TrajectoryGenerator.generateTrajectory(
+        DriveSS.getPose(), waypoints,targetPose,
         config);
 
       DriveTimer.start();
@@ -116,6 +127,7 @@ public class CmdT_DriveToReefPositionV3 extends Command {
     Trajectory.State goal = trajectory.sample(DriveTimer.get());
     ChassisSpeeds adjustedSpeeds = controller.calculate(
       DriveSS.getPose(), goal, goal.poseMeters.getRotation());
+    
 
     DriveSS.drive(adjustedSpeeds);
 
@@ -134,6 +146,7 @@ public class CmdT_DriveToReefPositionV3 extends Command {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
+
     DriveSS.drive(new ChassisSpeeds(0,0,0));
     DriveTimer.stop();
     DriveTimer.reset();
@@ -147,7 +160,7 @@ public class CmdT_DriveToReefPositionV3 extends Command {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return controller.atReference();
+    return (Math.abs(targetPose.getX()- DriveSS.getPose().getX()) <= 0.01 && Math.abs(targetPose.getY() - DriveSS.getPose().getY()) <= 0.01 && Math.abs(targetPose.getRotation().getDegrees()- DriveSS.getPose().getRotation().getDegrees()) <= 1.0);
   }
 
   public boolean wasInterrupted(){

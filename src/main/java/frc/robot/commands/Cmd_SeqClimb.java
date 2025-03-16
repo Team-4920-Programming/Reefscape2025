@@ -33,10 +33,12 @@ public class Cmd_SeqClimb extends SequentialCommandGroup {
     // Add your commands in the addCommands() call, e.g.
     // addCommands(new FooCommand(), new BarCommand());
     //addRequirements(Drive_SS, Coral_SS);
-    addCommands(
-      new ParallelCommandGroup(new CmdT_DriveToPose(Drive_SS,new Pose2d(7.11,5.1, new Rotation2d((Units.degreesToRadians(180)))),2), new CmdT_ClimberOut(Climb_SS)),
-      new CmdT_DriveToPose(Drive_SS,new Pose2d(8.87,5.1, new Rotation2d(Units.degreesToRadians(180))),0.75),
-      new CmdT_DriveToPose(Drive_SS,new Pose2d(8.07,5.1, new Rotation2d(Units.degreesToRadians( 180))),0.75)
+    addCommands(//7.11,5.1 180 - Blue
+    //10.438,2.952 0 - Red
+    //17.548 8.052 - Field
+      new ParallelCommandGroup(new CmdT_DriveToPose(Drive_SS,new Pose2d(10.438,2.952, new Rotation2d((Units.degreesToRadians(0)))),2), new CmdT_ClimberOut(Climb_SS))//,
+      // new CmdT_DriveToPose(Drive_SS,new Pose2d(8.87,5.1, new Rotation2d(Units.degreesToRadians(180))),0.75),
+      // new CmdT_DriveToPose(Drive_SS,new Pose2d(8.07,5.1, new Rotation2d(Units.degreesToRadians( 180))),0.75)
       // new CmdT_RunClimberIn4Seq(Climb_SS))
     );
   }

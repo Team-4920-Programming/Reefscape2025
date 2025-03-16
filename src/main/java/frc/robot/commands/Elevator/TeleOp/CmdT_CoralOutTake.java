@@ -4,6 +4,7 @@
 
 package frc.robot.commands.Elevator.TeleOp;
 
+import dev.doglog.DogLog;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.BoltLog;
@@ -52,6 +53,8 @@ public class CmdT_CoralOutTake extends Command {
   public void end(boolean interrupted) {
     CoralElevatorSS.setIntakeSpeed(0.0);
     BoltLogger.Log(BoltLogger.HighLog, getSubsystem(), getName(), "Execute", "Executing", false);
+    DogLog.log("ReefScore/PoseAtShoot",CoralElevatorSS.DH_In_RobotPose);
+    DogLog.log("ReefScore/PoseAtShootRotation",CoralElevatorSS.DH_In_RobotPose.getRotation().getDegrees());
   }
 
   // Returns true when the command should end.

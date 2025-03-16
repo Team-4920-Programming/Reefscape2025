@@ -40,6 +40,7 @@ import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.filter.LinearFilter;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
@@ -106,6 +107,7 @@ public class CoralElevatorSubsystem extends SubsystemBase {
   public boolean DH_In_RedZone = true;
   public boolean DH_In_YellowZone = false;
   public boolean DH_In_CoralZone = false;
+  public Pose2d DH_In_RobotPose = new Pose2d();
   public boolean OverrideRedZone = false; //set from the algae commands
   public int DH_Out_ScoreSelection = 1;
 
@@ -663,7 +665,9 @@ public class CoralElevatorSubsystem extends SubsystemBase {
     SmartDashboard.putBoolean("CanDecWrist", CanMoveWristDec());
 
     SmartDashboard.putNumber("LeftFlap", GetLeftFlap());
-    
+
+    SmartDashboard.putBoolean("ElevatorClearToMoveCheck",ElevatorClearToMoveCheck());
+    SmartDashboard.putBoolean("isWristPassingThroughVertical",!isWristPassingThroughVertical());
     
 
     SmartDashboard.putBoolean("HasCoral", isCoralPresent());
@@ -671,7 +675,7 @@ public class CoralElevatorSubsystem extends SubsystemBase {
     double  EmotorSpd =0;
    
       if (!ElevatorPID.atSetpoint() && ((CanMoveElevatorUp() && elevatorOutput > 0) || (CanMoveElevatorDown() && elevatorOutput < 0)))
-      {
+      { 
         double EleveFF = 0.025;
         if (getFilteredElevatorHeight() > 0.30 && getFilteredElevatorHeight() <0.5)
           EleveFF = 0.01;
@@ -694,11 +698,11 @@ public class CoralElevatorSubsystem extends SubsystemBase {
 
       SmartDashboard.putNumber("Elbow Output", elbowOutput);
       if (ElbowPID.getSetpoint() > GetElbowAngle()){
-        elbowOutput = MathUtil.clamp(elbowOutput,-.75,.0);
+        // elbowOutput = MathUtil.clamp(elbowOutput,-.1,.0);
         
       }
       if (ElbowPID.getSetpoint() < GetElbowAngle()){
-        elbowOutput = MathUtil.clamp(elbowOutput, 0,.75);
+        // elbowOutput = MathUtil.clamp(elbowOutput, 0,.75);
         
       }
       if (!ElbowPID.atSetpoint() && ((CanMoveElbowDec() && elbowOutput > 0) || (CanMoveElbowInc() && elbowOutput < 0))) 
@@ -713,11 +717,11 @@ public class CoralElevatorSubsystem extends SubsystemBase {
         
       //wristOutput = - wristOutput;
       if (WristPID.getSetpoint() > GetWristAngleWorldCoordinates()){
-        wristOutput = MathUtil.clamp(wristOutput,0,0.5);
+        wristOutput = MathUtil.clamp(wristOutput,0,0.75); //0.5
         
       }
       if (WristPID.getSetpoint() < GetWristAngleWorldCoordinates()){
-        wristOutput = MathUtil.clamp(wristOutput, -0.5,0);
+        wristOutput = MathUtil.clamp(wristOutput, -0.75,0); //0.5
         
       }
       if (WristPID.getSetpoint() < -90 && GetWristAngleWorldCoordinates() >0){

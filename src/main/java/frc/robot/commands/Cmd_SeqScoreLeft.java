@@ -30,8 +30,8 @@ public class Cmd_SeqScoreLeft extends SequentialCommandGroup {
     //addRequirements(Drive_SS, Coral_SS);
     addCommands(
       new CmdT_MoveToLevel(Coral_SS),
-      new CmdA_DriveToReefPositionV2(Drive_SS,1).withTimeout(3),
-      new CmdT_UltrasonicCheck(Coral_SS),
+      new CmdT_DriveToReefPositionV2(Drive_SS,1).withTimeout(3),
+      // new CmdT_UltrasonicCheck(Coral_SS),
       new CmdT_CoralOutTake(Coral_SS),
       new Reef_MarkOurs(Reef_SS, 0),
       new CmdT_DriveToReefPosition(Drive_SS,4),

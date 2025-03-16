@@ -45,8 +45,8 @@ public class CmdT_DriveToReefPositionV2 extends Command {
   @Override
   public void initialize() {
 
-    double branchoffset = Units.inchesToMeters(7.825);
-    double distanceFromFace = Units.inchesToMeters(19);
+    double branchoffset = Units.inchesToMeters(6.5);//7.825
+    double distanceFromFace = Units.inchesToMeters(18.375);
     inter = false;
     Pose2d targetAprilTagPose = DriveSS.GetClosestReefSegment();
 
@@ -109,11 +109,12 @@ public class CmdT_DriveToReefPositionV2 extends Command {
   //   double y = (ReefRadius + RobotOffset) * Math.sin(Units.degreesToRadians((ReefSegment *60)+offsetAng)) + CenterofReefY;
   //   double rot = ReefSegment * 60;
   //   ReefPose = new Pose2d(x,y, Rotation2d.fromDegrees(rot));
-    DogLog.log ("ReefScore/ReefPose", targetPose);
-
 
     
-    
+    // targetPose = new Pose2d(14.33,4.20,new Rotation2d(Units.degreesToRadians(0)));
+    DogLog.log("ReefScore/ReefPose", targetPose);
+
+
     XPID.setTolerance(0.02);
     YPID.setTolerance(0.02);
     RotPID.setTolerance(0.75);
@@ -131,12 +132,18 @@ public class CmdT_DriveToReefPositionV2 extends Command {
   //   double Reef_Rot = ReefPose.getRotation().getDegrees()+180;
     double XVel = 0;  
     double YVel =0;
+    double rawXVel = 0;
+    double rawYVel = 0;
+    double rawrotVel = 0;
   //   // if (RotPID.atSetpoint()){
       
       XVel = XPID.calculate(CurrentX, targetPose.getX());
+      rawXVel = XVel;
       YVel = YPID.calculate(CurrentY, targetPose.getY());
+      rawYVel = YVel;
   //   // }
     double RotVel = RotPID.calculate(CurrentRot,targetPose.getRotation().getDegrees() + 180);
+    rawrotVel = RotVel;
     XVel = MathUtil.clamp(XVel, -3, 3);
     YVel = MathUtil.clamp(YVel, -3,3);
     RotVel = MathUtil.clamp(RotVel, -3, 3);
@@ -149,12 +156,6 @@ public class CmdT_DriveToReefPositionV2 extends Command {
         XVel = Math.min(XVel, -minSpeed);
       }
     }
-    if (XPID.atSetpoint()){
-      XVel = XPID.calculate(CurrentX, targetPose.getX());
-    }
-    if (YPID.atSetpoint()){
-      YVel = YPID.calculate(CurrentY, targetPose.getY());
-    }
     if (!YPID.atSetpoint()){
       if (  YVel > 0 ){
         YVel = Math.max(YVel, minSpeed);
@@ -164,14 +165,34 @@ public class CmdT_DriveToReefPositionV2 extends Command {
       }
     }
 
+    if (!RotPID.atSetpoint()){
+      if (RotVel > 0 ){
+        RotVel = Math.max(RotVel, 0.15);
+      }
+      else if (RotVel < 0 ){
+        RotVel = Math.min(RotVel, -0.15);
+      }
+    }
+
+    if (XPID.atSetpoint()){
+      XVel = rawXVel;
+    }
+    if (YPID.atSetpoint()){
+      YVel = rawYVel;
+    }
+    if (RotPID.atSetpoint()){
+      RotVel = rawrotVel;
+    }
+
     DriveSS.drive(new Translation2d(XVel,YVel),RotVel,true);
 
-    DogLog.log("ReefScore/Xvel",XVel);
-    DogLog.log("ReefScore/Yvel",YVel);
-    DogLog.log("ReefScore/Rotvel",RotVel);
+    DogLog.log("ReefScore/XPIDval",XVel);
+    DogLog.log("ReefScore/YPIDval",YVel);
+    DogLog.log("ReefScore/RotPIDval",RotVel);
     DogLog.log("Reef XPID current", CurrentX);
     DogLog.log("Reef YPID current", CurrentY);
-    
+    DogLog.log("ReefScore/CurrentRobotPose",DriveSS.getPose());
+
    
     System.out.println("Driving toReef");
   }
@@ -181,15 +202,22 @@ public class CmdT_DriveToReefPositionV2 extends Command {
   public void end(boolean interrupted) {
     DriveSS.drive(new ChassisSpeeds(0,0,0));
     System.out.println("DrivetoReef Finished");
+    DogLog.log("ReefScore/FinalPose",DriveSS.getPose());
+    DogLog.log("ReefScore/FinalPoseRotation",DriveSS.getPose().getRotation().getDegrees());
     System.out.println("interrupted"+interrupted);
     inter = interrupted;
+    DogLog.log("ReefScore/IsStopped", DriveSS.isRobotStopped());
+    DogLog.log("ReefScore/Interrupted", inter);
+    DogLog.log("ReefScore/RobotXvel",DriveSS.getFieldVelocity().vxMetersPerSecond);
+    DogLog.log("ReefScore/RobotYvel",DriveSS.getFieldVelocity().vyMetersPerSecond);
+    DogLog.log("ReefScore/RobotRotvel",DriveSS.getFieldVelocity().omegaRadiansPerSecond);
     
   }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return XPID.atSetpoint() && YPID.atSetpoint() && RotPID.atSetpoint();
+    return XPID.atSetpoint() && YPID.atSetpoint() && RotPID.atSetpoint() && DriveSS.isRobotStopped();
   }
 
   public boolean wasInterrupted(){

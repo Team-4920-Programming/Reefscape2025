@@ -27,7 +27,7 @@ public class Cmd_SeqScoreRight extends SequentialCommandGroup {
     // Add your commands in the addCommands() call, e.g.
     // addCommands(new FooCommand(), new BarCommand());
     addCommands(new CmdT_MoveToLevel(Coral_SS),
-      new CmdA_DriveToReefPositionV2(Drive_SS,2).withTimeout(3),
+      new CmdT_DriveToReefPositionV2(Drive_SS,2).withTimeout(7),
       new CmdT_CoralOutTake(Coral_SS),
       new Reef_MarkOurs(Reef_SS, 1),
       new CmdT_DriveToReefPosition(Drive_SS,4),

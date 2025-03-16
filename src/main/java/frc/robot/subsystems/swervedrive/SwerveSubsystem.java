@@ -111,6 +111,7 @@ public class SwerveSubsystem extends SubsystemBase
   public boolean DH_In_InRightCoralZone = false;
   public Pose2d DH_In_ClosestReefSegment;
   public Pose2d DH_In_ReefPose;
+  public Pose2d DH_In_ClosestPickupSlot;
   public int DH_Out_ReefSegment = 0;
   public double DH_Out_ReefDistance = 0;
   public boolean DH_OUT_isBlueAlliance = false;
@@ -229,6 +230,10 @@ public class SwerveSubsystem extends SubsystemBase
   public Pose2d GetClosestReefSegment(){
     return DH_In_ClosestReefSegment;
   }
+  public Pose2d GetClosestPickupSlot(){
+    return DH_In_ClosestPickupSlot;
+  }
+
   /**
    * Construct the swerve drive.
    *
@@ -518,6 +523,9 @@ private void ProcessVision4920()
   }
   public void stopCIntake(){
         CintakeSimulation.stopIntake();
+  }
+  public boolean isRobotStopped(){
+    return Math.abs(getFieldVelocity().vxMetersPerSecond) <= 0.2 && Math.abs(getFieldVelocity().vyMetersPerSecond) <= 0.2 && Math.abs(getFieldVelocity().omegaRadiansPerSecond) <= 0.1;
   }
   public void getGamePieceFromCIntake(){
     CintakeSimulation.obtainGamePieceFromIntake();

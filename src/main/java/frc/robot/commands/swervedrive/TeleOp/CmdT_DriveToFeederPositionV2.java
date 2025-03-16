@@ -24,17 +24,15 @@ import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class CmdT_DriveToFeederPositionV2 extends Command {
   SwerveSubsystem DriveSS;
-  DataHighwaySubsystem DataSS;
   Pose2d targetPose;
   PIDController XPID = new PIDController(2.0, 0, 0.02);
   PIDController YPID = new PIDController(2.0, 0, 0.02);
-  PIDController RotPID = new PIDController(0.15,0,0);
+  PIDController RotPID = new PIDController(0.1,0,0);
   double minSpeed = 0.3;
   boolean inter;
-  public CmdT_DriveToFeederPositionV2(SwerveSubsystem DriveSubsystem, DataHighwaySubsystem DataSubsystem) {
+  public CmdT_DriveToFeederPositionV2(SwerveSubsystem DriveSubsystem) {
     // Use addRequirements() here to declare subsystem dependencies.
     DriveSS = DriveSubsystem;
-    DataSS = DataSubsystem;
     addRequirements(DriveSS);
   }
 
@@ -43,7 +41,7 @@ public class CmdT_DriveToFeederPositionV2 extends Command {
   public void initialize() {
     double distanceFromFace = Units.inchesToMeters(19);
     inter = false;
-    Pose2d targetPickupSlot = DataSS.getClosestPickupSlot();
+    Pose2d targetPickupSlot = DriveSS.GetClosestPickupSlot();
 
     // double CenterofReefX = 4.5;
     // double CenterofReefY = 4.0;
