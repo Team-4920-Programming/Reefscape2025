@@ -18,7 +18,7 @@ import frc.robot.LimelightHelpers.RawDetection;
 
 public class ReefSurveySubsystem extends SubsystemBase {
 
-  public int[][] ReefScoreTracker = new int[3][12];
+  public int[][] ReefScoreTracker = new int[4][12];
   private int scorethreshold = 1;
   public int DH_In_ReefSegment = 0;
   public int DH_In_ScoreSelection = 0;
@@ -30,11 +30,13 @@ public class ReefSurveySubsystem extends SubsystemBase {
     
   }
 
-  public void ScoreReef(int i, int j){
-    ReefScoreTracker[i][j] += 1;
+  public void ScoreReef(int l, int b){
+    System.out.println ( "ReefScore" + ReefScoreTracker[l][b] + " " + l + " " +b);
+    ReefScoreTracker[l][b] += 1;
   }
 
   public boolean IsReefLocScored(int i, int j){
+    //System.out.println ( "ReefScore" + ReefScoreTracker[i][j] + " " + i + " " +j);
     return ReefScoreTracker[i][j] >= scorethreshold;
   }
   public char getReefDataScoredChar(int i, int j)

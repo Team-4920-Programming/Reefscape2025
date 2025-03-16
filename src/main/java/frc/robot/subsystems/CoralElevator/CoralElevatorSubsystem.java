@@ -427,6 +427,10 @@ public class CoralElevatorSubsystem extends SubsystemBase {
     SmartDashboard.putNumber("IntakeSpeedCmd", speed);
   }
 
+  public boolean isIntakeRunning() {
+    return CoralIntakeMotor.get() > 0;
+  }
+
   public void MatchSetup(){
       if(!DH_In_RedZone){
       ElevatorPID.setSetpoint(CoralStation.height);

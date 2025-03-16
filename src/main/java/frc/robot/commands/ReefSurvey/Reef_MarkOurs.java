@@ -4,6 +4,7 @@
 
 package frc.robot.commands.ReefSurvey;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.ReefSurvey.ReefSurveySubsystem;
 
@@ -24,16 +25,21 @@ public class Reef_MarkOurs extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    Rlevel = Reef_SS.DH_In_ScoreSelection;
+    Rlevel = Reef_SS.DH_In_ScoreSelection-1;
     Rseg = Reef_SS.DH_In_ReefSegment;
-
-    int pos = Rside + Rseg *6;
-    if (pos < 12 && Rlevel < 3)
-   {
+    System.out.println ("Reef score ls"+Rlevel + " " +Rseg);
+    SmartDashboard.putNumber("Rlevel", Rlevel);
+    SmartDashboard.putNumber("Rseg", Rseg);
+    //pos 0 to 11
+    int pos = Rside + Rseg*2;
+    if (pos < 12 && pos >=0 && Rlevel >= 0 && Rlevel <= 3)
+   {  System.out.println ("Reef score lp"+Rlevel + " " +pos);
      //call three times to set threshold high enough
      Reef_SS.ScoreReef(Rlevel, pos);
      Reef_SS.ScoreReef(Rlevel, pos);
      Reef_SS.ScoreReef(Rlevel, pos);
+     SmartDashboard.putNumber("Scorepos", pos);
+     
    }
   }
 

@@ -33,7 +33,7 @@ public class Cmd_SeqScoreLeft extends SequentialCommandGroup {
       new CmdA_DriveToReefPositionV2(Drive_SS,1).withTimeout(3),
       new CmdT_UltrasonicCheck(Coral_SS),
       new CmdT_CoralOutTake(Coral_SS),
-      new Reef_MarkOurs(Reef_SS, 1),
+      new Reef_MarkOurs(Reef_SS, 0),
       new CmdT_DriveToReefPosition(Drive_SS,4),
       new CmdT_Station(Coral_SS),
       new CmdT_EnableAutoAim(Drive_SS));

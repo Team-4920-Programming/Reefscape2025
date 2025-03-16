@@ -306,7 +306,7 @@ public class RobotContainer
 
   drivebase.setDefaultCommand(driveFieldOrientedAnglularVelocity); // Overrides drive command above!
   CoralElevatorSS.setDefaultCommand(new CmdT_Def_Elevator(CoralElevatorSS));
-  ClimberSS.setDefaultCommand(new CmdT_ClimberIn(ClimberSS));
+  // ClimberSS.setDefaultCommand(new CmdT_ClimberIn(ClimberSS));
 
   //Driver Controller
   driverXbox.leftTrigger().whileTrue(new Cmd_SeqScoreLeft(CoralElevatorSS, drivebase, ReefSurveySS));
@@ -320,22 +320,31 @@ public class RobotContainer
   driverXbox.x().whileTrue(new CmdT_CoralIntake(CoralElevatorSS ));
   driverXbox.y().whileTrue(new CmdT_CoralOutTake(CoralElevatorSS ));
 
-  // driverXbox.a().whileTrue(new CmdT_DriveToFeederPosition(drivebase));
+  driverXbox.a().whileTrue(new CmdT_DriveToFeederPosition(drivebase));
   driverXbox.b().whileTrue(new CmdT_DriveToReefPositionV3(drivebase, 2));
 
-
+  // Button 1: Abort climb
   OperatorJoystick.button(1 ).whileTrue(new CmdT_ClimberIn(ClimberSS));
+  // Button 2: Setup Climb
   OperatorJoystick.button(2 ).whileTrue(new Cmd_SeqClimb(drivebase,ClimberSS));
+  // Button 3: Climb
   OperatorJoystick.button(3 ).whileTrue(new CmdT_RunClimberIn(ClimberSS));
   
+  // Button 4: Station
   OperatorJoystick.button(4).whileTrue(new CmdT_Station(CoralElevatorSS));
+  // Button 5: L4
   OperatorJoystick.button(5).whileTrue(new CmdT_Level4(CoralElevatorSS));
+  // Button 6: L3
   OperatorJoystick.button(6).whileTrue(new CmdT_Level3(CoralElevatorSS));
+  // Button 8: L2
   OperatorJoystick.button(8).whileTrue(new CmdT_Level2(CoralElevatorSS));
+  // Button 9: L1
   OperatorJoystick.button(9).whileTrue(new CmdT_Level1(CoralElevatorSS));
 
-  OperatorJoystick.button(7).whileTrue(new Cmd_SeqRemoveLowAlgea(CoralElevatorSS, drivebase));
-  OperatorJoystick.button(10).whileTrue(new Cmd_SeqRemoveHighAlgea(CoralElevatorSS, drivebase));
+  // Button 11: High Algae
+  OperatorJoystick.button(12).whileTrue(new Cmd_SeqRemoveLowAlgea(CoralElevatorSS, drivebase));
+  // Button 12: High Algae
+  OperatorJoystick.button(11).whileTrue(new Cmd_SeqRemoveHighAlgea(CoralElevatorSS, drivebase));
 
 
   ReefJoystick.button(1).whileTrue(new CmdT_LevelSelect(CoralElevatorSS, 1));

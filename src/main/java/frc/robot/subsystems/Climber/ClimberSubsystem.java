@@ -107,15 +107,17 @@ public class ClimberSubsystem extends SubsystemBase {
    // System.out.println(climberAngle);
     if (climberOut)
     {
-      //System.out.println("Climber Out");
+      System.out.println("Climber Out");
+      System.out.println("ClimberAnagle" + climberAngle);
       if((climberAngle <160 || climberAngle> 300) && !ClimberIdle)
       {
         ClimberPivot.set(0.1);
-        //System.out.println("Climber Spd 0.05");
+        System.out.println("Climber Spd 0.1");
       }
-      else 
+      else
       {
         ClimberPivot.set(0);
+        System.out.println("Climber Spd 0");
       }
     }
       if (!climberOut)
@@ -140,6 +142,7 @@ public class ClimberSubsystem extends SubsystemBase {
     ClimberPivotConfig.idleMode(IdleMode.kBrake);  
     ClimberPivot.configure(ClimberPivotConfig, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
     climberOut = true;
+    ClimberIdle = false;
   }
   public void ClimberIn()
   {

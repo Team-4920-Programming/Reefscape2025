@@ -26,7 +26,7 @@ public class CmdT_ClimberOut extends Command {
   @Override
   public void execute() {
     Climber_SS.ClimberOut();
-    Climber_SS.SetRightFlap(60);
+    Climber_SS.SetRightFlap(62);
   }
 
   // Called once the command ends or is interrupted.

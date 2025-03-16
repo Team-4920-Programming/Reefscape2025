@@ -133,7 +133,7 @@ public class DataHighwaySubsystem extends SubsystemBase {
     {
       white.applyTo(m_ledBuffer);
     }
-    else if(!hasCoral && (inCoralStationPickupZone)){
+    else if(!hasCoral && inCoralStationPickupZone && Coral_SS.isIntakeRunning()){
       CoralRainbow.applyTo(m_ledBuffer);
     }
     else{
