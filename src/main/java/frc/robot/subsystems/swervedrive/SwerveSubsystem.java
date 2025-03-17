@@ -117,6 +117,7 @@ public class SwerveSubsystem extends SubsystemBase
   public boolean DH_OUT_isBlueAlliance = false;
   public boolean DH_OUT_isRedAlliance = false;
   public boolean DH_Out_AtCoralStation = false;
+  public boolean DH_Out_isAutoAimEnabled = true;
 
   public Pose2d DH_In_LeftCoralPose;
   public Pose2d DH_In_RightCoralPose;
@@ -282,6 +283,7 @@ public class SwerveSubsystem extends SubsystemBase
 
     DH_OUT_isRedAlliance = isRedAlliance();
     DH_OUT_isBlueAlliance = !isRedAlliance();
+    DH_Out_isAutoAimEnabled = isAutoAim();
   }
   public int getReefSegment()
 {

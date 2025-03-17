@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.LEDPattern;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.FieldObject2d;
@@ -23,6 +24,7 @@ import frc.robot.subsystems.ReefSurvey.ReefSurveySubsystem;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 
 import static edu.wpi.first.units.Units.Rotation;
+import static edu.wpi.first.units.Units.Seconds;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -53,6 +55,7 @@ public class DataHighwaySubsystem extends SubsystemBase {
   private boolean InCoralSationZone = false;
   private boolean AtCoralStation = false;
   private boolean isRedAlliance = false;
+  private boolean isAutoAimEnabled = true;
   private Pose3d LeftCoralStationPose = new Pose3d();
   private Pose3d RightCoralStationPose = new Pose3d();
   private Pose2d ReefPose = new Pose2d();
@@ -132,20 +135,50 @@ public class DataHighwaySubsystem extends SubsystemBase {
     DogLog.log("Zones/RightCoralPose", RightCoralStationPose);
     
     if (inReefRedZone || inCageRedZone || inCoralStationRedZone){
-      red.applyTo(m_ledBuffer);
+      if(isAutoAimEnabled){
+        red.applyTo(m_ledBuffer);
+      }
+      else{
+        LEDPattern p = red.blink(Seconds.of(1), Seconds.of(1));
+        p.applyTo(m_ledBuffer);
+      }
     }
     else if(inReefYellowZone){
-      yellow.applyTo(m_ledBuffer);
+      if(isAutoAimEnabled){
+        yellow.applyTo(m_ledBuffer);
+      }
+      else{
+        LEDPattern p = yellow.blink(Seconds.of(1), Seconds.of(1));
+        p.applyTo(m_ledBuffer);
+      }
     }
     else if(hasCoral)
     {
-      white.applyTo(m_ledBuffer);
+      if(isAutoAimEnabled){
+        white.applyTo(m_ledBuffer);
+      }
+      else{
+        LEDPattern p = white.blink(Seconds.of(1), Seconds.of(1));
+        p.applyTo(m_ledBuffer);
+      }
     }
     else if(!hasCoral && inCoralStationPickupZone && Coral_SS.isIntakeRunning()){
-      CoralRainbow.applyTo(m_ledBuffer);
+      if(isAutoAimEnabled){
+        CoralRainbow.applyTo(m_ledBuffer);
+      }
+      else{
+        LEDPattern p = CoralRainbow.blink(Seconds.of(1), Seconds.of(1));
+        p.applyTo(m_ledBuffer);
+      }
     }
     else{
-      green.applyTo(m_ledBuffer);
+      if(isAutoAimEnabled){
+        green.applyTo(m_ledBuffer);
+      }
+      else{
+        LEDPattern p = green.blink(Seconds.of(1), Seconds.of(1));
+        p.applyTo(m_ledBuffer);
+      }
     }
 
     SmartDashboard.putBoolean("inReefRedZone", inReefRedZone);
@@ -232,6 +265,7 @@ public class DataHighwaySubsystem extends SubsystemBase {
     ReefSegment = Drive_SS.DH_Out_ReefSegment;   
     AtCoralStation = Drive_SS.DH_Out_AtCoralStation; 
     isRedAlliance = Drive_SS.DH_OUT_isRedAlliance;
+    isAutoAimEnabled = Drive_SS.DH_Out_isAutoAimEnabled;
   }
   private void setDriveData(){
     Drive_SS.DH_In_HasCoral = hasCoral;
