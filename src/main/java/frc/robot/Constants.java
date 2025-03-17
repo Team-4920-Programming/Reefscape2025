@@ -255,6 +255,11 @@ public final class Constants
       public static final double elbow =2; //degrees
       public static final double height = 0.12; //meters
   }
+  public static class WristEject {
+    public static final double wrist = 45; //degrees //-202
+    public static final double elbow =2; //degrees
+    public static final double height = 0.12; //meters
+}
   public static class Level1 {
     public static final double wrist = 30; //degrees
     public static final double elbow =1; //degrees
@@ -381,6 +386,18 @@ public static class ArmNeutral {
     }
     
   }
+
+  public static class RobotAutomationInformation {
+    public static class AutoAlignReef{
+      public static final double branchOffset = Units.inchesToMeters(6.5);
+      public static final double distanceFromFace = Units.inchesToMeters(18.375);
+    }
+    public static class AutoAlignCoralFeederStation{
+      public static final double distanceFromFace = Units.inchesToMeters(19);
+    }
+  }
+
+  
   public static class Vision4920 {
     public static final String kGreyFeederCam = "GreyFeederCam";
     public static final String kGreyReefCam = "GreyReefCam";

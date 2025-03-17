@@ -66,9 +66,9 @@ public class CmdA_DriveToReefPositionV2 extends Command {
 
       targetPose = targetAprilTagPose.plus(test);
 
-      System.out.println("target Pose = " + targetPose.toString());
-      System.out.println("target April Tag Pose = " + targetAprilTagPose.toString());
-      System.out.println("transform = " + test.toString());
+      //System.out.println("target Pose = " + targetPose.toString());
+      //System.out.println("target April Tag Pose = " + targetAprilTagPose.toString());
+      //System.out.println("transform = " + test.toString());
 
     }
     if (branch == 2){
@@ -78,9 +78,9 @@ public class CmdA_DriveToReefPositionV2 extends Command {
 
       targetPose = targetAprilTagPose.plus(test);
 
-      System.out.println("target Pose = " + targetPose.toString());
-      System.out.println("target April Tag Pose = " + targetAprilTagPose.toString());
-      System.out.println("transform = " + test.toString());
+      //System.out.println("target Pose = " + targetPose.toString());
+      //System.out.println("target April Tag Pose = " + targetAprilTagPose.toString());
+      //System.out.println("transform = " + test.toString());
     }
     
   //   double ReefRadius = Units.inchesToMeters(65.5)/2;
@@ -92,9 +92,9 @@ public class CmdA_DriveToReefPositionV2 extends Command {
   //   double RobotOffset = Units.inchesToMeters(15); 
     
   //   double offsetAng = 0;
-  //   System.out.println("Initializing Drive to Reef *****************");
+  //   //System.out.println("Initializing Drive to Reef *****************");
   //   int ReefSegment = DriveSS.getReefSegment();
-  //   System.out.println("ReefSegment" + ReefSegment);
+  //   //System.out.println("ReefSegment" + ReefSegment);
   //   if (Reef_Position ==1)
   //     offsetAng = LeftOffsetAng;
   //   if (Reef_Position == 2)
@@ -173,15 +173,15 @@ public class CmdA_DriveToReefPositionV2 extends Command {
     DogLog.log("Reef YPID current", CurrentY);
     
    
-    System.out.println("Driving toReef");
+    //System.out.println("Driving toReef");
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
     DriveSS.drive(new ChassisSpeeds(0,0,0));
-    System.out.println("DrivetoReef Finished");
-    System.out.println("interrupted"+interrupted);
+    //System.out.println("DrivetoReef Finished");
+    //System.out.println("interrupted"+interrupted);
     inter = interrupted;
     
   }

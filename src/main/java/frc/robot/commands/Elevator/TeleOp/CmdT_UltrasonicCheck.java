@@ -25,7 +25,7 @@ public class CmdT_UltrasonicCheck extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    System.out.println("checking ultrasonic");
+    //System.out.println("checking ultrasonic");
     int targetScore = css.GetScoreSelection();
     
     if(targetScore == 4){

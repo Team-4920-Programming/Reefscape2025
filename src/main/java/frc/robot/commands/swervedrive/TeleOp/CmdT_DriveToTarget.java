@@ -17,67 +17,94 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.Constants.RobotAutomationInformation.AutoAlignCoralFeederStation;
+import frc.robot.Constants.RobotAutomationInformation.AutoAlignReef;
 import frc.robot.subsystems.DataHighway.DataHighwaySubsystem;
+import frc.robot.subsystems.DataHighway.DataHighwaySubsystem.Target;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
-public class CmdT_DriveToReefPositionV2 extends Command {
+public class CmdT_DriveToTarget extends Command {
 
   Integer branch;
  
   SwerveSubsystem DriveSS;
-  Pose2d ReefPose;
+  DataHighwaySubsystem DataSS;
   Pose2d targetPose;
+  double maxZoom;
   PIDController XPID = new PIDController(2.0, 0, 0.02);
   PIDController YPID = new PIDController(2.0, 0, 0.02);
   PIDController RotPID = new PIDController(0.15,0,0);
   double minSpeed = 0.3;
   boolean inter;
-  public CmdT_DriveToReefPositionV2(SwerveSubsystem DriveSubsystem, int Position) {
+  Target whereAmIGoing;
+  int option;
+  public CmdT_DriveToTarget(SwerveSubsystem DriveSubsystem, Target t, double maxSpeed, int o) {
     // Use addRequirements() here to declare subsystem dependencies.
-    branch = Position;
+    whereAmIGoing = t;
     DriveSS = DriveSubsystem;
     addRequirements(DriveSS);
+    maxZoom = maxSpeed;
+    option = o;
   }
 
   // Called when the command is initially scheduled.
+
+  //  public enum Target{
+  //   ClosestPickupSlot,
+  //   ClosestReefSegment,
+  //   CLIMBSTART,
+  // } 
+
   @Override
   public void initialize() {
 
-    double branchoffset = Units.inchesToMeters(6.5);//7.825
-    double distanceFromFace = Units.inchesToMeters(18.375);
-    inter = false;
-    Pose2d targetAprilTagPose = DriveSS.GetClosestReefSegment();
+    DriveSS.DisableAutoAim();
 
-    targetPose = new Pose2d();
-    targetPose = targetAprilTagPose;
-    if (branch == 1){
-
-      Transform2d test = new Transform2d(distanceFromFace, -branchoffset
-      ,new Rotation2d(0));
-
-      targetPose = targetAprilTagPose.plus(test);
-
-      //System.out.println("target Pose = " + targetPose.toString());
-      //System.out.println("target April Tag Pose = " + targetAprilTagPose.toString());
-      //System.out.println("transform = " + test.toString());
+    if (whereAmIGoing == Target.ClosestPickupSlot){
+      
+      Pose2d tmp = DriveSS.GetClosestPickupSlot();
+      Transform2d translation = new Transform2d(AutoAlignCoralFeederStation.distanceFromFace, 0, new Rotation2d(180));
+      targetPose = tmp.plus(translation);
 
     }
-    if (branch == 2){
+    else if (whereAmIGoing == Target.ClosestReefSegment){
 
-      Transform2d test = new Transform2d(distanceFromFace, branchoffset
-      ,new Rotation2d(0));
+      Pose2d tmp = DriveSS.GetClosestReefSegment();
 
-      targetPose = targetAprilTagPose.plus(test);
+      if (option == 1){
 
-      //System.out.println("target Pose = " + targetPose.toString());
-      //System.out.println("target April Tag Pose = " + targetAprilTagPose.toString());
-      //System.out.println("transform = " + test.toString());
+        Transform2d test = new Transform2d(AutoAlignReef.distanceFromFace, -AutoAlignReef.branchOffset
+        ,new Rotation2d(0));
+  
+        targetPose = tmp.plus(test);
+  
+      }
+      if (option == 2){
+  
+        Transform2d test = new Transform2d(AutoAlignReef.distanceFromFace, AutoAlignReef.branchOffset
+        ,new Rotation2d(0));
+  
+        targetPose = tmp.plus(test);
+      }
+      
+
     }
+    else if (whereAmIGoing == Target.CLIMBSTART){
 
-    DogLog.log("ReefScore/ReefPose", targetPose);
+      if (DriveSS.DH_OUT_isRedAlliance){
+        targetPose = new Pose2d(10.438,2.952, new Rotation2d((Units.degreesToRadians(0))));
+      }
+      else{
+        targetPose = new Pose2d(7.11,5.1, new Rotation2d((Units.degreesToRadians(180))));
+      }
 
+    }
+    
+    DogLog.log ("DriveToTarget/Target", whereAmIGoing);
+    DogLog.log ("DriveToTarget/TargetPose", targetPose);
+    DogLog.log("DriveToTarget/CurrentPose", DriveSS.getPose());
 
     XPID.setTolerance(0.02);
     YPID.setTolerance(0.02);
@@ -147,31 +174,26 @@ public class CmdT_DriveToReefPositionV2 extends Command {
 
   DriveSS.drive(new Translation2d(XVel,YVel),RotVel,true);
 
-  DogLog.log("ReefScore/XPIDval",XVel);
-  DogLog.log("ReefScore/YPIDval",YVel);
-  DogLog.log("ReefScore/RotPIDval",RotVel);
-  DogLog.log("Reef XPID current", CurrentX);
-  DogLog.log("Reef YPID current", CurrentY);
-  DogLog.log("ReefScore/CurrentRobotPose",DriveSS.getPose());
-
-   
-    //System.out.println("Driving toReef");
+    DogLog.log("DriveToTarget/XPIDval",XVel);
+    DogLog.log("DriveToTarget/YPIDval",YVel);
+    DogLog.log("DriveToTarget/RotPIDval",RotVel);
+    DogLog.log("DriveToTarget/CurrentRobotPose",DriveSS.getPose());
+    DogLog.log("DriveToTarget/CurrentRobotPoseRotation",DriveSS.getPose().getRotation().getDegrees());
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
     DriveSS.drive(new ChassisSpeeds(0,0,0));
-    //System.out.println("DrivetoReef Finished");
-    DogLog.log("ReefScore/FinalPose",DriveSS.getPose());
-    DogLog.log("ReefScore/FinalPoseRotation",DriveSS.getPose().getRotation().getDegrees());
-    //System.out.println("interrupted"+interrupted);
+
+    DogLog.log("DriveToTarget/FinalPose",DriveSS.getPose());
+    DogLog.log("DriveToTarget/FinalPoseRotation",DriveSS.getPose().getRotation().getDegrees());
     inter = interrupted;
-    DogLog.log("ReefScore/IsStopped", DriveSS.isRobotStopped());
-    DogLog.log("ReefScore/Interrupted", inter);
-    DogLog.log("ReefScore/RobotXvel",DriveSS.getFieldVelocity().vxMetersPerSecond);
-    DogLog.log("ReefScore/RobotYvel",DriveSS.getFieldVelocity().vyMetersPerSecond);
-    DogLog.log("ReefScore/RobotRotvel",DriveSS.getFieldVelocity().omegaRadiansPerSecond);
+    DogLog.log("DriveToTarget/IsStopped", DriveSS.isRobotStopped());
+    DogLog.log("DriveToTarget/Interrupted", inter);
+    DogLog.log("DriveToTarget/RobotXvel",DriveSS.getFieldVelocity().vxMetersPerSecond);
+    DogLog.log("DriveToTarget/RobotYvel",DriveSS.getFieldVelocity().vyMetersPerSecond);
+    DogLog.log("DriveToTarget/RobotRotvel",DriveSS.getFieldVelocity().omegaRadiansPerSecond);
     
   }
 

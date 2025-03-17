@@ -153,10 +153,10 @@ public class SwerveSubsystem extends SubsystemBase
     //  The gear ratio is 6.75 motor revolutions per wheel rotation.
     //  The encoder resolution per motor revolution is 1 per motor revolution.
     double driveConversionFactor = SwerveMath.calculateMetersPerRotation(Units.inchesToMeters(3), 3.95);
-    System.out.println("\"conversionFactors\": {");
-    System.out.println("\t\"angle\": {\"factor\": " + angleConversionFactor + " },");
-    System.out.println("\t\"drive\": {\"factor\": " + driveConversionFactor + " }");
-    System.out.println("}");
+    //System.out.println("\"conversionFactors\": {");
+    //System.out.println("\t\"angle\": {\"factor\": " + angleConversionFactor + " },");
+    //System.out.println("\t\"drive\": {\"factor\": " + driveConversionFactor + " }");
+    //System.out.println("}");
 
     // Configure the Telemetry before creating the SwerveDrive to avoid unnecessary objects being created.
     SwerveDriveTelemetry.verbosity = TelemetryVerbosity.HIGH;
@@ -667,7 +667,7 @@ private void ProcessVision4920()
   public Command driveToPose(Pose2d pose)
   {
 // Create the constraints to use while pathfinding
-    System.out.println("PathPlanner");
+    //System.out.println("PathPlanner");
     PathConstraints constraints = new PathConstraints(
         swerveDrive.getMaximumChassisVelocity()*.05, 4.0,
         swerveDrive.getMaximumChassisAngularVelocity(), Units.degreesToRadians(720));
@@ -942,7 +942,7 @@ private void ProcessVision4920()
     double RobotOffset = Units.inchesToMeters(15); 
     double CurrentRot = getPose().getRotation().getDegrees();
     double offsetAng = 0;
-    //  System.out.println("Initializing Drive to Reef *****************");
+    //  //System.out.println("Initializing Drive to Reef *****************");
     int ReefSegment = getReefSegment();
   
      double Reefrot = ReefSegment * 60;

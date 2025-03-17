@@ -67,8 +67,8 @@ public class CmdT_DriveToFeederPosition extends Command {
     double TargetRot=0;
     double RobotOffsetX = Units.inchesToMeters(8); //38.6cm
     double RobotOffsetY = Units.inchesToMeters(10.5);
-    System.out.println("Initializing Drive to Feeder *****************");
-    System.out.println("blue Alliance"+ DriveSS.DH_OUT_isBlueAlliance);
+    //System.out.println("Initializing Drive to Feeder *****************");
+    //System.out.println("blue Alliance"+ DriveSS.DH_OUT_isBlueAlliance);
 
     if (CurrentLocation.getX() < 2.5 && CurrentLocation.getY() < 2.5 && DriveSS.DH_OUT_isBlueAlliance)
     {
@@ -216,7 +216,7 @@ public class CmdT_DriveToFeederPosition extends Command {
     closest = Math.min(closest, DistanceS5);
     closest = Math.min(closest, DistanceS6);
     closest = Math.min(closest, DistanceS7);
-    System.out.println("closest " + closest );
+    //System.out.println("closest " + closest );
 
     if (DistanceS1 == closest)
     {
@@ -288,22 +288,22 @@ public class CmdT_DriveToFeederPosition extends Command {
     DogLog.log("Yvel",YVel);
     DogLog.log("Rotvel",RotVel);
     DogLog.log("FeederPose", FeederPose);
-    //System.out.println("Driving toFeeder");
+    ////System.out.println("Driving toFeeder");
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
     DriveSS.drive(new ChassisSpeeds(0,0,0));
-    System.out.println("DrivetoFeeder Finished");
-    System.out.println ("XPID" + XPID.atSetpoint());
-    System.out.println ("YPID" + YPID.atSetpoint());
-    System.out.println ("RotPID" + RotPID.atSetpoint());
+    //System.out.println("DrivetoFeeder Finished");
+    //System.out.println ("XPID" + XPID.atSetpoint());
+    //System.out.println ("YPID" + YPID.atSetpoint());
+    //System.out.println ("RotPID" + RotPID.atSetpoint());
     
     if (XPID.atSetpoint() & YPID.atSetpoint() & RotPID.atSetpoint())
     {
       
-      System.out.println("At CoralStation");
+      //System.out.println("At CoralStation");
         DriveSS.DH_Out_AtCoralStation = true;
     }
 

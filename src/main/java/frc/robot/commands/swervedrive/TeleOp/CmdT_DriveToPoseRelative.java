@@ -100,15 +100,15 @@ public class CmdT_DriveToPoseRelative extends Command {
     DogLog.log("Reef YPID current", CurrentY);
     
    
-    System.out.println("We be climbin'");
+    //System.out.println("We be climbin'");
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
     DriveSS.drive(new ChassisSpeeds(0,0,0));
-    System.out.println("DrivetoReef Finished");
-    System.out.println("interrupted"+interrupted);
+    //System.out.println("DrivetoReef Finished");
+    //System.out.println("interrupted"+interrupted);
     inter = interrupted;
     
   }

@@ -36,13 +36,13 @@ public class CmdT_MoveToLevel extends Command {
   @Override
   public void execute() {
     
-    System.out.println("Moving to Level");
+    //System.out.println("Moving to Level");
     if (Coral_SS.DH_In_YellowZone)
     {
-      System.out.println("Moving to Level (In yellow)");
+      //System.out.println("Moving to Level (In yellow)");
       if (Coral_SS.GetScoreSelection() ==1)
       {
-        System.out.println("Moving to Level 1");
+        //System.out.println("Moving to Level 1");
         //CmdT_Level1 GoLevel1 = new CmdT_Level1(Coral_SS);
         //GoLevel1.schedule();
         TargetHeight = Level1.height;
@@ -51,7 +51,7 @@ public class CmdT_MoveToLevel extends Command {
       }
       if (Coral_SS.GetScoreSelection() ==2)
       {
-        System.out.println("Moving to Level 2");
+        //System.out.println("Moving to Level 2");
         //dT_Level2 GoLevel2 = new CmdT_Level2(Coral_SS);
         //GoLevel2.schedule();
         TargetHeight = Level2.height;
@@ -60,7 +60,7 @@ public class CmdT_MoveToLevel extends Command {
       }
       if (Coral_SS.GetScoreSelection() ==3)
       {
-        System.out.println("Moving to Level 3");
+        //System.out.println("Moving to Level 3");
         //CmdT_Level3 GoLevel3 = new CmdT_Level3(Coral_SS);
         //GoLevel3.schedule();
         TargetHeight = Level3.height;
@@ -69,7 +69,7 @@ public class CmdT_MoveToLevel extends Command {
       }
       if (Coral_SS.GetScoreSelection() ==4)
       {
-        System.out.println("Moving to Level 4");
+        //System.out.println("Moving to Level 4");
         //CmdT_Level4 GoLevel4 = new CmdT_Level4(Coral_SS);
         //GoLevel4.schedule();
         TargetHeight = Level4.height;
@@ -83,7 +83,7 @@ public class CmdT_MoveToLevel extends Command {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    System.out.println("Move to Level End");
+    //System.out.println("Move to Level End");
   }
 
   // Returns true when the command should end.
@@ -93,15 +93,15 @@ public class CmdT_MoveToLevel extends Command {
     if (!Coral_SS.DH_In_YellowZone)
     {
       finished = true;
-      System.out.println("Not in yellow finish command");
+      //System.out.println("Not in yellow finish command");
     } 
-    System.out.println("ElevatorPs" + Math.abs(Coral_SS.getHeightLaserMeters() - TargetHeight));
-    System.out.println("Elbow" +Math.abs(Coral_SS.GetElbowAngle() - TargetElbowAng));
-    System.out.println("Wrist"+Math.abs(Coral_SS.GetWristAngleWorldCoordinates() - TargetWristAng));
+    //System.out.println("ElevatorPs" + Math.abs(Coral_SS.getHeightLaserMeters() - TargetHeight));
+    //System.out.println("Elbow" +Math.abs(Coral_SS.GetElbowAngle() - TargetElbowAng));
+    //System.out.println("Wrist"+Math.abs(Coral_SS.GetWristAngleWorldCoordinates() - TargetWristAng));
     if  ((Math.abs(Coral_SS.getHeightLaserMeters() - TargetHeight) < 0.1) && (Math.abs(Coral_SS.GetElbowAngle() - TargetElbowAng) < 5) && (Math.abs(Coral_SS.GetWristAngleWorldCoordinates() - TargetWristAng) < 5))
   {
       finished = true;
-      System.out.println("At Position finish command");
+      //System.out.println("At Position finish command");
   }
 
     return finished;

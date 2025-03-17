@@ -82,6 +82,13 @@ public class DataHighwaySubsystem extends SubsystemBase {
     feederStationPoses.add(new Pose2d().kZero);
   }
 
+  
+  public enum Target{
+    ClosestPickupSlot,
+    ClosestReefSegment,
+    CLIMBSTART,
+  }
+
   @Override
   public void periodic() {
 

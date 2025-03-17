@@ -104,29 +104,29 @@ public class ClimberSubsystem extends SubsystemBase {
     SmartDashboard.putNumber("ClimberEncoder", climberAngleEncoder.getPosition());
       rightFlapOutput = -MathUtil.clamp(rightFlapOutput, -.1, .1);
     CoralFlapRight.set(rightFlapOutput); //move to climber SS and only PID if we are setting up for a climb
-   // System.out.println(climberAngle);
+   // //System.out.println(climberAngle);
     if (climberOut)
     {
-      System.out.println("Climber Out");
-      System.out.println("ClimberAnagle" + climberAngle);
+      // //System.out.println("Climber Out");
+      // //System.out.println("ClimberAnagle" + climberAngle);
       if((climberAngle <160 || climberAngle> 300) && !ClimberIdle)
       {
         ClimberPivot.set(0.1);
-        System.out.println("Climber Spd 0.1");
+        // //System.out.println("Climber Spd 0.1");
       }
       else
       {
         ClimberPivot.set(0);
-        System.out.println("Climber Spd 0");
+        // //System.out.println("Climber Spd 0");
       }
     }
       if (!climberOut)
     {
-     // System.out.println("Climber In");
+     // //System.out.println("Climber In");
       if(climberAngle >10 && climberAngle <170 && !ClimberIdle)
       {
         ClimberPivot.set(-0.1);
-        //System.out.println("Climber Spd -0.05");
+        ////System.out.println("Climber Spd -0.05");
       }
       else 
       {
@@ -156,7 +156,7 @@ public class ClimberSubsystem extends SubsystemBase {
     ClimberIdle = true;
   }
   public void RunClimberIn(double speed){
-   // System.out.println("RunClimberIn");
+   // //System.out.println("RunClimberIn");
     ClimberPivotConfig.idleMode(IdleMode.kCoast);
     ClimberPivot.configure(ClimberPivotConfig, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
     climberMotor.set(-speed);

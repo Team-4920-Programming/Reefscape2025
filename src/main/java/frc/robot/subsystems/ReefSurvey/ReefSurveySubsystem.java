@@ -31,12 +31,12 @@ public class ReefSurveySubsystem extends SubsystemBase {
   }
 
   public void ScoreReef(int l, int b){
-    System.out.println ( "ReefScore" + ReefScoreTracker[l][b] + " " + l + " " +b);
+    ////System.out.println ( "ReefScore" + ReefScoreTracker[l][b] + " " + l + " " +b);
     ReefScoreTracker[l][b] += 1;
   }
 
   public boolean IsReefLocScored(int i, int j){
-    //System.out.println ( "ReefScore" + ReefScoreTracker[i][j] + " " + i + " " +j);
+    //////System.out.println ( "ReefScore" + ReefScoreTracker[i][j] + " " + i + " " +j);
     return ReefScoreTracker[i][j] >= scorethreshold;
   }
   public char getReefDataScoredChar(int i, int j)

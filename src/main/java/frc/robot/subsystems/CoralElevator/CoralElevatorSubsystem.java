@@ -383,11 +383,11 @@ public class CoralElevatorSubsystem extends SubsystemBase {
 
   public void SetWristAngle(double angle)
   {
-    //System.out.println("Angle = " + angle);
-    //System.out.println("GetWristAngleWorldCoordinates = " + GetWristAngleWorldCoordinates());
-    //System.out.println("CanMoveWristInc = " + CanMoveWristInc());
-    //System.out.println("CanMoveWristDec = " + CanMoveWristDec());
-    //System.out.println("GetWristAngle =" +  GetWristAngle());
+    ////System.out.println("Angle = " + angle);
+    ////System.out.println("GetWristAngleWorldCoordinates = " + GetWristAngleWorldCoordinates());
+    ////System.out.println("CanMoveWristInc = " + CanMoveWristInc());
+    ////System.out.println("CanMoveWristDec = " + CanMoveWristDec());
+    ////System.out.println("GetWristAngle =" +  GetWristAngle());
     // if (angle > GetWristAngleWorldCoordinates() && CanMoveWristInc() && !SetpointsFrozen){
     //   WristPID.setSetpoint(angle);
     // }

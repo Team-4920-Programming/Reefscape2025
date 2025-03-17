@@ -39,7 +39,7 @@ import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
-public class CmdT_DriveToReefPositionV3 extends Command {
+public class CmdT_DriveToReefPositionTesting extends Command {
 
   Integer branch;
  
@@ -51,7 +51,7 @@ public class CmdT_DriveToReefPositionV3 extends Command {
   HolonomicDriveController controller;
   List<Translation2d> waypoints;
   private Timer DriveTimer = new Timer();
-  public CmdT_DriveToReefPositionV3(SwerveSubsystem DriveSubsystem, int Position) {
+  public CmdT_DriveToReefPositionTesting(SwerveSubsystem DriveSubsystem, int Position) {
     // Use addRequirements() here to declare subsystem dependencies.
     branch = Position;
     DriveSS = DriveSubsystem;
@@ -76,9 +76,9 @@ public class CmdT_DriveToReefPositionV3 extends Command {
 
       targetPose = targetAprilTagPose.plus(test);
 
-      System.out.println("target Pose = " + targetPose.toString());
-      System.out.println("target April Tag Pose = " + targetAprilTagPose.toString());
-      System.out.println("transform = " + test.toString());
+      //System.out.println("target Pose = " + targetPose.toString());
+      //System.out.println("target April Tag Pose = " + targetAprilTagPose.toString());
+      //System.out.println("transform = " + test.toString());
 
     }
     if (branch == 2){
@@ -88,9 +88,9 @@ public class CmdT_DriveToReefPositionV3 extends Command {
 
       targetPose = targetAprilTagPose.plus(test);
 
-      System.out.println("target Pose = " + targetPose.toString());
-      System.out.println("target April Tag Pose = " + targetAprilTagPose.toString());
-      System.out.println("transform = " + test.toString());
+      //System.out.println("target Pose = " + targetPose.toString());
+      //System.out.println("target April Tag Pose = " + targetAprilTagPose.toString());
+      //System.out.println("transform = " + test.toString());
     }
 
     controller = new HolonomicDriveController(
@@ -140,7 +140,7 @@ public class CmdT_DriveToReefPositionV3 extends Command {
     DogLog.log ("DriveV3/ScoreTargetPose", targetPose);
     
    
-    System.out.println("Driving V3 toReef");
+    //System.out.println("Driving V3 toReef");
   }
 
   // Called once the command ends or is interrupted.
@@ -151,8 +151,8 @@ public class CmdT_DriveToReefPositionV3 extends Command {
     DriveTimer.stop();
     DriveTimer.reset();
     
-    System.out.println("DrivetoReef Finished");
-    System.out.println("interrupted"+interrupted);
+    //System.out.println("DrivetoReef Finished");
+    //System.out.println("interrupted"+interrupted);
     inter = interrupted;
     
   }

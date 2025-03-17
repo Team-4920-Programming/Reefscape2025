@@ -27,13 +27,13 @@ public class Reef_MarkOurs extends Command {
   public void initialize() {
     Rlevel = Reef_SS.DH_In_ScoreSelection-1;
     Rseg = Reef_SS.DH_In_ReefSegment;
-    System.out.println ("Reef score ls"+Rlevel + " " +Rseg);
+    //System.out.println ("Reef score ls"+Rlevel + " " +Rseg);
     SmartDashboard.putNumber("Rlevel", Rlevel);
     SmartDashboard.putNumber("Rseg", Rseg);
     //pos 0 to 11
     int pos = Rside + Rseg*2;
     if (pos < 12 && pos >=0 && Rlevel >= 0 && Rlevel <= 3)
-   {  System.out.println ("Reef score lp"+Rlevel + " " +pos);
+   {  //System.out.println ("Reef score lp"+Rlevel + " " +pos);
      //call three times to set threshold high enough
      Reef_SS.ScoreReef(Rlevel, pos);
      Reef_SS.ScoreReef(Rlevel, pos);
