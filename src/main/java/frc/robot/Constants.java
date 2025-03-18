@@ -276,8 +276,8 @@ public final class Constants
       public static final double height = 0.725; //meters 0.12
   }
   public static class Level4 {
-    public static final double wrist = -35; //degrees-38
-    public static final double elbow =190; //degrees 185
+    public static final double wrist = -33; //degrees-38
+    public static final double elbow =180; //degrees 185
     public static final double height = 0.725; //meters
 }
   public static class Level4_Far {
