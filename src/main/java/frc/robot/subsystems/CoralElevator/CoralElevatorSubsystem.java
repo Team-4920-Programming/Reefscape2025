@@ -664,11 +664,18 @@ public class CoralElevatorSubsystem extends SubsystemBase {
     DogLog.log("CoralElevatorSS/Wrist/CanWristInc", CanMoveWristInc());
     DogLog.log("CoralElevatorSS/Wrist/CanWirstDec", CanMoveWristDec());
 
-    DogLog.log("CoralEelvatorSS/Check/ElevatorClearToMove",ElevatorClearToMoveCheck());
+    DogLog.log("CoralElevatorSS/Check/ElevatorClearToMove",ElevatorClearToMoveCheck());
     DogLog.log("CoralElevatorSS/Check/isWristPassingThroughVertical",isWristPassingThroughVertical());
-    
+    DogLog.log("CoralElevatorSS/Check/isElevatorInRedZone", isElevatorInRedZone());
+    DogLog.log("CoralElevatorSS/Check/isElevatorPassingThroughRedZone", isElevatorPassingThroughRedZone());
     DogLog.log("CoralElevatorSS/Intake/HasCoral", isCoralPresent());
     DogLog.log("CoralElevatorSS/Intake/IntakeSpeed", CoralIntakeMotor.get());
+    DogLog.log("CoralElevatorSS/Check/ScoreSelection", ScoreSelection);
+
+    DogLog.log("CoralElevatorSS/Check/IsElevatorAtSetpoint", IsElevatorAtSetpoint());
+    DogLog.log("CoralElevatorSS/Check/IsElbowAtSetpoint", IsElbowAtSetpoint());
+    DogLog.log("CoralElevatorSS/Check/ScoreSelection", IsWristAtSetpoint());
+
     double  EmotorSpd =0;
    
       if (!ElevatorPID.atSetpoint() && ((CanMoveElevatorUp() && elevatorOutput > 0) || (CanMoveElevatorDown() && elevatorOutput < 0)))

@@ -29,12 +29,17 @@ public class CmdT_CoralOutTake extends Command {
 
   // Called when the command is initially scheduled.
   @Override
-  public void initialize() {}
+  public void initialize() {
+    DogLog.log("Tele/CoralOutTakeCmd/CommandStatus", "initialized");
+
+  }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-      BoltLogger.Log(BoltLogger.HighLog, getSubsystem(), getName(), "execute", "Executing", true);
+    DogLog.log("Tele/CoralOutTakeCmd/CommandStatus", "executing");
+
+      // BoltLogger.Log(BoltLogger.HighLog, getSubsystem(), getName(), "execute", "Executing", true);
       int i = CoralElevatorSS.GetScoreSelection();
 
       if (i == 1){
@@ -44,6 +49,8 @@ public class CmdT_CoralOutTake extends Command {
         speed = 0.75;
       }
   
+      DogLog.log("Tele/CoralOutTakeCmd/Exec/IntakeSpeed", -speed);
+
       CoralElevatorSS.setIntakeSpeed(-speed);
    
   }
@@ -51,10 +58,13 @@ public class CmdT_CoralOutTake extends Command {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
+    DogLog.log("Tele/CoralOutTakeCmd/CommandStatus", "finished");
+    DogLog.log("Tele/CoralOutTakeCmd/CommandWasInterrupted", interrupted);
+
     CoralElevatorSS.setIntakeSpeed(0.0);
-    BoltLogger.Log(BoltLogger.HighLog, getSubsystem(), getName(), "Execute", "Executing", false);
-    DogLog.log("ReefScore/PoseAtShoot",CoralElevatorSS.DH_In_RobotPose);
-    DogLog.log("ReefScore/PoseAtShootRotation",CoralElevatorSS.DH_In_RobotPose.getRotation().getDegrees());
+    // BoltLogger.Log(BoltLogger.HighLog, getSubsystem(), getName(), "Execute", "Executing", false);
+    DogLog.log("Tele/CoralOutTakeCmd/End/RobotPose",CoralElevatorSS.DH_In_RobotPose);
+    DogLog.log("Tele/CoralOutTakeCmd/End/RobotHeading",CoralElevatorSS.DH_In_RobotPose.getRotation().getDegrees());
   }
 
   // Returns true when the command should end.

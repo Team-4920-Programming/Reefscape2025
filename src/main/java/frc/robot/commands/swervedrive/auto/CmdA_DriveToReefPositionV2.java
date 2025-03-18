@@ -110,11 +110,10 @@ public class CmdA_DriveToReefPositionV2 extends Command {
   //   double y = (ReefRadius + RobotOffset) * Math.sin(Units.degreesToRadians((ReefSegment *60)+offsetAng)) + CenterofReefY;
   //   double rot = ReefSegment * 60;
   //   ReefPose = new Pose2d(x,y, Rotation2d.fromDegrees(rot));
-    DogLog.log ("ReefScore/ReefPose", targetPose);
+    DogLog.log("Auto/DriveToReefV2Cmd/CommandStatus", "initialized");
+    DogLog.log("Auto/DriveToReefV2Cmd/Init/Branch", branch);
+    DogLog.log("Auto/DriveToReefV2Cmd/Init/targetPose", targetPose);
 
-
-    
-    
     XPID.setTolerance(0.025);
     YPID.setTolerance(0.025);
     RotPID.setTolerance(0.75);
@@ -124,6 +123,9 @@ public class CmdA_DriveToReefPositionV2 extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
+    DogLog.log("Auto/DriveToReefV2Cmd/CommandStatus", "executing");
+    DogLog.log("Auto/DriveToReefV2Cmd/Exec/CurrentRobotPose", DriveSS.getPose());
+
     double CurrentX = DriveSS.getPose().getX();
     double CurrentY = DriveSS.getPose().getY();
     double CurrentRot = DriveSS.getPose().getRotation().getDegrees();
@@ -136,11 +138,16 @@ public class CmdA_DriveToReefPositionV2 extends Command {
       
       XVel = XPID.calculate(CurrentX, targetPose.getX());
       YVel = YPID.calculate(CurrentY, targetPose.getY());
+
   //   // }
     double RotVel = RotPID.calculate(CurrentRot,targetPose.getRotation().getDegrees() + 180);
     XVel = MathUtil.clamp(XVel, -3, 3);
     YVel = MathUtil.clamp(YVel, -3,3);
     RotVel = MathUtil.clamp(RotVel, -3, 3);
+
+    DogLog.log("Auto/DriveToReefV2Cmd/Exec/ClampedXPIDOutput", XVel);
+    DogLog.log("Auto/DriveToReefV2Cmd/Exec/ClampedYPIDOutput", YVel);
+    DogLog.log("Auto/DriveToReefV2Cmd/Exec/ClampedRotPIDOutput", RotVel);
 
     if (!XPID.atSetpoint()){
       if (XVel > 0 ){
@@ -175,11 +182,17 @@ public class CmdA_DriveToReefPositionV2 extends Command {
 
     DriveSS.drive(new Translation2d(XVel,YVel),RotVel,true);
 
-    DogLog.log("ReefScore/Xvel",XVel);
-    DogLog.log("ReefScore/Yvel",YVel);
-    DogLog.log("ReefScore/Rotvel",RotVel);
-    DogLog.log("Reef XPID current", CurrentX);
-    DogLog.log("Reef YPID current", CurrentY);
+    DogLog.log("Auto/DriveToReefV2Cmd/Exec/ActualXOutput", XVel);
+    DogLog.log("Auto/DriveToReefV2Cmd/Exec/ActualYOutput", YVel);
+    DogLog.log("Auto/DriveToReefV2Cmd/Exec/ActualRotOutput", RotVel);
+    DogLog.log("Auto/DriveToReefV2Cmd/Exec/XPIDError", XPID.getError());
+    DogLog.log("Auto/DriveToReefV2Cmd/Exec/YPIDError", YPID.getError());
+    DogLog.log("Auto/DriveToReefV2Cmd/Exec/RotPIDError", RotPID.getError());
+    DogLog.log("Auto/DriveToReefV2Cmd/Check/XPIDAtSetpoint", XPID.atSetpoint());
+    DogLog.log("Auto/DriveToReefV2Cmd/Check/YPIDAtSetpoint", YPID.atSetpoint());
+    DogLog.log("Auto/DriveToReefV2Cmd/Check/RotPIDAtSetpoint", RotPID.atSetpoint());
+
+
     
    
     //System.out.println("Driving toReef");
@@ -188,6 +201,7 @@ public class CmdA_DriveToReefPositionV2 extends Command {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
+    DogLog.log("Auto/DriveToReefV2Cmd/CommandStatus", "finished");
     DriveSS.drive(new ChassisSpeeds(0,0,0));
     //System.out.println("DrivetoReef Finished");
     //System.out.println("interrupted"+interrupted);

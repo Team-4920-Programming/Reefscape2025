@@ -4,6 +4,7 @@
 
 package frc.robot.commands.Elevator.TeleOp;
 
+import dev.doglog.DogLog;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.CoralElevator.CoralElevatorSubsystem;
 import frc.robot.Constants.RobotPositions;
@@ -24,18 +25,27 @@ public class CmdT_Level4 extends Command {
 
   // Called when the command is initially scheduled.
   @Override
-  public void initialize() {}
+  public void initialize() {
+    DogLog.log("Tele/Level4Cmd/CommandStatus", "initialized");
+
+    
+  }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
+    DogLog.log("Tele/Level4Cmd/CommandStatus", "executing");
+
 
         m_ElevatorSubsystem.setArmPosition(Level4.height, Level4.elbow, Level4.wrist);
       }
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {}
+  public void end(boolean interrupted) {
+        DogLog.log("Tele/Level4Cmd/CommandStatus", "finished");
+        DogLog.log("Tele/Level4Cmd/CommandWasInterrupted", interrupted);
+  }
 
   // Returns true when the command should end.
   @Override

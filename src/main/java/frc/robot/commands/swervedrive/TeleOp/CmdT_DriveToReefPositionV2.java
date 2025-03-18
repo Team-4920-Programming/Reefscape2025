@@ -76,7 +76,9 @@ public class CmdT_DriveToReefPositionV2 extends Command {
       //System.out.println("transform = " + test.toString());
     }
 
-    DogLog.log("ReefScore/ReefPose", targetPose);
+    DogLog.log("Tele/DriveToReefV2Cmd/CommandStatus", "initialized");
+    DogLog.log("Tele/DriveToReefV2Cmd/Init/targetPose", targetPose);
+    DogLog.log("Tele/DriveToReefV2Cmd/Init/branch", branch);
 
 
     XPID.setTolerance(0.02);
@@ -88,6 +90,8 @@ public class CmdT_DriveToReefPositionV2 extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
+    DogLog.log("Tele/DriveToReefV2Cmd/CommandStatus", "executing");
+    DogLog.log("Tele/DriveToReefV2Cmd/Exec/CurrentRobotPose", DriveSS.getPose());
     double CurrentX = DriveSS.getPose().getX();
     double CurrentY = DriveSS.getPose().getY();
     double CurrentRot = DriveSS.getPose().getRotation().getDegrees();
@@ -108,6 +112,10 @@ public class CmdT_DriveToReefPositionV2 extends Command {
     XVel = MathUtil.clamp(XVel, -3, 3);
     YVel = MathUtil.clamp(YVel, -3,3);
     RotVel = MathUtil.clamp(RotVel, -3, 3);
+
+    DogLog.log("Tele/DriveToReefV2Cmd/Exec/ClampedXPIDOutput", XVel);
+    DogLog.log("Tele/DriveToReefV2Cmd/Exec/ClampedYPIDOutput", YVel);
+    DogLog.log("Tele/DriveToReefV2Cmd/Exec/ClampedRotPIDOutput", RotVel);
 
   if (!XPID.atSetpoint()){
     if (XVel > 0 ){
@@ -147,12 +155,16 @@ public class CmdT_DriveToReefPositionV2 extends Command {
 
   DriveSS.drive(new Translation2d(XVel,YVel),RotVel,true);
 
-  DogLog.log("ReefScore/XPIDval",XVel);
-  DogLog.log("ReefScore/YPIDval",YVel);
-  DogLog.log("ReefScore/RotPIDval",RotVel);
-  DogLog.log("Reef XPID current", CurrentX);
-  DogLog.log("Reef YPID current", CurrentY);
-  DogLog.log("ReefScore/CurrentRobotPose",DriveSS.getPose());
+    DogLog.log("Tele/DriveToReefV2Cmd/Exec/ActualXOutput", XVel);
+    DogLog.log("Tele/DriveToReefV2Cmd/Exec/ActualYOutput", YVel);
+    DogLog.log("Tele/DriveToReefV2Cmd/Exec/ActualRotOutput", RotVel);
+    DogLog.log("Tele/DriveToReefV2Cmd/Exec/XPIDError", XPID.getError());
+    DogLog.log("Tele/DriveToReefV2Cmd/Exec/YPIDError", YPID.getError());
+    DogLog.log("Tele/DriveToReefV2Cmd/Exec/RotPIDError", RotPID.getError());
+    DogLog.log("Tele/DriveToReefV2Cmd/Check/XPIDAtSetpoint", XPID.atSetpoint());
+    DogLog.log("Tele/DriveToReefV2Cmd/Check/YPIDAtSetpoint", YPID.atSetpoint());
+    DogLog.log("Tele/DriveToReefV2Cmd/Check/RotPIDAtSetpoint", RotPID.atSetpoint());
+    DogLog.log("Tele/DriveToReefV2Cmd/Check/IsRobotStopped", DriveSS.isRobotStopped());
 
    
     //System.out.println("Driving toReef");
@@ -163,16 +175,15 @@ public class CmdT_DriveToReefPositionV2 extends Command {
   public void end(boolean interrupted) {
     DriveSS.drive(new ChassisSpeeds(0,0,0));
     //System.out.println("DrivetoReef Finished");
-    DogLog.log("ReefScore/FinalPose",DriveSS.getPose());
-    DogLog.log("ReefScore/FinalPoseRotation",DriveSS.getPose().getRotation().getDegrees());
-    //System.out.println("interrupted"+interrupted);
+    DogLog.log("Tele/DriveToReefV2Cmd/CommandStatus", "finished");
+    DogLog.log("Tele/DriveToReefV2Cmd/End/RobotPose", DriveSS.getPose());
+    DogLog.log("Tele/DriveToReefV2Cmd/End/RobotHeading", DriveSS.getPose().getRotation().getDegrees());
+    DogLog.log("Tele/DriveToReefV2Cmd/End/IsStopped", DriveSS.isRobotStopped());
+    DogLog.log("Tele/DriveToReefV2Cmd/End/Interrupted", interrupted);
+    DogLog.log("Tele/DriveToReefV2Cmd/End/FieldXVelocity", DriveSS.getFieldVelocity().vxMetersPerSecond);
+    DogLog.log("Tele/DriveToReefV2Cmd/End/FieldYVelocity", DriveSS.getFieldVelocity().vyMetersPerSecond);
+    DogLog.log("Tele/DriveToReefV2Cmd/End/FieldRotVelocity", Units.radiansToDegrees(DriveSS.getFieldVelocity().omegaRadiansPerSecond));
     inter = interrupted;
-    DogLog.log("ReefScore/IsStopped", DriveSS.isRobotStopped());
-    DogLog.log("ReefScore/Interrupted", inter);
-    DogLog.log("ReefScore/RobotXvel",DriveSS.getFieldVelocity().vxMetersPerSecond);
-    DogLog.log("ReefScore/RobotYvel",DriveSS.getFieldVelocity().vyMetersPerSecond);
-    DogLog.log("ReefScore/RobotRotvel",DriveSS.getFieldVelocity().omegaRadiansPerSecond);
-    
   }
 
   // Returns true when the command should end.

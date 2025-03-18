@@ -4,6 +4,7 @@
 
 package frc.robot.commands.Elevator.Auto;
 
+import dev.doglog.DogLog;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.BoltLog;
@@ -26,12 +27,16 @@ public class CmdA_CoralIntake extends Command {
 
   // Called when the command is initially scheduled.
   @Override
-  public void initialize() {}
+  public void initialize() {
+
+      DogLog.log("Auto/CoralIntakeCmd/CommandStatus", "initialized");
+  }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    BoltLogger.Log(BoltLogger.HighLog, getSubsystem(), getName(), "execute", "Executing", true);
+    // BoltLogger.Log(BoltLogger.HighLog, getSubsystem(), getName(), "execute", "Executing", true);
+    DogLog.log("Auto/CoralIntakeCmd/CommandStatus", "executing");
     if (Robot.isSimulation()){
                 
     }
@@ -44,8 +49,12 @@ public class CmdA_CoralIntake extends Command {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
+    DogLog.log("Auto/CoralIntakeCmd/CommandStatus", "finished");
+    DogLog.log("Auto/CoralIntakeCmd/CommandWasInterrupted", interrupted);
+
+    
     CoralElevatorSS.setIntakeSpeed(0.0);
-    BoltLogger.Log(BoltLogger.HighLog, getSubsystem(), getName(), "Execute", "Executing", false);
+    // BoltLogger.Log(BoltLogger.HighLog, getSubsystem(), getName(), "Execute", "Executing", false);
   }
 
   // Returns true when the command should end.

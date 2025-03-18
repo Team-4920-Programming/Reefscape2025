@@ -100,8 +100,8 @@ public class ClimberSubsystem extends SubsystemBase {
   public void periodic() {
     ReadSensorValues();
     double rightFlapOutput = RightFlapPID.calculate(GetRightFlap());
-    SmartDashboard.putNumber("RightFlap", GetRightFlap());
-    SmartDashboard.putNumber("ClimberEncoder", climberAngleEncoder.getPosition());
+    DogLog.log("ClimberSS/RampAngle", GetRightFlap());
+    DogLog.log("ClimberSS/ClimberAngleEncoder", climberAngleEncoder.getPosition());
       rightFlapOutput = -MathUtil.clamp(rightFlapOutput, -.1, .1);
     CoralFlapRight.set(rightFlapOutput); //move to climber SS and only PID if we are setting up for a climb
    // //System.out.println(climberAngle);

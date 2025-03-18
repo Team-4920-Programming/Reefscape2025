@@ -4,6 +4,8 @@
 
 package frc.robot.commands.Elevator.TeleOp;
 
+import dev.doglog.DogLog;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.CoralElevator.CoralElevatorSubsystem;
 import frc.robot.Constants.RobotPositions.*;
@@ -30,18 +32,22 @@ public class CmdT_MoveToLevel extends Command {
 
   // Called when the command is initially scheduled.
   @Override
-  public void initialize() {}
+  public void initialize() {
+      DogLog.log("Tele/MoveToLevelCmd/CommandStatus", "initialized");
+  }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    
+
+    DogLog.log("Tele/MoveToLevelCmd/CommandStatus", "executing");    
     //System.out.println("Moving to Level");
     if (Coral_SS.DH_In_YellowZone)
     {
       //System.out.println("Moving to Level (In yellow)");
       if (Coral_SS.GetScoreSelection() ==1)
       {
+        DogLog.log("Tele/MoveToLevelCmd/Conditions/ScoreSelection", 1);
         //System.out.println("Moving to Level 1");
         //CmdT_Level1 GoLevel1 = new CmdT_Level1(Coral_SS);
         //GoLevel1.schedule();
@@ -51,6 +57,7 @@ public class CmdT_MoveToLevel extends Command {
       }
       if (Coral_SS.GetScoreSelection() ==2)
       {
+        DogLog.log("Tele/MoveToLevelCmd/Conditions/ScoreSelection", 2);
         //System.out.println("Moving to Level 2");
         //dT_Level2 GoLevel2 = new CmdT_Level2(Coral_SS);
         //GoLevel2.schedule();
@@ -60,6 +67,7 @@ public class CmdT_MoveToLevel extends Command {
       }
       if (Coral_SS.GetScoreSelection() ==3)
       {
+        DogLog.log("Tele/MoveToLevelCmd/Conditions/ScoreSelection", 3);
         //System.out.println("Moving to Level 3");
         //CmdT_Level3 GoLevel3 = new CmdT_Level3(Coral_SS);
         //GoLevel3.schedule();
@@ -69,13 +77,20 @@ public class CmdT_MoveToLevel extends Command {
       }
       if (Coral_SS.GetScoreSelection() ==4)
       {
+        DogLog.log("Tele/MoveToLevelCmd/Conditions/ScoreSelection", 4);
         //System.out.println("Moving to Level 4");
         //CmdT_Level4 GoLevel4 = new CmdT_Level4(Coral_SS);
         //GoLevel4.schedule();
         TargetHeight = Level4.height;
         TargetElbowAng = Level4.elbow;
         TargetWristAng = Level4.wrist;
+        TargetHeight = SmartDashboard.getNumber("ElevatorTestingHeight", 0.725);
+        TargetElbowAng = SmartDashboard.getNumber("ElbowTestingAngle", 180);
+        TargetWristAng = SmartDashboard.getNumber("WristTestingAngle", -33.0);
       }
+      DogLog.log("Tele/MoveToLevelCmd/Exec/TargetHeight", TargetHeight);
+      DogLog.log("Tele/MoveToLevelCmd/Exec/TargetElbowAng", TargetElbowAng);
+      DogLog.log("Tele/MoveToLevelCmd/Exec/TargetWristAng", TargetWristAng);
       Coral_SS.setArmPosition(TargetHeight, TargetElbowAng, TargetWristAng);
     }
   }
@@ -83,6 +98,8 @@ public class CmdT_MoveToLevel extends Command {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
+    DogLog.log("Tele/MoveToLevelCmd/CommandWasInterrupted", interrupted);
+    DogLog.log("Tele/MoveToLevelCmd/CommandStatus", "finished");
     //System.out.println("Move to Level End");
   }
 
@@ -92,6 +109,7 @@ public class CmdT_MoveToLevel extends Command {
     boolean finished = false;
     if (!Coral_SS.DH_In_YellowZone)
     {
+      DogLog.log("Tele/MoveToLevelCmd/FinishedCondition/NotInYellowZone", !Coral_SS.DH_In_YellowZone);
       finished = true;
       //System.out.println("Not in yellow finish command");
     } 
@@ -100,6 +118,9 @@ public class CmdT_MoveToLevel extends Command {
     //System.out.println("Wrist"+Math.abs(Coral_SS.GetWristAngleWorldCoordinates() - TargetWristAng));
     if  ((Math.abs(Coral_SS.getHeightLaserMeters() - TargetHeight) < 0.1) && (Math.abs(Coral_SS.GetElbowAngle() - TargetElbowAng) < 5) && (Math.abs(Coral_SS.GetWristAngleWorldCoordinates() - TargetWristAng) < 5))
   {
+    DogLog.log("Tele/MoveToLevelCmd/FinishedCondition/ElevatorAtSetpoint", Math.abs(Coral_SS.getHeightLaserMeters() - TargetHeight) < 0.1);
+    DogLog.log("Tele/MoveToLevelCmd/FinishedCondition/ElbowAtSetpoint", Math.abs(Coral_SS.GetElbowAngle() - TargetElbowAng) < 5);
+    DogLog.log("Tele/MoveToLevelCmd/FinishedCondition/WristAtSetpoint",Math.abs(Coral_SS.GetWristAngleWorldCoordinates() - TargetWristAng) < 5);
       finished = true;
       //System.out.println("At Position finish command");
   }

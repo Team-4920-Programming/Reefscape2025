@@ -107,7 +107,7 @@ public class DataHighwaySubsystem extends SubsystemBase {
     CalculateClosestReefSegment();
     // if ((inLeftCoralZone || inRightCoralZone) && !hasCoral)
     // {
-      CalculateClosestPickupSlot();
+    CalculateClosestPickupSlot();
     // }
 
     if (Robot.isSimulation())
@@ -122,7 +122,7 @@ public class DataHighwaySubsystem extends SubsystemBase {
     setCoralData();
     setSurveyData();
     double distancefromReefWall = ReefDistance- ReefRadius;
-    DogLog.log ("DistanceToReefWall", distancefromReefWall);
+    // DogLog.log ("DistanceToReefWall", distancefromReefWall);
     LEDPattern red = LEDPattern.solid(Color.kRed);
     LEDPattern white = LEDPattern.solid(Color.kWhite);
     LEDPattern yellow = LEDPattern.solid(Color.kYellow);
@@ -130,17 +130,24 @@ public class DataHighwaySubsystem extends SubsystemBase {
     LEDPattern blue = LEDPattern.solid(Color.kBlue);
     LEDPattern CoralRainbow = LEDPattern.rainbow(255,128);
 
-    SmartDashboard.putBoolean("InLeftCoralZone", inLeftCoralZone);
-    SmartDashboard.putBoolean("InRightCoralZone", inRightCoralZone);
-    DogLog.log("Zones/LeftCoralPose",LeftCoralStationPose);
-    DogLog.log("Zones/RightCoralPose", RightCoralStationPose);
+    DogLog.log("DataHighwaySS/Checks/InLeftCoralZone", inLeftCoralZone);
+    DogLog.log("DataHighwaySS/Checks/InRightCoralZone", inRightCoralZone);
+    DogLog.log("DataHighwaySS/Checks/inReefRedZone", inReefRedZone);
+    DogLog.log("DataHighwaySS/Checks/InCageRedZone", inCageRedZone);
+    DogLog.log("DataHighwaySS/Checks/InCoralStationRedZone", inCoralStationRedZone);
+    DogLog.log("DataHighwaySS/Checks/InReefYellowZone", inReefYellowZone);
+
+    DogLog.log("DataHighWaySS/Zones/LeftCoralPose",LeftCoralStationPose);
+    DogLog.log("DataHighwaySS/Zones/RightCoralPose", RightCoralStationPose);
+    DogLog.log("DataHighwaySS/Zones/CenterOfReefPose", ReefPose);
+
     
     if (inReefRedZone || inCageRedZone || inCoralStationRedZone){
       if(isAutoAimEnabled){
         red.applyTo(m_ledBuffer);
       }
       else{
-        LEDPattern p = red.blink(Seconds.of(1), Seconds.of(1));
+        LEDPattern p = red.breathe(Seconds.of(0.5));
         p.applyTo(m_ledBuffer);
       }
     }
@@ -149,7 +156,7 @@ public class DataHighwaySubsystem extends SubsystemBase {
         yellow.applyTo(m_ledBuffer);
       }
       else{
-        LEDPattern p = yellow.blink(Seconds.of(1), Seconds.of(1));
+        LEDPattern p = yellow.breathe(Seconds.of(0.5));
         p.applyTo(m_ledBuffer);
       }
     }
@@ -159,7 +166,7 @@ public class DataHighwaySubsystem extends SubsystemBase {
         white.applyTo(m_ledBuffer);
       }
       else{
-        LEDPattern p = white.blink(Seconds.of(1), Seconds.of(1));
+        LEDPattern p = white.breathe(Seconds.of(0.5));
         p.applyTo(m_ledBuffer);
       }
     }
@@ -168,7 +175,7 @@ public class DataHighwaySubsystem extends SubsystemBase {
         CoralRainbow.applyTo(m_ledBuffer);
       }
       else{
-        LEDPattern p = CoralRainbow.blink(Seconds.of(1), Seconds.of(1));
+        LEDPattern p = CoralRainbow.breathe(Seconds.of(0.5));
         p.applyTo(m_ledBuffer);
       }
     }
@@ -177,17 +184,10 @@ public class DataHighwaySubsystem extends SubsystemBase {
         green.applyTo(m_ledBuffer);
       }
       else{
-        LEDPattern p = green.blink(Seconds.of(1), Seconds.of(1));
+        LEDPattern p = green.breathe(Seconds.of(0.5));
         p.applyTo(m_ledBuffer);
       }
     }
-
-    SmartDashboard.putBoolean("inReefRedZone", inReefRedZone);
-    SmartDashboard.putBoolean("inLeftCoralZone", inLeftCoralZone);
-    SmartDashboard.putBoolean("inRightCoralZone", inRightCoralZone);
-    SmartDashboard.putBoolean("inCageRedZone", inCageRedZone);
-    SmartDashboard.putBoolean("inCoralStationRedZone", inCoralStationRedZone);
-    SmartDashboard.putBoolean("inReefYellowZone", inReefYellowZone);
 
   //   if (hasCoral){
   //     AtCoralStation = false;
@@ -258,6 +258,8 @@ public class DataHighwaySubsystem extends SubsystemBase {
   //   }
   //   // Write the data to the LED strip
     m_led.setData(m_ledBuffer);
+
+    DogLog.log("DataHighwaySS/LEDS/LEDState", m_ledBuffer.toString());
 
   }
   private void getDriveData()
@@ -330,7 +332,6 @@ public class DataHighwaySubsystem extends SubsystemBase {
         RightCoralStationPose = atf.getTagPose(12).get();
         ReefPose = new Pose2d((tmp1.getX() + tmp2.getX())/2,tmp1.getY(),new Rotation2d().kZero);
     }
-    DogLog.log("Zones/ReefCenterPose", ReefPose);
   }
   public void StartUp(){
     feederStationPoses.clear();
@@ -420,12 +421,12 @@ public class DataHighwaySubsystem extends SubsystemBase {
 
   private void CalculateClosestReefSegment(){
     ClosestReefSegment = CurrentPose.nearest(reefPoses);
-    DogLog.log("Zones/ClosestReefSegment", ClosestReefSegment);
+    DogLog.log("DataHighwaySS/Zones/ClosestReefSegment", ClosestReefSegment);
   }
 
   private void CalculateClosestPickupSlot(){
     ClosestPickupSlot = CurrentPose.nearest(feederStationPoses);
-    DogLog.log("Zones/ClosestPickupSlot", ClosestPickupSlot);
+    DogLog.log("DataHighwaySS/Zones/ClosestPickupSlot", ClosestPickupSlot);
   }
 
   private Boolean WithinZone(String name, Pose2d targetPose, Pose2d currentPose, double radius, double headingOffset, double impactedHeading){
