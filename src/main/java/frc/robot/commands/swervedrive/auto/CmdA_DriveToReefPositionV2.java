@@ -17,6 +17,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.Constants.RobotAutomationInformation.AutoAlignReef;
 import frc.robot.subsystems.DataHighway.DataHighwaySubsystem;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 
@@ -45,8 +46,8 @@ public class CmdA_DriveToReefPositionV2 extends Command {
   @Override
   public void initialize() {
 
-    double branchoffset = Units.inchesToMeters(6.5);
-    double distanceFromFace = Units.inchesToMeters(18.375);
+    double branchoffset = AutoAlignReef.branchOffset;
+    double distanceFromFace = AutoAlignReef.distanceFromFace;
     inter = false;
     Pose2d targetAprilTagPose = DriveSS.GetClosestReefSegment();
 
