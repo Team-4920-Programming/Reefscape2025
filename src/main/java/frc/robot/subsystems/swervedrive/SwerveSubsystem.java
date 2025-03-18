@@ -112,6 +112,7 @@ public class SwerveSubsystem extends SubsystemBase
   public Pose2d DH_In_ClosestReefSegment;
   public Pose2d DH_In_ReefPose;
   public Pose2d DH_In_ClosestPickupSlot;
+  public int DH_In_ScoreSelection = 4;
   public int DH_Out_ReefSegment = 0;
   public double DH_Out_ReefDistance = 0;
   public boolean DH_OUT_isBlueAlliance = false;
@@ -233,6 +234,10 @@ public class SwerveSubsystem extends SubsystemBase
   }
   public Pose2d GetClosestPickupSlot(){
     return DH_In_ClosestPickupSlot;
+  }
+  public int GetScoreSelection(){
+    return 2;
+    // return DH_In_ScoreSelection;
   }
 
   /**

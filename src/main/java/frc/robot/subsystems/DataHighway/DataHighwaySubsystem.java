@@ -90,6 +90,7 @@ public class DataHighwaySubsystem extends SubsystemBase {
     ClosestPickupSlot,
     ClosestReefSegment,
     CLIMBSTART,
+    SELECTEDCLIMB
   }
 
   @Override
@@ -104,10 +105,10 @@ public class DataHighwaySubsystem extends SubsystemBase {
     // SetupReefPoses();
     CheckZones();
     CalculateClosestReefSegment();
-    if ((inLeftCoralZone || inRightCoralZone) && !hasCoral)
-    {
+    // if ((inLeftCoralZone || inRightCoralZone) && !hasCoral)
+    // {
       CalculateClosestPickupSlot();
-    }
+    // }
 
     if (Robot.isSimulation())
     {
@@ -282,6 +283,7 @@ public class DataHighwaySubsystem extends SubsystemBase {
     Drive_SS.DH_In_ClosestReefSegment = ClosestReefSegment;
     Drive_SS.DH_In_ReefPose = ReefPose;
     Drive_SS.DH_In_ClosestPickupSlot = getClosestPickupSlot();
+    Drive_SS.DH_In_ScoreSelection = scoreSelection;
     
   }
   private void getCoralData(){

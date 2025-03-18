@@ -99,7 +99,52 @@ public class CmdT_DriveToTarget extends Command {
       else{
         targetPose = new Pose2d(7.11,5.1, new Rotation2d((Units.degreesToRadians(0))));
       }
+    }
+    else if (whereAmIGoing == Target.SELECTEDCLIMB){
+      
+      if (DriveSS.GetScoreSelection() == 1){
 
+        if (DriveSS.DH_OUT_isRedAlliance){
+          targetPose = new Pose2d(10.438,0.0786, new Rotation2d((Units.degreesToRadians(180))));
+        }
+        else{
+
+          targetPose = new Pose2d(7.11,7.266, new Rotation2d((Units.degreesToRadians(0))));
+        }
+
+      }
+      else if (DriveSS.GetScoreSelection() == 2){
+        if (DriveSS.DH_OUT_isRedAlliance){
+          targetPose = new Pose2d(10.438,1.8796, new Rotation2d((Units.degreesToRadians(180))));
+        }
+        else{
+
+          targetPose = new Pose2d(7.11,6.169, new Rotation2d((Units.degreesToRadians(0))));
+        }
+
+      }
+      else if (DriveSS.GetScoreSelection() == 3){
+
+        if (DriveSS.DH_OUT_isRedAlliance){
+          targetPose = new Pose2d(10.438,2.952, new Rotation2d((Units.degreesToRadians(180))));
+        }
+        else{
+
+          targetPose = new Pose2d(7.11,5.1, new Rotation2d((Units.degreesToRadians(0))));
+        }
+
+      }
+      else{
+
+        if (DriveSS.DH_OUT_isRedAlliance){
+          targetPose = new Pose2d(10.438,2.952, new Rotation2d((Units.degreesToRadians(180))));
+        }
+        else{
+
+          targetPose = new Pose2d(7.11,5.1, new Rotation2d((Units.degreesToRadians(0))));
+        }
+
+      }
     }
     
     DogLog.log ("DriveToTarget/Target", whereAmIGoing);
