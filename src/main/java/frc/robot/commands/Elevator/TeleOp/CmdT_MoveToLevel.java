@@ -84,9 +84,9 @@ public class CmdT_MoveToLevel extends Command {
         TargetHeight = Level4.height;
         TargetElbowAng = Level4.elbow;
         TargetWristAng = Level4.wrist;
-        TargetHeight = SmartDashboard.getNumber("ElevatorTestingHeight", 0.725);
-        TargetElbowAng = SmartDashboard.getNumber("ElbowTestingAngle", 180);
-        TargetWristAng = SmartDashboard.getNumber("WristTestingAngle", -33.0);
+        // TargetHeight = SmartDashboard.getNumber("ElevatorTestingHeight", 0.725);
+        // TargetElbowAng = SmartDashboard.getNumber("ElbowTestingAngle", 180);
+        // TargetWristAng = SmartDashboard.getNumber("WristTestingAngle", -33.0);
       }
       DogLog.log("Tele/MoveToLevelCmd/Exec/TargetHeight", TargetHeight);
       DogLog.log("Tele/MoveToLevelCmd/Exec/TargetElbowAng", TargetElbowAng);

@@ -21,9 +21,9 @@ public class CmdT_EnableAutoAim extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    SmartDashboard.putNumber("ElevatorTestingHeight", Level4.height);
-    SmartDashboard.putNumber("ElbowTestingAngle", Level4.elbow);
-    SmartDashboard.putNumber("WristTestingAngle", Level4.wrist);
+    // SmartDashboard.putNumber("ElevatorTestingHeight", Level4.height);
+    // SmartDashboard.putNumber("ElbowTestingAngle", Level4.elbow);
+    // SmartDashboard.putNumber("WristTestingAngle", Level4.wrist);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
