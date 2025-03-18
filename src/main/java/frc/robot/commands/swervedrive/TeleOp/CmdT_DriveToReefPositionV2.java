@@ -66,7 +66,7 @@ public class CmdT_DriveToReefPositionV2 extends Command {
     }
     if (branch == 2){
 
-      Transform2d test = new Transform2d(distanceFromFace, branchoffset
+      Transform2d test = new Transform2d(distanceFromFace, branchoffset + Units.inchesToMeters(1)
       ,new Rotation2d(0));
 
       targetPose = targetAprilTagPose.plus(test);
