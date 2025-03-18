@@ -420,11 +420,11 @@ public static class ArmNeutral {
   public 
   static final Transform3d kRobotToRedGeneralCam =
             new Transform3d(new Translation3d(Units.inchesToMeters(-3.25), Units.inchesToMeters(10.75), Units.inchesToMeters(37.75)), 
-            new Rotation3d(0, Units.degreesToRadians(10.5), Units.degreesToRadians(180))); // 0.48
+            new Rotation3d(0, Units.degreesToRadians(12), Units.degreesToRadians(180))); // 0.48
   
   public static final Transform3d kRobotToBlueGeneralCam =
             new Transform3d(new Translation3d(Units.inchesToMeters(0.75), Units.inchesToMeters(-14.25), Units.inchesToMeters(40.25)), 
-            new Rotation3d(Units.degreesToRadians(0), Units.degreesToRadians(-45), Units.degreesToRadians(270))); // 0.48
+            new Rotation3d(Units.degreesToRadians(0), Units.degreesToRadians(-48), Units.degreesToRadians(270))); // 0.48
    
             public static final Transform3d kRobotToBlueFrontCam =
             new Transform3d(new Translation3d(Units.inchesToMeters(12.5), Units.inchesToMeters(-13), Units.inchesToMeters(34.5)), 
