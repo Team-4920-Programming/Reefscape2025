@@ -426,7 +426,7 @@ public class CoralElevatorSubsystem extends SubsystemBase {
   public void setIntakeSpeed(double speed)
   {
     CoralIntakeMotor.set(speed);
-    DogLog.log("IntakeSpeedCmd", speed);
+    // DogLog.log("CoralElevatorSS/Intake/IntakeSpeed", speed);
   }
 
   public boolean isIntakeRunning() {
@@ -589,7 +589,7 @@ public class CoralElevatorSubsystem extends SubsystemBase {
     DistanceSensor.setEnabled(true);
     if (DistanceSensor.isRangeValid())
     {
-      DogLog.log("ultasonic", DistanceSensor.getRangeInches());
+      DogLog.log("CoralElevatorSS/UltasonicDistanceInches", DistanceSensor.getRangeInches());
     }
     filteredelevatorHeight = elevatorFilter.calculate(getHeightLaserMeters());
     if (DH_In_RedZone && !OverrideRedZone  && !SetpointsFrozen){
@@ -637,41 +637,38 @@ public class CoralElevatorSubsystem extends SubsystemBase {
     //double leftFlapOutput = LeftFlapPID.calculate(GetLeftFlap());
     
     
-    DogLog.log("Elevator PID Output", elevatorPIDValue);
-    DogLog.log("Elevator Output", elevatorOutput);
-    DogLog.log("Elevator FF Output", elevatorFFValue);
-    DogLog.log("Elevator Setpount", ElevatorPID.getSetpoint());
-    DogLog.log("Elevator Error", ElevatorPID.getError());
-    
-    DogLog.log("ElevatorVelocity", linearVelocity);
-    DogLog.log("Elevator Height", getFilteredElevatorHeight());
-    DogLog.log("CanMoveElevatorUp", CanMoveElevatorUp());
-    DogLog.log("CanMoveElevatorDown", CanMoveElevatorDown());
-    DogLog.log("ElevatorAtGoal", ElevatorPID.atSetpoint());
-    DogLog.log("Elevator Current", ElevatorStageMotor.getOutputCurrent());
+    DogLog.log("CoralElevatorSS/Elevator/ElevatorPIDOutput", elevatorPIDValue);
+    DogLog.log("CoralElevatorSS/Elevator/ClampedElevatorPIDOutput", elevatorOutput);
+    DogLog.log("CoralElevatorSS/Elevator/ElevatorPIDSetpoint", ElevatorPID.getSetpoint());
+    DogLog.log("CoralElevatorSS/Elevator/ElevatorPIDError", ElevatorPID.getError());
+    DogLog.log("CoralElevatorSS/Elevator/ElevatorHeight", getFilteredElevatorHeight());
+
+    DogLog.log("CoralElevatorSS/Elevator/CanMoveElevatorUp", CanMoveElevatorUp());
+    DogLog.log("CoralElevatorSS/Elevator/CanMoveElevatorDown", CanMoveElevatorDown());
+    DogLog.log("CoralElevatorSS/Elevator/ElevatorAtSetpoint", ElevatorPID.atSetpoint());
   
     //Elbow Data
-    DogLog.log("ElbowAngle", GetElbowAngle());
+    DogLog.log("CoralElevatorSS/Elbow/ElbowAngle",GetElbowAngle());
+    DogLog.log("CoralElevatorSS/Elbow/ElbowPIDSetpoint",ElbowPID.getSetpoint());
+    DogLog.log("CoralElevatorSS/Elbow/ElbowPIDError",ElbowPID.getError());
+    DogLog.log("CoralElevatorSS/Elbow/ElbowPIDOutput",elbowOutput);
+    DogLog.log("CoralElevatorSS/Elbow/CanElbowInc", CanMoveElbowInc());
+    DogLog.log("CoralElevatorSS/Elbow/CanElbowDec", CanMoveElbowDec());
+
+    DogLog.log("CoralElevatorSS/Wrist/WristPIDOutput", wristOutput);
+    DogLog.log("CoralElevatorSS/Wrist/WristPIDSetpoint", WristPID.getSetpoint());
+    DogLog.log("CoralElevatorSS/Wrist/WristAbsoluteAngle", WristAbsoluteEncoder.getPosition());
+    DogLog.log("CoralElevatorSS/Wrist/WristPIDError", WristPID.getError());
     
-    DogLog.log("Elbow Setpoint", ElbowPID.getSetpoint());
-    DogLog.log("CanIncElbow", CanMoveElbowInc());
-    DogLog.log("CanDecElbow", CanMoveElbowDec());
+    DogLog.log("CoralElevatorSS/Wrist/WristWorldAngle", GetWristAngleWorldCoordinates());
+    DogLog.log("CoralElevatorSS/Wrist/CanWristInc", CanMoveWristInc());
+    DogLog.log("CoralElevatorSS/Wrist/CanWirstDec", CanMoveWristDec());
 
-    DogLog.log("Wrist Output", wristOutput);
-    DogLog.log("Wrist Setpoint", WristPID.getSetpoint());
-    DogLog.log("WristAbsolute", WristAbsoluteEncoder.getPosition());
-    DogLog.log("WristWorld", GetWristAngleWorldCoordinates());
-    DogLog.log("CanIncWrist", CanMoveWristInc());
-    DogLog.log("CanDecWrist", CanMoveWristDec());
-
-    DogLog.log("LeftFlap", GetLeftFlap());
-
-    DogLog.log("ElevatorClearToMoveCheck",ElevatorClearToMoveCheck());
-    DogLog.log("isWristPassingThroughVertical",!isWristPassingThroughVertical());
+    DogLog.log("CoralEelvatorSS/Check/ElevatorClearToMove",ElevatorClearToMoveCheck());
+    DogLog.log("CoralElevatorSS/Check/isWristPassingThroughVertical",isWristPassingThroughVertical());
     
-
-    DogLog.log("HasCoral", isCoralPresent());
-    DogLog.log("IntakeSpeed", CoralIntakeMotor.get());
+    DogLog.log("CoralElevatorSS/Intake/HasCoral", isCoralPresent());
+    DogLog.log("CoralElevatorSS/Intake/IntakeSpeed", CoralIntakeMotor.get());
     double  EmotorSpd =0;
    
       if (!ElevatorPID.atSetpoint() && ((CanMoveElevatorUp() && elevatorOutput > 0) || (CanMoveElevatorDown() && elevatorOutput < 0)))
@@ -692,40 +689,32 @@ public class CoralElevatorSubsystem extends SubsystemBase {
         ElevatorStageMotor.set(0.0);
         EmotorSpd = 0;
       }
-      DogLog.log("Elevator Output", EmotorSpd);
 
 
+      DogLog.log("CoralElevatorSS/Elevator/ActualElevatorMotorOutput", EmotorSpd);
 
-      DogLog.log("Elbow Output", elbowOutput);
-      if (ElbowPID.getSetpoint() > GetElbowAngle()){
-        // elbowOutput = MathUtil.clamp(elbowOutput,-.1,.0);
-        
-      }
-      if (ElbowPID.getSetpoint() < GetElbowAngle()){
-        // elbowOutput = MathUtil.clamp(elbowOutput, 0,.75);
-        
-      }
       if (!ElbowPID.atSetpoint() && ((CanMoveElbowDec() && elbowOutput > 0) || (CanMoveElbowInc() && elbowOutput < 0))) 
       {
-        SmartDashboard.putString("Elbow Allowed to move", "true") ; 
         ElbowMotor.set(elbowOutput);
+        DogLog.log("CoralElevatorSS/Elbow/ActualElbowMotorOutput", elbowOutput);
       }
-        else{
-          SmartDashboard.putString("Elbow Allowed to move", "false") ;
-          ElbowMotor.set(0);
-        }
+      else{
+        ElbowMotor.set(0);
+        DogLog.log("CoralElevatorSS/Elbow/ActualElbowMotorOutput", 0);
+      }
+
+
         
-      //wristOutput = - wristOutput;
       if (WristPID.getSetpoint() > GetWristAngleWorldCoordinates()){
-        wristOutput = MathUtil.clamp(wristOutput,0,0.75); //0.5
+        wristOutput = MathUtil.clamp(wristOutput,0,0.75);
         
       }
       if (WristPID.getSetpoint() < GetWristAngleWorldCoordinates()){
-        wristOutput = MathUtil.clamp(wristOutput, -0.75,0); //0.5
+        wristOutput = MathUtil.clamp(wristOutput, -0.75,0);
         
       }
       if (WristPID.getSetpoint() < -90 && GetWristAngleWorldCoordinates() >0){
-        wristOutput = 0.5;//MathUtil.clamp(wristOutput, -.05,0);
+        wristOutput = 0.5;
         
       }
       if (GetWristAngleWorldCoordinates() < -180 && isCoralPresent() && !WristPID.atSetpoint())
@@ -733,19 +722,18 @@ public class CoralElevatorSubsystem extends SubsystemBase {
         wristOutput = MathUtil.clamp(wristOutput, -0.5,0);
       }
 
-      if (!WristPID.atSetpoint())  
+      if (!WristPID.atSetpoint()){
+        DogLog.log("CoralElevatorSS/Wrist/ActualWristMotorOutput", wristOutput); 
         WristMotor.set(wristOutput);
-      else 
+      }
+      else{
         WristMotor.set(0);
+        DogLog.log("CoralElevatorSS/Wrist/ActualWristMotorOutput", 0); 
+
+      }
   
     // Datahighway
-    DogLog.log("LeftFlapPos", GetLeftFlap());
-    //leftFlapOutput = -MathUtil.clamp(leftFlapOutput, -.1, .1);
-  
-    //DogLog.log("LeftFlapOut", leftFlapOutput);
-   // DogLog.log("LeftSetpoint", LeftFlapPID.getSetpoint());
-    //CoralFlapLeft.set(-leftFlapOutput);
-      //CoralFlapRight.set(-rightFlapOutput);
+
       
 
     DH_Out_HasCoral = isCoralPresent();
@@ -823,7 +811,7 @@ public class CoralElevatorSubsystem extends SubsystemBase {
   {
     double elevatorHeight = (ElevatorEncoder.getPosition() / PIDs.CoralElevator.Elevator.elevatorReduction) *
     (2 * Math.PI * PIDs.CoralElevator.Elevator.pulleyRadius);
-    DogLog.log("Elevator Height", elevatorHeight);
+    // DogLog.log("Elevator Height", elevatorHeight);
     return elevatorHeight;
   }
 
@@ -834,7 +822,7 @@ public class CoralElevatorSubsystem extends SubsystemBase {
     double elevatorHeight = 0;
     try {
       elevatorHeight = measurement.distance_mm / 1000.0;
-      DogLog.log("Elevator Height", elevatorHeight);
+      // DogLog.log("Elevator Height", elevatorHeight);
         
     } catch (Exception e) {
       // TODO: handle exception

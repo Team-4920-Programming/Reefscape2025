@@ -278,10 +278,11 @@ public class SwerveSubsystem extends SubsystemBase
     ProcessVision4920();
 
 
-    DogLog.log("Data/RobotOdo",swerveDrive.getPose());
-    DogLog.log("Data/RoboSpeed", swerveDrive.getRobotVelocity());
-    DogLog.log("Data/Reefposition",getReefSegment());
-    DogLog.log("Data/ReefDistance",getReefDistance());
+    DogLog.log("SwerveSS/RobotOdo",swerveDrive.getPose());
+    DogLog.log("SwerveSS/RoboSpeed", swerveDrive.getRobotVelocity());
+    DogLog.log("SwerveSS/isRedAlliance", isRedAlliance());
+    // DogLog.log("SwerveSS/Reefposition",getReefSegment());
+    // DogLog.log("SwerveSS/ReefDistance",getReefDistance());
 
     DH_Out_ReefSegment = getReefSegment();
     DH_Out_ReefDistance = getReefDistance();
@@ -357,7 +358,7 @@ private void ProcessVision4920()
   if ( DriverStation.isDSAttached() && GreyFeederCamera != null)
   {
      var visionEst = GreyFeederCamera.getEstimatedGlobalPose();
-     SmartDashboard.putBoolean("GreyFeederCamera Present", GreyFeederCamera.isConnected());
+     DogLog.log("SwerveSS/Vision/GreyFeederCameraPresent", GreyFeederCamera.isConnected());
      
       if (visionEst.isPresent()){
           GreyFeederPose = visionEst.get().estimatedPose.toPose2d();
@@ -365,8 +366,8 @@ private void ProcessVision4920()
 
           
           GreyFeederVisionTimestamp = visionEst.get().timestampSeconds;
-          DogLog.log("Grey Feeder Camera Pose", GreyFeederCameraPose3d);
-          DogLog.log("Grey Feeder TimeStamp",GreyFeederVisionTimestamp);
+          DogLog.log("SwerveSS/Vision/GreyFeederCameraPose", GreyFeederCameraPose3d);
+          DogLog.log("SwerveSS/Vision/GreyFeederTimeStamp",GreyFeederVisionTimestamp);
             VisionReading(GreyFeederPose, GreyFeederVisionTimestamp, GreyFeederCamera.confidenceCalculator(visionEst.get()));
       }
   
@@ -379,7 +380,7 @@ private void ProcessVision4920()
   if ( DriverStation.isDSAttached() && GreyReefCamera != null)
   {
      var visionEst = GreyReefCamera.getEstimatedGlobalPose();
-     SmartDashboard.putBoolean("GreyReefCamera Present", GreyReefCamera.isConnected());
+     DogLog.log("SwerveSS/Vision/GreyReefCameraPresent", GreyReefCamera.isConnected());
      
       if (visionEst.isPresent()){
           GreyReefPose = visionEst.get().estimatedPose.toPose2d();
@@ -387,8 +388,8 @@ private void ProcessVision4920()
 
           
           GreyReefVisionTimestamp = visionEst.get().timestampSeconds;
-          DogLog.log("Grey Reef Camera Pose", GreyReefCameraPose3d);
-          DogLog.log("Grey Reef TimeStamp",GreyReefVisionTimestamp);
+          DogLog.log("SwerveSS/Vision/GreyReefCameraPose", GreyReefCameraPose3d);
+          DogLog.log("SwerveSS/Vision/GreyReefTimeStamp",GreyReefVisionTimestamp);
             VisionReading(GreyReefPose, GreyReefVisionTimestamp, GreyReefCamera.confidenceCalculator(visionEst.get()));
       }
   
@@ -400,7 +401,7 @@ private void ProcessVision4920()
   if ( DriverStation.isDSAttached() && RedReefCamera != null)
   {
      var visionEst = RedReefCamera.getEstimatedGlobalPose();
-     SmartDashboard.putBoolean("RedReefCamera Present", RedReefCamera.isConnected());
+     DogLog.log("SwerveSS/Vision/RedReefCameraPresent", RedReefCamera.isConnected());
      
       if (visionEst.isPresent()){
           RedReefPose = visionEst.get().estimatedPose.toPose2d();
@@ -408,8 +409,8 @@ private void ProcessVision4920()
 
           
           RedReefVisionTimestamp = visionEst.get().timestampSeconds;
-          DogLog.log("Red Reef Camera Pose", RedReefCameraPose3d);
-          DogLog.log("Red Reef TimeStamp",RedReefVisionTimestamp);
+          DogLog.log("SwerveSS/Vision/RedReefCameraPose", RedReefCameraPose3d);
+          DogLog.log("SwerveSS/Vision/RedReefTimeStamp",RedReefVisionTimestamp);
           
             VisionReading(RedReefPose, RedReefVisionTimestamp, RedReefCamera.confidenceCalculator(visionEst.get()));
       }
@@ -422,7 +423,7 @@ private void ProcessVision4920()
   if ( DriverStation.isDSAttached() && RedGeneralCamera != null)
   {
      var visionEst = RedGeneralCamera.getEstimatedGlobalPose();
-     SmartDashboard.putBoolean("RedGeneralCamera Present", RedGeneralCamera.isConnected());
+     DogLog.log("SwerveSS/Vision/RedGeneralCameraPresent", RedGeneralCamera.isConnected());
      
       if (visionEst.isPresent()){
           RedGeneralPose = visionEst.get().estimatedPose.toPose2d();
@@ -430,8 +431,8 @@ private void ProcessVision4920()
 
           
           RedGeneralVisionTimestamp = visionEst.get().timestampSeconds;
-          DogLog.log("Red General Camera Pose", RedGeneralCameraPose3d);
-          DogLog.log("Red General TimeStamp",RedGeneralVisionTimestamp);
+          DogLog.log("SwerveSS/Vision/RedGeneralCameraPose", RedGeneralCameraPose3d);
+          DogLog.log("SwerveSS/Vision/RedGeneralTimeStamp",RedGeneralVisionTimestamp);
           if (!DriverStation.isAutonomous())
           VisionReading(RedGeneralPose, RedGeneralVisionTimestamp, RedGeneralCamera.confidenceCalculator(visionEst.get()));
       }
@@ -444,7 +445,7 @@ private void ProcessVision4920()
   if ( DriverStation.isDSAttached() && BlueFrontCamera != null)
   {
      var visionEst = BlueFrontCamera.getEstimatedGlobalPose();
-     SmartDashboard.putBoolean("BlueFrontCamera Present", BlueFrontCamera.isConnected());
+     DogLog.log("SwerveSS/Vision/BlueFrontCameraPresent", BlueFrontCamera.isConnected());
      
       if (visionEst.isPresent()){
           BlueFrontPose = visionEst.get().estimatedPose.toPose2d();
@@ -452,8 +453,8 @@ private void ProcessVision4920()
 
           
           BlueFrontVisionTimestamp = visionEst.get().timestampSeconds;
-          DogLog.log("Blue Front Camera Pose", BlueFrontCameraPose3d);
-          DogLog.log("Blue Front TimeStamp",BlueFrontVisionTimestamp);
+          DogLog.log("SwerveSS/Vision/BlueFrontCameraPose", BlueFrontCameraPose3d);
+          DogLog.log("SwerveSS/Vision/BlueFrontTimeStamp",BlueFrontVisionTimestamp);
           if(!DriverStation.isAutonomous())
             VisionReading(BlueFrontPose, BlueFrontVisionTimestamp, BlueFrontCamera.confidenceCalculator(visionEst.get()));
       }
@@ -466,7 +467,7 @@ private void ProcessVision4920()
   if ( DriverStation.isDSAttached() && BlueGeneralCamera != null)
   {
      var visionEst = BlueGeneralCamera.getEstimatedGlobalPose();
-     SmartDashboard.putBoolean("BlueGeneralCamera Present", BlueGeneralCamera.isConnected());
+     DogLog.log("SwerveSS/Vision/BlueGeneralCameraPresent", BlueGeneralCamera.isConnected());
      
       if (visionEst.isPresent()){
           BlueGeneralPose = visionEst.get().estimatedPose.toPose2d();
@@ -474,8 +475,8 @@ private void ProcessVision4920()
 
           
           BlueGeneralVisionTimestamp = visionEst.get().timestampSeconds;
-          DogLog.log("Blue General Camera Pose", BlueGeneralCameraPose3d);
-          DogLog.log("Blue General TimeStamp",BlueGeneralVisionTimestamp);
+          DogLog.log("SwerveSS/Vision/BlueGeneralCameraPose", BlueGeneralCameraPose3d);
+          DogLog.log("SwerveSS/Vision/BlueGeneralTimeStamp",BlueGeneralVisionTimestamp);
           if (!DriverStation.isAutonomous())
           VisionReading(BlueGeneralPose, BlueGeneralVisionTimestamp, BlueGeneralCamera.confidenceCalculator(visionEst.get()));
       }

@@ -141,17 +141,17 @@ public class Vision
        */
       visionSim.update(swerveDrive.getSimulationDriveTrainPose().get());
     }
-    DogLog.log("Camera Values ", Cameras.values());
+    DogLog.log("Vision/CameraValues ", Cameras.values());
     for (Cameras camera : Cameras.values())
     {
       Optional<EstimatedRobotPose> poseEst = getEstimatedGlobalPose(camera);
-      DogLog.log("CamPosePresent"+camera.name(),poseEst.isPresent());
-      DogLog.log("CamPoseTime"+camera.name(),camera.lastReadTimestamp);
+      DogLog.log("Vision/CamPosePresent"+camera.name(),poseEst.isPresent());
+      DogLog.log("Vision/CamPoseTime"+camera.name(),camera.lastReadTimestamp);
       if (poseEst.isPresent())
       {
         var pose = poseEst.get();
         Pose3d CamPose = pose.estimatedPose;
-        DogLog.log("CamPose"+camera.name(),CamPose);
+        DogLog.log("Vision/CamPose"+camera.name(),CamPose);
         
         swerveDrive.addVisionMeasurement(pose.estimatedPose.toPose2d(),
                                          pose.timestampSeconds,
