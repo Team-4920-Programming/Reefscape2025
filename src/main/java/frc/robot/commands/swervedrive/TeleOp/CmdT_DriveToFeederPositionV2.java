@@ -51,7 +51,7 @@ public class CmdT_DriveToFeederPositionV2 extends Command {
     //   CenterofReefX  = 17.5-4.5;
     // }
 
-    Transform2d translation = new Transform2d(distanceFromFace, 0, new Rotation2d(180));
+    Transform2d translation = new Transform2d(distanceFromFace, 0, new Rotation2d(Units.degreesToRadians(180)));
     targetPose = targetPickupSlot.plus(translation);
 
     // targetPose = new Pose2d();
@@ -106,7 +106,7 @@ public class CmdT_DriveToFeederPositionV2 extends Command {
   //   double y = (ReefRadius + RobotOffset) * Math.sin(Units.degreesToRadians((ReefSegment *60)+offsetAng)) + CenterofReefY;
   //   double rot = ReefSegment * 60;
   //   ReefPose = new Pose2d(x,y, Rotation2d.fromDegrees(rot));
-    // DogLog.log ("ReefScore/ReefPose", targetPose);
+    DogLog.log ("FeederAlign/ReefPose", targetPose);
 
 
     
