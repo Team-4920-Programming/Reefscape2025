@@ -51,6 +51,7 @@ import frc.robot.commands.Elevator.TeleOp.*;
 import frc.robot.commands.ReefSurvey.AddToReefTest;
 import frc.robot.commands.swervedrive.auto.CmdA_DriveToReefPosition;
 import frc.robot.commands.swervedrive.auto.CmdA_DriveToReefPositionV2;
+import frc.robot.commands.swervedrive.auto.CmdA_DriveToReefPositionV3_Relative;
 import frc.robot.commands.swervedrive.TeleOp.*;
 import swervelib.SwerveDriveTest;
 import frc.robot.commands.Climber.Auto.CmdA_BridgeOut;
@@ -168,8 +169,8 @@ public class RobotContainer
     NamedCommands.registerCommand("CmdA_Station", new CmdA_Station (CoralElevatorSS));
     NamedCommands.registerCommand("CmdA_CoralOutTake", new CmdA_CoralOutTake (CoralElevatorSS));
     NamedCommands.registerCommand("CmdA_CoralIntake", new CmdA_CoralIntake (CoralElevatorSS));
-    NamedCommands.registerCommand("CmdA_DriveToReefPositionR", new CmdA_DriveToReefPositionV2(drivebase, 2));
-    NamedCommands.registerCommand("CmdA_DriveToReefPositionL", new CmdA_DriveToReefPositionV2(drivebase, 1));
+    NamedCommands.registerCommand("CmdA_DriveToReefPositionR", new CmdA_DriveToReefPositionV3_Relative(drivebase, 2));
+    NamedCommands.registerCommand("CmdA_DriveToReefPositionL", new CmdA_DriveToReefPositionV3_Relative(drivebase, 1));
 
 
     if (Robot.isSimulation()) 
@@ -321,7 +322,7 @@ public class RobotContainer
   driverXbox.y().whileTrue(new CmdT_CoralOutTake(CoralElevatorSS ));
 
   driverXbox.a().whileTrue(new CmdT_DriveToFeederPositionV2(drivebase));
-  // driverXbox.b().whileTrue(new CmdT_Level4Test(CoralElevatorSS));
+  // driverXbox.b().whileTrue(new CmdA_DriveToReefPositionV3_Relative(drivebase, 2));
 
   // Button 1: Abort climb
   OperatorJoystick.button(1 ).whileTrue(new CmdT_ClimberIn(ClimberSS));
