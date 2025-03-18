@@ -384,6 +384,7 @@ public class RobotContainer
   public void StartUpConfig(){
     DataHighwaySS.StartUp();
     CoralElevatorSS.MatchSetup();
+    DogLog.log("RobotContainer/IsSetupComplete", true);
   }
 
   public boolean IsSetupCompleted(){

@@ -1,0 +1,56 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 5.0
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "CmdA_Level4"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "H5 - M - 1 - Start to 4R"
+          }
+        },
+        {
+          "type": "race",
+          "data": {
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "CmdA_DriveToReefPositionR"
+                }
+              },
+              {
+                "type": "wait",
+                "data": {
+                  "waitTime": 4.0
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "CmdA_CoralOutTake"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": "Humber",
+  "choreoAuto": false
+}

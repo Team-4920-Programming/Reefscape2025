@@ -137,7 +137,7 @@ public class DataHighwaySubsystem extends SubsystemBase {
     DogLog.log("DataHighwaySS/Checks/InCoralStationRedZone", inCoralStationRedZone);
     DogLog.log("DataHighwaySS/Checks/InReefYellowZone", inReefYellowZone);
 
-    DogLog.log("DataHighWaySS/Zones/LeftCoralPose",LeftCoralStationPose);
+    DogLog.log("DataHighwaySS/Zones/LeftCoralPose",LeftCoralStationPose);
     DogLog.log("DataHighwaySS/Zones/RightCoralPose", RightCoralStationPose);
     DogLog.log("DataHighwaySS/Zones/CenterOfReefPose", ReefPose);
 
@@ -407,7 +407,7 @@ public class DataHighwaySubsystem extends SubsystemBase {
     inRightCoralZone = WithinZone("RightCoralStationZone",RightCoralStationPose.toPose2d(),CurrentPose, 3, 0, 180);
     inCoralStationRedZone = WithinZone("LeftCoralStationRedZone",LeftCoralStationPose.toPose2d(),CurrentPose, 2, 0, 90) || WithinZone("RightCoralStationRedZone",RightCoralStationPose.toPose2d(),CurrentPose, 2, 0, 90);
     inReefRedZone = WithinZone("ReefRedZone_ClosestTag",ClosestReefSegment, CurrentPose, 1.1, 0, 45) || WithinZone("ReefRedZone_MainBorder",ReefPose, CurrentPose, 1.65, 0, 180) ;
-    inReefYellowZone = WithinZone("ReefYelloZone",ReefPose, CurrentPose, Units.inchesToMeters(38.25)+2, 0, 180) && !inReefRedZone;
+    inReefYellowZone = WithinZone("ReefYellowZone",ReefPose, CurrentPose, Units.inchesToMeters(38.25)+2, 0, 180) && !inReefRedZone;
     if(inLeftCoralZone){
       inCoralStationPickupZone = WithinZone("LeftCoralStationPickupZone",ClosestPickupSlot,CurrentPose, 0.6, 180, 15);
     }
@@ -442,12 +442,12 @@ public class DataHighwaySubsystem extends SubsystemBase {
     targetPose = targetPose.plus(new Transform2d(0,0,Rotation2d.fromDegrees(180)));
 
     Transform2d t = new Transform2d(currentPose,targetPose);
-    DogLog.log("Zones/"+name+"_currentPose", currentPose.getRotation().getDegrees());
-    DogLog.log("Zones/"+name+"_targetPose", targetPose.getRotation().getDegrees());
-    DogLog.log("Zones/"+name+"_t", t.getRotation().getDegrees());
-    DogLog.log("Zones/"+name+"_distance", distance);
-    DogLog.log("Zones/"+name+"_radius", radius);
-    DogLog.log("Zones/"+name+"_impactedHeading", impactedHeading);
+    DogLog.log("DataHighwaySS/Zones/"+name+"/currentPose", currentPose.getRotation().getDegrees());
+    DogLog.log("DataHighwaySS/Zones/"+name+"/targetPose", targetPose.getRotation().getDegrees());
+    DogLog.log("DataHighwaySS/Zones/"+name+"/t", t.getRotation().getDegrees());
+    DogLog.log("DataHighwaySS/Zones/"+name+"/distance", distance);
+    DogLog.log("DataHighwaySS/Zones/"+name+"/radius", radius);
+    DogLog.log("DataHighwaySS/Zones/"+name+"/impactedHeading", impactedHeading);
 
     // double RightCone = robotHeading + impactedHeading; // 180
     // double LeftCone = robotHeading - impactedHeading; //60
