@@ -94,10 +94,10 @@ public class CmdT_DriveToTarget extends Command {
     else if (whereAmIGoing == Target.CLIMBSTART){
 
       if (DriveSS.DH_OUT_isRedAlliance){
-        targetPose = new Pose2d(10.438,2.952, new Rotation2d((Units.degreesToRadians(0))));
+        targetPose = new Pose2d(10.438,2.952, new Rotation2d((Units.degreesToRadians(180))));
       }
       else{
-        targetPose = new Pose2d(7.11,5.1, new Rotation2d((Units.degreesToRadians(180))));
+        targetPose = new Pose2d(7.11,5.1, new Rotation2d((Units.degreesToRadians(0))));
       }
 
     }
