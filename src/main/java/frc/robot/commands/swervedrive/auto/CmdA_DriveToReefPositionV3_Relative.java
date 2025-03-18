@@ -37,7 +37,7 @@ public class CmdA_DriveToReefPositionV3_Relative extends Command {
   PIDController XPID = new PIDController(2, 0, 0.02);
   PIDController YPID = new PIDController(2, 0, 0.02);
   PIDController RotPID = new PIDController(0.15,0,0);
-  double minSpeed = 0.25;
+  double minSpeed = 0.2;
   boolean inter;
   Twist2d test;
   public CmdA_DriveToReefPositionV3_Relative(SwerveSubsystem DriveSubsystem, int Position) {
@@ -52,7 +52,7 @@ public class CmdA_DriveToReefPositionV3_Relative extends Command {
   public void initialize() {
 
     double branchoffset = AutoAlignReef.branchOffset;
-    double distanceFromFace = AutoAlignReef.distanceFromFace;
+    double distanceFromFace = AutoAlignReef.distanceFromFace-Units.inchesToMeters(0.25);
     inter = false;
     Pose2d targetAprilTagPose = DriveSS.GetClosestReefSegment();
 
