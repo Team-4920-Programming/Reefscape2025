@@ -45,8 +45,8 @@ public class CmdA_DriveToReefPositionV2 extends Command {
   @Override
   public void initialize() {
 
-    double branchoffset = Units.inchesToMeters(7.825);
-    double distanceFromFace = Units.inchesToMeters(19);
+    double branchoffset = Units.inchesToMeters(6.5);
+    double distanceFromFace = Units.inchesToMeters(18.375);
     inter = false;
     Pose2d targetAprilTagPose = DriveSS.GetClosestReefSegment();
 
