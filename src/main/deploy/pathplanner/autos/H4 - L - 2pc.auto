@@ -30,9 +30,22 @@
           }
         },
         {
-          "type": "named",
+          "type": "race",
           "data": {
-            "name": "CmdA_DriveToReefPositionL"
+            "commands": [
+              {
+                "type": "wait",
+                "data": {
+                  "waitTime": 3.0
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "CmdA_DriveToReefPositionL"
+                }
+              }
+            ]
           }
         },
         {
@@ -80,9 +93,22 @@
           }
         },
         {
-          "type": "named",
+          "type": "race",
           "data": {
-            "name": "CmdA_DriveToReefPositionL"
+            "commands": [
+              {
+                "type": "wait",
+                "data": {
+                  "waitTime": 3.0
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "CmdA_DriveToReefPositionL"
+                }
+              }
+            ]
           }
         },
         {

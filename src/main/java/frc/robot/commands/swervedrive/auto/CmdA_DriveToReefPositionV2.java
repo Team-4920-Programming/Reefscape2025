@@ -115,8 +115,8 @@ public class CmdA_DriveToReefPositionV2 extends Command {
 
     
     
-    XPID.setTolerance(0.02);
-    YPID.setTolerance(0.02);
+    XPID.setTolerance(0.025);
+    YPID.setTolerance(0.025);
     RotPID.setTolerance(0.75);
     RotPID.enableContinuousInput(-180, 180);
   }
