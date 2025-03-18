@@ -426,7 +426,7 @@ public class CoralElevatorSubsystem extends SubsystemBase {
   public void setIntakeSpeed(double speed)
   {
     CoralIntakeMotor.set(speed);
-    SmartDashboard.putNumber("IntakeSpeedCmd", speed);
+    DogLog.log("IntakeSpeedCmd", speed);
   }
 
   public boolean isIntakeRunning() {
@@ -589,7 +589,7 @@ public class CoralElevatorSubsystem extends SubsystemBase {
     DistanceSensor.setEnabled(true);
     if (DistanceSensor.isRangeValid())
     {
-      SmartDashboard.putNumber("ultasonic", DistanceSensor.getRangeInches());
+      DogLog.log("ultasonic", DistanceSensor.getRangeInches());
     }
     filteredelevatorHeight = elevatorFilter.calculate(getHeightLaserMeters());
     if (DH_In_RedZone && !OverrideRedZone  && !SetpointsFrozen){
@@ -637,41 +637,41 @@ public class CoralElevatorSubsystem extends SubsystemBase {
     //double leftFlapOutput = LeftFlapPID.calculate(GetLeftFlap());
     
     
-    SmartDashboard.putNumber("Elevator PID Output", elevatorPIDValue);
-    SmartDashboard.putNumber("Elevator Output", elevatorOutput);
-    SmartDashboard.putNumber("Elevator FF Output", elevatorFFValue);
-    SmartDashboard.putNumber("Elevator Setpount", ElevatorPID.getSetpoint());
-    SmartDashboard.putNumber("Elevator Error", ElevatorPID.getError());
+    DogLog.log("Elevator PID Output", elevatorPIDValue);
+    DogLog.log("Elevator Output", elevatorOutput);
+    DogLog.log("Elevator FF Output", elevatorFFValue);
+    DogLog.log("Elevator Setpount", ElevatorPID.getSetpoint());
+    DogLog.log("Elevator Error", ElevatorPID.getError());
     
-    SmartDashboard.putNumber("ElevatorVelocity", linearVelocity);
-    SmartDashboard.putNumber("Elevator Height", getFilteredElevatorHeight());
-    SmartDashboard.putBoolean("CanMoveElevatorUp", CanMoveElevatorUp());
-    SmartDashboard.putBoolean("CanMoveElevatorDown", CanMoveElevatorDown());
-    SmartDashboard.putBoolean("ElevatorAtGoal", ElevatorPID.atSetpoint());
-    SmartDashboard.putNumber("Elevator Current", ElevatorStageMotor.getOutputCurrent());
+    DogLog.log("ElevatorVelocity", linearVelocity);
+    DogLog.log("Elevator Height", getFilteredElevatorHeight());
+    DogLog.log("CanMoveElevatorUp", CanMoveElevatorUp());
+    DogLog.log("CanMoveElevatorDown", CanMoveElevatorDown());
+    DogLog.log("ElevatorAtGoal", ElevatorPID.atSetpoint());
+    DogLog.log("Elevator Current", ElevatorStageMotor.getOutputCurrent());
   
     //Elbow Data
-    SmartDashboard.putNumber("ElbowAngle", GetElbowAngle());
+    DogLog.log("ElbowAngle", GetElbowAngle());
     
-    SmartDashboard.putNumber("Elbow Setpoint", ElbowPID.getSetpoint());
-    SmartDashboard.putBoolean("CanIncElbow", CanMoveElbowInc());
-    SmartDashboard.putBoolean("CanDecElbow", CanMoveElbowDec());
+    DogLog.log("Elbow Setpoint", ElbowPID.getSetpoint());
+    DogLog.log("CanIncElbow", CanMoveElbowInc());
+    DogLog.log("CanDecElbow", CanMoveElbowDec());
 
-    SmartDashboard.putNumber("Wrist Output", wristOutput);
-    SmartDashboard.putNumber("Wrist Setpoint", WristPID.getSetpoint());
-    SmartDashboard.putNumber("WristAbsolute", WristAbsoluteEncoder.getPosition());
-    SmartDashboard.putNumber("WristWorld", GetWristAngleWorldCoordinates());
-    SmartDashboard.putBoolean("CanIncWrist", CanMoveWristInc());
-    SmartDashboard.putBoolean("CanDecWrist", CanMoveWristDec());
+    DogLog.log("Wrist Output", wristOutput);
+    DogLog.log("Wrist Setpoint", WristPID.getSetpoint());
+    DogLog.log("WristAbsolute", WristAbsoluteEncoder.getPosition());
+    DogLog.log("WristWorld", GetWristAngleWorldCoordinates());
+    DogLog.log("CanIncWrist", CanMoveWristInc());
+    DogLog.log("CanDecWrist", CanMoveWristDec());
 
-    SmartDashboard.putNumber("LeftFlap", GetLeftFlap());
+    DogLog.log("LeftFlap", GetLeftFlap());
 
-    SmartDashboard.putBoolean("ElevatorClearToMoveCheck",ElevatorClearToMoveCheck());
-    SmartDashboard.putBoolean("isWristPassingThroughVertical",!isWristPassingThroughVertical());
+    DogLog.log("ElevatorClearToMoveCheck",ElevatorClearToMoveCheck());
+    DogLog.log("isWristPassingThroughVertical",!isWristPassingThroughVertical());
     
 
-    SmartDashboard.putBoolean("HasCoral", isCoralPresent());
-    SmartDashboard.putNumber("IntakeSpeed", CoralIntakeMotor.get());
+    DogLog.log("HasCoral", isCoralPresent());
+    DogLog.log("IntakeSpeed", CoralIntakeMotor.get());
     double  EmotorSpd =0;
    
       if (!ElevatorPID.atSetpoint() && ((CanMoveElevatorUp() && elevatorOutput > 0) || (CanMoveElevatorDown() && elevatorOutput < 0)))
@@ -692,11 +692,11 @@ public class CoralElevatorSubsystem extends SubsystemBase {
         ElevatorStageMotor.set(0.0);
         EmotorSpd = 0;
       }
-      SmartDashboard.putNumber("Elevator Output", EmotorSpd);
+      DogLog.log("Elevator Output", EmotorSpd);
 
 
 
-      SmartDashboard.putNumber("Elbow Output", elbowOutput);
+      DogLog.log("Elbow Output", elbowOutput);
       if (ElbowPID.getSetpoint() > GetElbowAngle()){
         // elbowOutput = MathUtil.clamp(elbowOutput,-.1,.0);
         
@@ -739,11 +739,11 @@ public class CoralElevatorSubsystem extends SubsystemBase {
         WristMotor.set(0);
   
     // Datahighway
-    SmartDashboard.putNumber("LeftFlapPos", GetLeftFlap());
+    DogLog.log("LeftFlapPos", GetLeftFlap());
     //leftFlapOutput = -MathUtil.clamp(leftFlapOutput, -.1, .1);
   
-    //SmartDashboard.putNumber("LeftFlapOut", leftFlapOutput);
-   // SmartDashboard.putNumber("LeftSetpoint", LeftFlapPID.getSetpoint());
+    //DogLog.log("LeftFlapOut", leftFlapOutput);
+   // DogLog.log("LeftSetpoint", LeftFlapPID.getSetpoint());
     //CoralFlapLeft.set(-leftFlapOutput);
       //CoralFlapRight.set(-rightFlapOutput);
       
@@ -823,7 +823,7 @@ public class CoralElevatorSubsystem extends SubsystemBase {
   {
     double elevatorHeight = (ElevatorEncoder.getPosition() / PIDs.CoralElevator.Elevator.elevatorReduction) *
     (2 * Math.PI * PIDs.CoralElevator.Elevator.pulleyRadius);
-    SmartDashboard.putNumber("Elevator Height", elevatorHeight);
+    DogLog.log("Elevator Height", elevatorHeight);
     return elevatorHeight;
   }
 
@@ -834,7 +834,7 @@ public class CoralElevatorSubsystem extends SubsystemBase {
     double elevatorHeight = 0;
     try {
       elevatorHeight = measurement.distance_mm / 1000.0;
-      SmartDashboard.putNumber("Elevator Height", elevatorHeight);
+      DogLog.log("Elevator Height", elevatorHeight);
         
     } catch (Exception e) {
       // TODO: handle exception
@@ -863,8 +863,8 @@ public class CoralElevatorSubsystem extends SubsystemBase {
   @Override
   public void simulationPeriodic() {
     // This method will be called once per scheduler run
-    if (Robot.isSimulation())
-    SmartDashboard.putData  ("Simulation/Elevator",SimElevator);
+    if (Robot.isSimulation()){}
+    // DogLog.log("Simulation/Elevator",SimElevator);
 
   }
 

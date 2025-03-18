@@ -165,6 +165,14 @@ public class CmdA_DriveToReefPositionV2 extends Command {
       }
     }
 
+    if(Math.abs(RotPID.getError()) >= 3.0){
+      XVel = 0.1*XVel;
+      YVel = 0.1*YVel;
+      // System.out.println("Limpin'");
+      // System.out.println(Math.abs(CurrentRot - (targetPose.getRotation().getDegrees() + 180)));
+    
+    }
+
     DriveSS.drive(new Translation2d(XVel,YVel),RotVel,true);
 
     DogLog.log("ReefScore/Xvel",XVel);
