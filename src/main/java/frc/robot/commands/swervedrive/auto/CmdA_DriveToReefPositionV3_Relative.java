@@ -34,12 +34,14 @@ public class CmdA_DriveToReefPositionV3_Relative extends Command {
   Pose2d ReefPose;
   Pose2d targetPose;
   Pose2d startingPose;
-  PIDController XPID = new PIDController(2, 0, 0.02);
-  PIDController YPID = new PIDController(2, 0, 0.02);
-  PIDController RotPID = new PIDController(0.15,0,0);
   double minSpeed = 0.2;
   boolean inter;
-  Twist2d test;
+  Twist2d RobotDelta;
+  double xytolerance = 0.03;
+  double thetaTolerance = Units.degreesToRadians(1);
+  double px = 2;
+  double py = 2;
+  double pt = 5;
   public CmdA_DriveToReefPositionV3_Relative(SwerveSubsystem DriveSubsystem, int Position) {
     // Use addRequirements() here to declare subsystem dependencies.
     branch = Position;
@@ -56,13 +58,6 @@ public class CmdA_DriveToReefPositionV3_Relative extends Command {
     inter = false;
     Pose2d targetAprilTagPose = DriveSS.GetClosestReefSegment();
 
-    // double CenterofReefX = 4.5;
-    // double CenterofReefY = 4.0;
-
-    // if (DriveSS.DH_OUT_isRedAlliance)
-    // {
-    //   CenterofReefX  = 17.5-4.5;
-    // }
     targetPose = new Pose2d();
     targetPose = targetAprilTagPose;
     if (branch == 1){
@@ -86,47 +81,13 @@ public class CmdA_DriveToReefPositionV3_Relative extends Command {
       targetPose = targetAprilTagPose.plus(test);
       targetPose = targetPose.rotateAround(targetPose.getTranslation(), new Rotation2d(Units.degreesToRadians(180)));
 
-      //System.out.println("target Pose = " + targetPose.toString());
-      //System.out.println("target April Tag Pose = " + targetAprilTagPose.toString());
-      //System.out.println("transform = " + test.toString());
     }
     
-  //   double ReefRadius = Units.inchesToMeters(65.5)/2;
-  //   //onshape cordinates of blue 
-  //   //y along alliance wall 
-  //   //x from blue to red
-  //   double LeftOffsetAng=-8;
-  //   double RightOffsetAng=8;
-  //   double RobotOffset = Units.inchesToMeters(15); 
-    
-  //   double offsetAng = 0;
-  //   //System.out.println("Initializing Drive to Reef *****************");
-  //   int ReefSegment = DriveSS.getReefSegment();
-  //   //System.out.println("ReefSegment" + ReefSegment);
-  //   if (Reef_Position ==1)
-  //     offsetAng = LeftOffsetAng;
-  //   if (Reef_Position == 2)
-  //     offsetAng = RightOffsetAng;
-  //   if (Reef_Position == 3 || Reef_Position == 4)
-  //     offsetAng = 0; // algae position
-  //   if ( Reef_Position == 4)
-  //       RobotOffset = RobotOffset +1; // move 1 meter further if removeing algae
-
-        
-  //   double x = (ReefRadius + RobotOffset) * Math.cos(Units.degreesToRadians((ReefSegment *60)+offsetAng)) + CenterofReefX;
-  //   double y = (ReefRadius + RobotOffset) * Math.sin(Units.degreesToRadians((ReefSegment *60)+offsetAng)) + CenterofReefY;
-  //   double rot = ReefSegment * 60;
-  //   ReefPose = new Pose2d(x,y, Rotation2d.fromDegrees(rot));
     DogLog.log("Auto/DriveToReefV2Cmd/CommandStatus", "initialized");
     DogLog.log("Auto/DriveToReefV2Cmd/Init/Branch", branch);
     DogLog.log("Auto/DriveToReefV2Cmd/Init/targetPose", targetPose);
 
     startingPose = DriveSS.getPose();
-
-    XPID.setTolerance(0.025);
-    YPID.setTolerance(0.025);
-    RotPID.setTolerance(0.75);
-    RotPID.enableContinuousInput(-180, 180);
   }
 
 
@@ -137,36 +98,27 @@ public class CmdA_DriveToReefPositionV3_Relative extends Command {
     DogLog.log("Auto/DriveToReefV2Cmd/CommandStatus", "executing");
     DogLog.log("Auto/DriveToReefV2Cmd/Exec/CurrentRobotPose", DriveSS.getPose());
 
-    double CurrentX = DriveSS.getPose().getX();
-    double CurrentY = DriveSS.getPose().getY();
-    double CurrentRot = DriveSS.getPose().getRotation().getDegrees();
-  //   double Reef_X = ReefPose.getX();
-  //   double Reef_Y = ReefPose.getY();
-  //   double Reef_Rot = ReefPose.getRotation().getDegrees()+180;
-
     Pose2d currentPose = DriveSS.getPose();
 
-    test = currentPose.log(targetPose);
+    RobotDelta = currentPose.log(targetPose);
 
-    Pose2d test3 = currentPose.rotateAround(currentPose.getTranslation(), new Rotation2d(test.dtheta));
-    Transform2d test2 = targetPose.minus(currentPose);
-  //   // if (RotPID.atSetpoint()){
+    DogLog.log("Auto/DriveToReefV2Cmd/Exec/TwistDx", RobotDelta.dx);
+    DogLog.log("Auto/DriveToReefV2Cmd/Exec/TwistDy", RobotDelta.dy);
+    DogLog.log("Auto/DriveToReefV2Cmd/Exec/TwistDtheta", Units.radiansToDegrees(RobotDelta.dtheta));
 
-    DogLog.log("Auto/DriveToReefV2Cmd/Exec/TwistDx", test.dx);
-    DogLog.log("Auto/DriveToReefV2Cmd/Exec/TwistDy", test.dy);
-    DogLog.log("Auto/DriveToReefV2Cmd/Exec/TwistDtheta", Units.radiansToDegrees(test.dtheta));
-   
-      DogLog.log("Auto/DriveToReefV2Cmd/Exec/test3Pose", test3);
       double XVel = 0;
       double YVel = 0;
-      XVel = test.dx * 2;
-      YVel = test.dy * 2;
-      // XVel = XPID.calculate(CurrentX, targetPose.getX());
-      // YVel = YPID.calculate(CurrentY, targetPose.getY());
+      double RotVel = 0;
+      double RawXVel = 0;
+      double RawYVel = 0;
+      double RawRotVel = 0;
+      RawXVel = RobotDelta.dx * px;
+      RawYVel = RobotDelta.dy * py;
+      RawRotVel = RobotDelta.dtheta * pt;
+      XVel = RawXVel;
+      YVel = RawYVel;
+      RotVel = RawRotVel;
 
-  //   // }
-    // double RotVel = RotPID.calculate(DriveSS.getPose().getRotation().getDegrees(),targetPose.getRotation().getDegrees());
-    double RotVel = test.dtheta * 5;
     XVel = MathUtil.clamp(XVel, -3, 3);
     YVel = MathUtil.clamp(YVel, -3,3);
     RotVel = MathUtil.clamp(RotVel, -3, 3);
@@ -175,7 +127,7 @@ public class CmdA_DriveToReefPositionV3_Relative extends Command {
     DogLog.log("Auto/DriveToReefV2Cmd/Exec/ClampedYPIDOutput", YVel);
     DogLog.log("Auto/DriveToReefV2Cmd/Exec/ClampedRotPIDOutput", RotVel);
 
-    if (!atSetpoint(XVel, 0.03)){
+    if (!atSetpoint(XVel, xytolerance)){
       if (XVel > 0 ){
         XVel = Math.max(XVel, minSpeed);
       }
@@ -183,13 +135,16 @@ public class CmdA_DriveToReefPositionV3_Relative extends Command {
         XVel = Math.min(XVel, -minSpeed);
       }
     }
-    if (atSetpoint(XVel, 0.03)){
-      XVel = XPID.calculate(CurrentX, targetPose.getX());
+    if (atSetpoint(XVel, xytolerance)){
+      XVel = RawXVel;
     }
-    if (atSetpoint(YVel, 0.03)){
-      YVel = YPID.calculate(CurrentY, targetPose.getY());
+    if (atSetpoint(YVel, xytolerance)){
+      YVel = RawYVel ;
     }
-    if (!atSetpoint(YVel, 0.03)){
+    if (atSetpoint(RotVel, thetaTolerance)){
+      RotVel = RawRotVel ;
+    }
+    if (!atSetpoint(YVel, xytolerance)){
       if (  YVel > 0 ){
         YVel = Math.max(YVel, minSpeed);
       }
@@ -197,27 +152,24 @@ public class CmdA_DriveToReefPositionV3_Relative extends Command {
         YVel = Math.min(YVel, -minSpeed);
       }
     }
-
-    // if(Math.abs(RotPID.getError()) >= 3.0){
-    //   XVel = 0.1*XVel;
-    //   YVel = 0.1*YVel;
-      // System.out.println("Limpin'");
-      // System.out.println(Math.abs(CurrentRot - (targetPose.getRotation().getDegrees() + 180)));
+    // if (!atSetpoint(RotVel, thetaTolerance)){
+    //   if (  RotVel > 0 ){
+    //     RotVel = Math.max(RotVel, minThetaSpeed);
+    //   }
+    //   else if (RotVel < 0 ){
+    //     RotVel = Math.min(RotVel, -minThetaSpeed);
+    //   }
     
-    // }  
+
     DriveSS.drive(new Translation2d(XVel,YVel),RotVel,false);
 
-    // DriveSS.drive(new Translation2d(test.dx*3,test.dy*3),test.dtheta*3,false);
 
     DogLog.log("Auto/DriveToReefV2Cmd/Exec/ActualXOutput", XVel);
     DogLog.log("Auto/DriveToReefV2Cmd/Exec/ActualYOutput", YVel);
     DogLog.log("Auto/DriveToReefV2Cmd/Exec/ActualRotOutput", RotVel);
-    DogLog.log("Auto/DriveToReefV2Cmd/Exec/XPIDError", XPID.getError());
-    DogLog.log("Auto/DriveToReefV2Cmd/Exec/YPIDError", YPID.getError());
-    DogLog.log("Auto/DriveToReefV2Cmd/Exec/RotPIDError", RotPID.getError());
-    DogLog.log("Auto/DriveToReefV2Cmd/Check/XPIDAtSetpoint", Math.abs(test.dx) < 0.03);
-    DogLog.log("Auto/DriveToReefV2Cmd/Check/YPIDAtSetpoint", Math.abs(test.dy) < 0.03);
-    DogLog.log("Auto/DriveToReefV2Cmd/Check/RotPIDAtSetpoint", Math.abs(test.dtheta) < Units.degreesToRadians(1));
+    DogLog.log("Auto/DriveToReefV2Cmd/Check/XPIDAtSetpoint", atSetpoint(RobotDelta.dx, xytolerance));
+    DogLog.log("Auto/DriveToReefV2Cmd/Check/YPIDAtSetpoint", atSetpoint(RobotDelta.dy, xytolerance));
+    DogLog.log("Auto/DriveToReefV2Cmd/Check/RotPIDAtSetpoint", atSetpoint(RobotDelta.dtheta, thetaTolerance));
 
 
     
@@ -240,7 +192,7 @@ public class CmdA_DriveToReefPositionV3_Relative extends Command {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return Math.abs(test.dx) <= 0.03 && Math.abs(test.dy) <= 0.03 && RotPID.atSetpoint() && Math.abs((test.dtheta)) <= Units.degreesToRadians(1);
+    return atSetpoint(RobotDelta.dx, xytolerance) && atSetpoint(RobotDelta.dy, xytolerance) && atSetpoint(RobotDelta.dtheta, thetaTolerance);
   }
 
   public boolean wasInterrupted(){
