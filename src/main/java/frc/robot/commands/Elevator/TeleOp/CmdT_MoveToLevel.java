@@ -42,7 +42,7 @@ public class CmdT_MoveToLevel extends Command {
 
     DogLog.log("Tele/MoveToLevelCmd/CommandStatus", "executing");    
     //System.out.println("Moving to Level");
-    if (Coral_SS.DH_In_YellowZone)
+    if (!Coral_SS.DH_In_RedZone)
     {
       //System.out.println("Moving to Level (In yellow)");
       if (Coral_SS.GetScoreSelection() ==1)
@@ -112,6 +112,6 @@ public class CmdT_MoveToLevel extends Command {
     DogLog.log("Tele/MoveToLevelCmd/FinishedCondition/ElbowAtSetpoint", Coral_SS.IsElbowAtSetpoint());
     DogLog.log("Tele/MoveToLevelCmd/FinishedCondition/WristAtSetpoint", Coral_SS.IsWristAtSetpoint());
 
-    return (Coral_SS.IsElevatorAtSetpoint() && Coral_SS.IsElbowAtSetpoint() && Coral_SS.IsWristAtSetpoint()) || !Coral_SS.DH_In_YellowZone;
+    return (Coral_SS.IsElevatorAtSetpoint() && Coral_SS.IsElbowAtSetpoint() && Coral_SS.IsWristAtSetpoint()) || (!Coral_SS.DH_In_YellowZone && !Coral_SS.DH_In_RedZone);
   }
 }

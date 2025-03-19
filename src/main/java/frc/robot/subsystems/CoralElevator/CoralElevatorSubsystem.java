@@ -281,7 +281,11 @@ public class CoralElevatorSubsystem extends SubsystemBase {
   }
 
   public boolean IsElevatorAtSetpoint(){
-    return ElevatorPID.atSetpoint() || (ElevatorPID.getSetpoint() >= getFilteredElevatorHeight() && getUpStop()) || (ElevatorPID.getSetpoint() <= getFilteredElevatorHeight() && getDownStop());
+    boolean check =  ElevatorPID.atSetpoint() || (ElevatorPID.getSetpoint() > getFilteredElevatorHeight() && getUpStop()) || (ElevatorPID.getSetpoint() < getFilteredElevatorHeight() && getDownStop());
+    if (check && (getUpStop() || getDownStop())){
+      ElevatorPID.setSetpoint(tmpElbowSetpointHolder);
+    }
+    return check;
   }
   public boolean IsWristAtSetpoint(){
     return WristPID.atSetpoint();
