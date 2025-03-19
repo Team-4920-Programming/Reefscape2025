@@ -110,7 +110,7 @@ public final class Constants
         public static final double maxVelocity = 0.01;
       }
       public static class Wrist{
-        public static final double kp = 0.01;
+        public static final double kp = 0.008;//was .01 mjd 3/18 4:47pm
         public static final double ki = 0;
         public static final double kd = 0;
         

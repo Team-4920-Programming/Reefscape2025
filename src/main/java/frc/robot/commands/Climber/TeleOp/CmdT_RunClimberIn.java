@@ -25,7 +25,7 @@ public class CmdT_RunClimberIn extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    Climber_SS.RunClimberIn(0.7);
+    Climber_SS.RunClimberIn(1);
   }
 
   // Called once the command ends or is interrupted.
