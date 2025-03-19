@@ -82,6 +82,8 @@ public class Robot extends TimedRobot
   @Override
   public void disabledInit()
   {
+    m_robotContainer.DisableLimelight();
+
     m_robotContainer.ResetSetup();
 
     m_robotContainer.setMotorBrake(true);
@@ -106,6 +108,8 @@ public class Robot extends TimedRobot
   @Override
   public void autonomousInit()
   {
+    m_robotContainer.EnableLimelight();
+
     if(!m_robotContainer.IsSetupCompleted())
     {
       m_robotContainer.StartUpConfig();
@@ -136,6 +140,8 @@ public class Robot extends TimedRobot
     // teleop starts running. If you want the autonomous to
     // continue until interrupted by another command, remove
     // this line or comment it out.
+    m_robotContainer.EnableLimelight();
+
     if(!m_robotContainer.IsSetupCompleted())
     {
       m_robotContainer.StartUpConfig();
@@ -162,6 +168,7 @@ public class Robot extends TimedRobot
   @Override
   public void testInit()
   {
+    m_robotContainer.EnableLimelight();
     if(!m_robotContainer.IsSetupCompleted())
     {
       m_robotContainer.StartUpConfig();

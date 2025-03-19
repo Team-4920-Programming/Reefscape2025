@@ -130,7 +130,7 @@ public class CmdT_DriveToTarget extends Command {
         }
         else{
 
-          targetPose = new Pose2d(7.11,5.1, new Rotation2d((Units.degreesToRadians(0))));
+          targetPose = new Pose2d(7.11,5.076, new Rotation2d((Units.degreesToRadians(0))));
         }
 
       }

@@ -282,8 +282,8 @@ public class CoralElevatorSubsystem extends SubsystemBase {
 
   public boolean IsElevatorAtSetpoint(){
     boolean check =  ElevatorPID.atSetpoint() || (ElevatorPID.getSetpoint() > getFilteredElevatorHeight() && getUpStop()) || (ElevatorPID.getSetpoint() < getFilteredElevatorHeight() && getDownStop());
-    if (check && (getUpStop() || getDownStop())){
-      ElevatorPID.setSetpoint(tmpElbowSetpointHolder);
+    if (check && (getUpStop() || getDownStop() || getFilteredElevatorHeight() >= 0.55)){
+      ElevatorPID.setSetpoint(getFilteredElevatorHeight());
     }
     return check;
   }

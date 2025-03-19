@@ -49,15 +49,35 @@
           }
         },
         {
-          "type": "named",
+          "type": "sequential",
           "data": {
-            "name": "CmdA_Level4"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "CmdA_CoralOutTake"
+            "commands": [
+              {
+                "type": "race",
+                "data": {
+                  "commands": [
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "CmdA_Level4"
+                      }
+                    },
+                    {
+                      "type": "wait",
+                      "data": {
+                        "waitTime": 0.25
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "CmdA_CoralOutTake"
+                }
+              }
+            ]
           }
         },
         {
@@ -90,24 +110,57 @@
                 }
               },
               {
-                "type": "named",
+                "type": "race",
                 "data": {
-                  "name": "CmdA_DriveToReefPositionL"
+                  "commands": [
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "CmdA_DriveToReefPositionLTest"
+                      }
+                    },
+                    {
+                      "type": "wait",
+                      "data": {
+                        "waitTime": 4.0
+                      }
+                    }
+                  ]
                 }
               }
             ]
           }
         },
         {
-          "type": "named",
+          "type": "sequential",
           "data": {
-            "name": "CmdA_Level4"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "CmdA_CoralOutTake"
+            "commands": [
+              {
+                "type": "race",
+                "data": {
+                  "commands": [
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "CmdA_Level4"
+                      }
+                    },
+                    {
+                      "type": "wait",
+                      "data": {
+                        "waitTime": 0.25
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "CmdA_CoralOutTake"
+                }
+              }
+            ]
           }
         },
         {
@@ -136,28 +189,61 @@
               {
                 "type": "named",
                 "data": {
-                  "name": "CmdA_DriveToReefPositionR"
+                  "name": "CmdA_Level4"
                 }
               },
               {
-                "type": "named",
+                "type": "race",
                 "data": {
-                  "name": "CmdA_Level4"
+                  "commands": [
+                    {
+                      "type": "wait",
+                      "data": {
+                        "waitTime": 4.0
+                      }
+                    },
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "CmdA_DriveToReefPositionRTest"
+                      }
+                    }
+                  ]
                 }
               }
             ]
           }
         },
         {
-          "type": "named",
+          "type": "sequential",
           "data": {
-            "name": "CmdA_Level4"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "CmdA_CoralOutTake"
+            "commands": [
+              {
+                "type": "race",
+                "data": {
+                  "commands": [
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "CmdA_Level4"
+                      }
+                    },
+                    {
+                      "type": "wait",
+                      "data": {
+                        "waitTime": 0.25
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "CmdA_CoralOutTake"
+                }
+              }
+            ]
           }
         }
       ]

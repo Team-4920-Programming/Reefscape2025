@@ -49,9 +49,22 @@
           }
         },
         {
-          "type": "named",
+          "type": "race",
           "data": {
-            "name": "CmdA_Level4"
+            "commands": [
+              {
+                "type": "wait",
+                "data": {
+                  "waitTime": 0.25
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "CmdA_Level4"
+                }
+              }
+            ]
           }
         },
         {
@@ -90,9 +103,22 @@
                 }
               },
               {
-                "type": "named",
+                "type": "race",
                 "data": {
-                  "name": "CmdA_DriveToReefPositionR"
+                  "commands": [
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "CmdA_DriveToReefPositionRTest"
+                      }
+                    },
+                    {
+                      "type": "wait",
+                      "data": {
+                        "waitTime": 4.0
+                      }
+                    }
+                  ]
                 }
               }
             ]
@@ -103,9 +129,22 @@
           "data": {
             "commands": [
               {
-                "type": "named",
+                "type": "race",
                 "data": {
-                  "name": "CmdA_Level4"
+                  "commands": [
+                    {
+                      "type": "wait",
+                      "data": {
+                        "waitTime": 0.25
+                      }
+                    },
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "CmdA_Level4"
+                      }
+                    }
+                  ]
                 }
               },
               {
@@ -143,13 +182,26 @@
               {
                 "type": "named",
                 "data": {
-                  "name": "CmdA_DriveToReefPositionL"
+                  "name": "CmdA_Level4"
                 }
               },
               {
-                "type": "named",
+                "type": "race",
                 "data": {
-                  "name": "CmdA_Level4"
+                  "commands": [
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "CmdA_DriveToReefPositionLTest"
+                      }
+                    },
+                    {
+                      "type": "wait",
+                      "data": {
+                        "waitTime": 4.0
+                      }
+                    }
+                  ]
                 }
               }
             ]
@@ -160,9 +212,22 @@
           "data": {
             "commands": [
               {
-                "type": "named",
+                "type": "race",
                 "data": {
-                  "name": "CmdA_Level4"
+                  "commands": [
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "CmdA_Level4"
+                      }
+                    },
+                    {
+                      "type": "wait",
+                      "data": {
+                        "waitTime": 0.25
+                      }
+                    }
+                  ]
                 }
               },
               {

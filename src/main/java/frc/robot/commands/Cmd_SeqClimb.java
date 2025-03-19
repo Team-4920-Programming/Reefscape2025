@@ -46,9 +46,9 @@ public class Cmd_SeqClimb extends SequentialCommandGroup {
     addCommands(//7.11,5.1 180 - Blue
     //10.438,2.952 0 - Red
     //17.548 8.052 - Field
-      new ParallelDeadlineGroup(new ParallelCommandGroup(new CmdT_DriveToTarget(Drive_SS, Target.CLIMBSTART, 2, 0), new CmdT_ClimberOut(Climb_SS)), new CmdT_WristEject(Coral_SS)),
-      new CmdT_DriveToPoseRelative(Drive_SS, 1.25, Units.metersToInches(-1.76), 0, 0),
-      new CmdT_DriveToPoseRelative(Drive_SS, 1.25, Units.metersToInches(0.87), 0, 0)
+      new ParallelCommandGroup(new CmdT_DriveToTarget(Drive_SS, Target.CLIMBSTART, 2, 0), new CmdT_ClimberOut(Climb_SS))//,
+      // new CmdT_DriveToPoseRelative(Drive_SS, 1.25, Units.metersToInches(-1.76), 0, 0),
+      // new CmdT_DriveToPoseRelative(Drive_SS, 1.25, Units.metersToInches(0.87), 0, 0)
 
     );
   }
