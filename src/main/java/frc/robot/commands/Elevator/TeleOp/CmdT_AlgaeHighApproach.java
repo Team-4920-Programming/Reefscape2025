@@ -8,8 +8,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.CoralElevator.CoralElevatorSubsystem;
 import frc.robot.Constants.RobotPositions;
 import frc.robot.Constants.RobotPositions.*;
-import frc.robot.Constants.RobotPositions.Level1;
-import frc.robot.Constants.RobotPositions.Level2;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class CmdT_AlgaeHighApproach extends Command {
@@ -40,6 +38,6 @@ public class CmdT_AlgaeHighApproach extends Command {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return (Math.abs(m_ElevatorSubsystem.getHeightLaserMeters() - AlgaeHighApproach.height) < 0.1) && (Math.abs(m_ElevatorSubsystem.GetElbowAngle() - AlgaeHighApproach.elbow) < 5) && (Math.abs(m_ElevatorSubsystem.GetWristAngleWorldCoordinates() - AlgaeHighApproach.wrist) < 5) ;
+    return (m_ElevatorSubsystem.IsElevatorAtSetpoint() && m_ElevatorSubsystem.IsWristAtSetpoint() && m_ElevatorSubsystem.IsElbowAtSetpoint());
   }
 }

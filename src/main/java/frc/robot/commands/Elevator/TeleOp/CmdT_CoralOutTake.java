@@ -46,7 +46,7 @@ public class CmdT_CoralOutTake extends Command {
         speed = 0.35;
       }
       else{
-        speed = 0.75;
+        speed = 0.5;
       }
   
       DogLog.log("Tele/CoralOutTakeCmd/Exec/IntakeSpeed", -speed);

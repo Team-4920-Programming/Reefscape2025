@@ -41,6 +41,6 @@ public class CmdT_AlgaeMidApproach extends Command {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return (Math.abs(m_ElevatorSubsystem.getHeightLaserMeters() - AlgaeMidApproach.height) < 0.1) && (Math.abs(m_ElevatorSubsystem.GetElbowAngle() - AlgaeMidApproach.elbow) < 5) && (Math.abs(m_ElevatorSubsystem.GetWristAngleWorldCoordinates() - AlgaeMidApproach.wrist) < 5) ;
+    return (m_ElevatorSubsystem.IsElevatorAtSetpoint() && m_ElevatorSubsystem.IsWristAtSetpoint() && m_ElevatorSubsystem.IsElbowAtSetpoint());
   }
 }

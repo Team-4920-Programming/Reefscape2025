@@ -26,6 +26,7 @@ public class CmdA_Level4 extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
+        m_ElevatorSubsystem.OverrideRedZone = true;
         DogLog.log("Auto/Level4Cmd/CommandStatus", "initialized");
 
   }
@@ -41,6 +42,7 @@ public class CmdA_Level4 extends Command {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
+    m_ElevatorSubsystem.OverrideRedZone = false;
     DogLog.log("Auto/Level4Cmd/CommandStatus", "finished");
     DogLog.log("Auto/Level4Cmd/CommandWasInterrupted", interrupted);
 

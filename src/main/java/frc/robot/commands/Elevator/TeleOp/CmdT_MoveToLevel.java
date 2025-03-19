@@ -42,7 +42,7 @@ public class CmdT_MoveToLevel extends Command {
 
     DogLog.log("Tele/MoveToLevelCmd/CommandStatus", "executing");    
     //System.out.println("Moving to Level");
-    if (Coral_SS.DH_In_YellowZone)
+    if (!Coral_SS.DH_In_RedZone)
     {
       //System.out.println("Moving to Level (In yellow)");
       if (Coral_SS.GetScoreSelection() ==1)
@@ -106,25 +106,12 @@ public class CmdT_MoveToLevel extends Command {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    boolean finished = false;
-    if (!Coral_SS.DH_In_YellowZone)
-    {
-      DogLog.log("Tele/MoveToLevelCmd/FinishedCondition/NotInYellowZone", !Coral_SS.DH_In_YellowZone);
-      finished = true;
-      //System.out.println("Not in yellow finish command");
-    } 
-    //System.out.println("ElevatorPs" + Math.abs(Coral_SS.getHeightLaserMeters() - TargetHeight));
-    //System.out.println("Elbow" +Math.abs(Coral_SS.GetElbowAngle() - TargetElbowAng));
-    //System.out.println("Wrist"+Math.abs(Coral_SS.GetWristAngleWorldCoordinates() - TargetWristAng));
-    if  ((Math.abs(Coral_SS.getHeightLaserMeters() - TargetHeight) < 0.1) && (Math.abs(Coral_SS.GetElbowAngle() - TargetElbowAng) < 5) && (Math.abs(Coral_SS.GetWristAngleWorldCoordinates() - TargetWristAng) < 5))
-  {
-    DogLog.log("Tele/MoveToLevelCmd/FinishedCondition/ElevatorAtSetpoint", Math.abs(Coral_SS.getHeightLaserMeters() - TargetHeight) < 0.1);
-    DogLog.log("Tele/MoveToLevelCmd/FinishedCondition/ElbowAtSetpoint", Math.abs(Coral_SS.GetElbowAngle() - TargetElbowAng) < 5);
-    DogLog.log("Tele/MoveToLevelCmd/FinishedCondition/WristAtSetpoint",Math.abs(Coral_SS.GetWristAngleWorldCoordinates() - TargetWristAng) < 5);
-      finished = true;
-      //System.out.println("At Position finish command");
-  }
 
-    return finished;
+    DogLog.log("Tele/MoveToLevelCmd/FinishedCondition/NotInYellowZone", !Coral_SS.DH_In_YellowZone);
+    DogLog.log("Tele/MoveToLevelCmd/FinishedCondition/ElevatorAtSetpoint", Coral_SS.IsElevatorAtSetpoint());
+    DogLog.log("Tele/MoveToLevelCmd/FinishedCondition/ElbowAtSetpoint", Coral_SS.IsElbowAtSetpoint());
+    DogLog.log("Tele/MoveToLevelCmd/FinishedCondition/WristAtSetpoint", Coral_SS.IsWristAtSetpoint());
+
+    return (Coral_SS.IsElevatorAtSetpoint() && Coral_SS.IsElbowAtSetpoint() && Coral_SS.IsWristAtSetpoint()) || (!Coral_SS.DH_In_YellowZone && !Coral_SS.DH_In_RedZone);
   }
 }
