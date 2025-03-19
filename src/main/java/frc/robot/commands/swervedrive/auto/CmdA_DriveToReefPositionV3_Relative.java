@@ -37,7 +37,7 @@ public class CmdA_DriveToReefPositionV3_Relative extends Command {
   double minSpeed = 0.25;
   boolean inter;
   Twist2d RobotDelta;
-  double xytolerance = 0.03;
+  double xytolerance = 0.025;
   double thetaTolerance = Units.degreesToRadians(1);
   double px = 2;
   double py = 2;
