@@ -20,15 +20,14 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.Constants.RobotAutomationInformation.AutoAlignCoralFeederStation;
 import frc.robot.Constants.RobotAutomationInformation.AutoAlignReef;
 import frc.robot.subsystems.DataHighway.DataHighwaySubsystem;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
-public class CmdA_DriveToReefPositionV3_Relative extends Command {
-
-  Integer branch;
+public class CmdA_DriveToFeederPosition_Relative extends Command {
  
   SwerveSubsystem DriveSS;
   Pose2d ReefPose;
@@ -37,14 +36,13 @@ public class CmdA_DriveToReefPositionV3_Relative extends Command {
   double minSpeed = 0.25;
   boolean inter;
   Twist2d RobotDelta;
-  double xytolerance = 0.03;
-  double thetaTolerance = Units.degreesToRadians(1);
+  double xytolerance = 0.05;
+  double thetaTolerance = Units.degreesToRadians(5);
   double px = 2;
   double py = 2;
   double pt = 5;
-  public CmdA_DriveToReefPositionV3_Relative(SwerveSubsystem DriveSubsystem, int Position) {
+  public CmdA_DriveToFeederPosition_Relative(SwerveSubsystem DriveSubsystem) {
     // Use addRequirements() here to declare subsystem dependencies.
-    branch = Position;
     DriveSS = DriveSubsystem;
     addRequirements(DriveSS);
   }
@@ -53,39 +51,20 @@ public class CmdA_DriveToReefPositionV3_Relative extends Command {
   @Override
   public void initialize() {
 
-    double branchoffset = AutoAlignReef.branchOffset;
-    double distanceFromFace = AutoAlignReef.distanceFromFace-Units.inchesToMeters(0.25);
     inter = false;
     Pose2d targetAprilTagPose = DriveSS.GetClosestReefSegment();
 
     targetPose = new Pose2d();
     targetPose = targetAprilTagPose;
-    if (branch == 1){
-
-      Transform2d test = new Transform2d(distanceFromFace, -branchoffset
+      Transform2d test = new Transform2d(AutoAlignCoralFeederStation.distanceFromFace, 0
       ,new Rotation2d(0));
 
-      targetPose = targetAprilTagPose.plus(test);
-      targetPose = targetPose.rotateAround(targetPose.getTranslation(), new Rotation2d(Units.degreesToRadians(180)));
+      targetPose = DriveSS.GetClosestPickupSlot().plus(test);
 
-      //System.out.println("target Pose = " + targetPose.toString());
-      //System.out.println("target April Tag Pose = " + targetAprilTagPose.toString());
-      //System.out.println("transform = " + test.toString());
 
-    }
-    if (branch == 2){
-
-      Transform2d test = new Transform2d(distanceFromFace, branchoffset + Units.inchesToMeters(1)
-      ,new Rotation2d(0));
-
-      targetPose = targetAprilTagPose.plus(test);
-      targetPose = targetPose.rotateAround(targetPose.getTranslation(), new Rotation2d(Units.degreesToRadians(180)));
-
-    }
     
-    DogLog.log("Auto/DriveToReefRelative/CommandStatus", "initialized");
-    DogLog.log("Auto/DriveToReefRelative/Init/Branch", branch);
-    DogLog.log("Auto/DriveToReefRelative/Init/targetPose", targetPose);
+    DogLog.log("Auto/DriveToFeederRelative/CommandStatus", "initialized");
+    DogLog.log("Auto/DriveToFeederRelative/Init/targetPose", targetPose);
 
     startingPose = DriveSS.getPose();
   }
@@ -95,16 +74,16 @@ public class CmdA_DriveToReefPositionV3_Relative extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    DogLog.log("Auto/DriveToReefRelative/CommandStatus", "executing");
-    DogLog.log("Auto/DriveToReefRelative/Exec/CurrentRobotPose", DriveSS.getPose());
+    DogLog.log("Auto/DriveToFeederRelative/CommandStatus", "executing");
+    DogLog.log("Auto/DriveToFeederRelative/Exec/CurrentRobotPose", DriveSS.getPose());
 
     Pose2d currentPose = DriveSS.getPose();
 
     RobotDelta = currentPose.log(targetPose);
 
-    DogLog.log("Auto/DriveToReefRelative/Exec/TwistDx", RobotDelta.dx);
-    DogLog.log("Auto/DriveToReefRelative/Exec/TwistDy", RobotDelta.dy);
-    DogLog.log("Auto/DriveToReefRelative/Exec/TwistDtheta", Units.radiansToDegrees(RobotDelta.dtheta));
+    DogLog.log("Auto/DriveToFeederRelative/Exec/TwistDx", RobotDelta.dx);
+    DogLog.log("Auto/DriveToFeederRelative/Exec/TwistDy", RobotDelta.dy);
+    DogLog.log("Auto/DriveToFeederRelative/Exec/TwistDtheta", Units.radiansToDegrees(RobotDelta.dtheta));
 
       double XVel = 0;
       double YVel = 0;
@@ -123,9 +102,9 @@ public class CmdA_DriveToReefPositionV3_Relative extends Command {
     YVel = MathUtil.clamp(YVel, -3,3);
     RotVel = MathUtil.clamp(RotVel, -3, 3);
 
-    DogLog.log("Auto/DriveToReefRelative/Exec/ClampedXPIDOutput", XVel);
-    DogLog.log("Auto/DriveToReefRelative/Exec/ClampedYPIDOutput", YVel);
-    DogLog.log("Auto/DriveToReefRelative/Exec/ClampedRotPIDOutput", RotVel);
+    DogLog.log("Auto/DriveToFeederRelative/Exec/ClampedXPIDOutput", XVel);
+    DogLog.log("Auto/DriveToFeederRelative/Exec/ClampedYPIDOutput", YVel);
+    DogLog.log("Auto/DriveToFeederRelative/Exec/ClampedRotPIDOutput", RotVel);
 
     if (!atSetpoint(XVel, xytolerance)){
       if (XVel > 0 ){
@@ -157,12 +136,12 @@ public class CmdA_DriveToReefPositionV3_Relative extends Command {
     DriveSS.drive(new Translation2d(XVel,YVel),RotVel,false);
 
 
-    DogLog.log("Auto/DriveToReefRelative/Exec/ActualXOutput", XVel);
-    DogLog.log("Auto/DriveToReefRelative/Exec/ActualYOutput", YVel);
-    DogLog.log("Auto/DriveToReefRelative/Exec/ActualRotOutput", RotVel);
-    DogLog.log("Auto/DriveToReefRelative/Check/XPIDAtSetpoint", atSetpoint(RobotDelta.dx, xytolerance));
-    DogLog.log("Auto/DriveToReefRelative/Check/YPIDAtSetpoint", atSetpoint(RobotDelta.dy, xytolerance));
-    DogLog.log("Auto/DriveToReefRelative/Check/RotPIDAtSetpoint", atSetpoint(RobotDelta.dtheta, thetaTolerance));
+    DogLog.log("Auto/DriveToFeederRelative/Exec/ActualXOutput", XVel);
+    DogLog.log("Auto/DriveToFeederRelative/Exec/ActualYOutput", YVel);
+    DogLog.log("Auto/DriveToFeederRelative/Exec/ActualRotOutput", RotVel);
+    DogLog.log("Auto/DriveToFeederRelative/Check/XPIDAtSetpoint", atSetpoint(RobotDelta.dx, xytolerance));
+    DogLog.log("Auto/DriveToFeederRelative/Check/YPIDAtSetpoint", atSetpoint(RobotDelta.dy, xytolerance));
+    DogLog.log("Auto/DriveToFeederRelative/Check/RotPIDAtSetpoint", atSetpoint(RobotDelta.dtheta, thetaTolerance));
 
 
     
@@ -173,12 +152,12 @@ public class CmdA_DriveToReefPositionV3_Relative extends Command {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    DogLog.log("Auto/DriveToReefRelative/CommandStatus", "finished");
+    DogLog.log("Auto/DriveToFeederRelative/CommandStatus", "finished");
     DriveSS.drive(new ChassisSpeeds(0,0,0));
     //System.out.println("DrivetoReef Finished");
     //System.out.println("interrupted"+interrupted);
     inter = interrupted;
-    DogLog.log("Auto/DriveToReefRelative/End/Interrupted", inter); 
+    DogLog.log("Auto/DriveToFeederRelative/End/Interrupted", inter); 
     
   }
 

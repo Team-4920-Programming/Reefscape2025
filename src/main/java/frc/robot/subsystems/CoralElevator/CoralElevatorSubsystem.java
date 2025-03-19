@@ -278,17 +278,10 @@ public class CoralElevatorSubsystem extends SubsystemBase {
     if (!SetpointsFrozen){
       ElevatorPID.setSetpoint(height);
     }
-    // if (height > getFilteredElevatorHeight() && !SetpointsFrozen){ //&& CanMoveElevatorUp()&& !SetpointsFrozen){
-    //   // ElevatorPID.setGoal(new State(height, 0));
-    //   ElevatorPID.setSetpoint(height); //(new State(height, 0));
-    // }
-    // else if (height < getFilteredElevatorHeight() && CanMoveElevatorDown()&& !SetpointsFrozen){
-    //   ElevatorPID.setSetpoint(height); //(new State(height, 0));
-    // }
   }
 
   public boolean IsElevatorAtSetpoint(){
-    return ElevatorPID.atSetpoint();
+    return ElevatorPID.atSetpoint() || (ElevatorPID.getSetpoint() >= getFilteredElevatorHeight() && getUpStop()) || (ElevatorPID.getSetpoint() <= getFilteredElevatorHeight() && getDownStop());
   }
   public boolean IsWristAtSetpoint(){
     return WristPID.atSetpoint();
@@ -383,17 +376,6 @@ public class CoralElevatorSubsystem extends SubsystemBase {
 
   public void SetWristAngle(double angle)
   {
-    ////System.out.println("Angle = " + angle);
-    ////System.out.println("GetWristAngleWorldCoordinates = " + GetWristAngleWorldCoordinates());
-    ////System.out.println("CanMoveWristInc = " + CanMoveWristInc());
-    ////System.out.println("CanMoveWristDec = " + CanMoveWristDec());
-    ////System.out.println("GetWristAngle =" +  GetWristAngle());
-    // if (angle > GetWristAngleWorldCoordinates() && CanMoveWristInc() && !SetpointsFrozen){
-    //   WristPID.setSetpoint(angle);
-    // }
-    // if (angle < GetWristAngleWorldCoordinates() && CanMoveWristDec() && !SetpointsFrozen){
-    //   WristPID.setSetpoint(angle);
-    // }
     if (!SetpointsFrozen){
       WristPID.setSetpoint(angle);
     }
@@ -438,135 +420,14 @@ public class CoralElevatorSubsystem extends SubsystemBase {
       ElevatorPID.setSetpoint(CoralStation.height);
       }
       else{
-      ElevatorPID.setSetpoint(getHeightLaserMeters());
+      ElevatorPID.setSetpoint(getFilteredElevatorHeight());
       }
     }
 
   public void setArmPosition(double height, double elbow, double wrist){
-  
-    double goalheight = height ;
-    double goalwrist = wrist;
-    double goalelbow = elbow;
-
-    /*****
-       //safety Checks
-    boolean ElevatorDirectionUp = false;
-    boolean ElevatorDirectionDown = false;
-    boolean ElbowUp = false;
-    boolean ElbowDown = false;
-    boolean WristUp = false;
-    boolean WristDown = false;
-
-    if (getFilteredElevatorHeight() < goalheight )
-    {
-      ElevatorDirectionUp = true;
-      ElevatorDirectionDown = false;
-
-    }
-    if (getFilteredElevatorHeight() > goalheight )
-    {
-      ElevatorDirectionDown = true;
-      ElevatorDirectionUp = false;
-    }
-
-    if (GetElbowAngle() < goalelbow )
-    {
-      ElbowUp = true;
-      ElbowDown = false;
-
-    }
-    if (GetElbowAngle() > goalelbow )
-    {
-      ElbowDown = true;
-      ElbowUp = false;
-    }
-    if (GetWristAngleWorldCoordinates() < goalwrist )
-    {
-      WristUp = true;
-      WristDown = false;
-
-    }
-    if (GetWristAngleWorldCoordinates() > goalwrist )
-    {
-      WristUp = false;
-      WristDown = true;
-
-    }
-
-    //Elevator Height Move
-
-
-    // if (ElevatorDirectionUp && CanMoveElevatorUp())
-    // {
-        SetElevatorPosition(goalheight);
-    // }
-    // if (ElevatorDirectionDown && CanMoveElevatorDown())
-    // {
-    //     SetElevatorPosition(goalheight);
-    // }
-
-    //Elbow Move
-    // Boolean ElevatorClearForElbowUp = false;
-    // Boolean ElevatorClearForElbowDown = false;
-    // if (getFilteredElevatorHeight() > RobotMotionLimits.Elevator.minHeight && getFilteredElevatorHeight() < RobotMotionLimits.Elevator.maxHeight)
-    // {
-    //     ElevatorClearForElbowUp = true;
-    //     ElevatorClearForElbowDown = true;
-    // }
-    // Boolean WristClearforElbowUp = false;
-    // Boolean WristClearforElbowDown = false;
-
-
-    // if (GetWristAngleWorldCoordinates() > RobotMotionLimits.Wrist.minAngle + 10 && GetWristAngleWorldCoordinates() < RobotMotionLimits.Wrist.maxAngle - 5)
-    // {
-     
-    //     WristClearforElbowUp = true;
-      
-    // }
-
-    // if (GetWristAngleWorldCoordinates() > RobotMotionLimits.Wrist.minAngle + 10)
-    // {
-     
-    //     WristClearforElbowDown = true;
-      
-    // }
-
-    
-
-    // if (ElbowUp && ElevatorClearForElbowUp && WristClearforElbowUp)
-      if (ElbowUp && CanMoveElbowInc()){
-      SetElbowAngle(goalelbow);
-      }
-    // if (ElbowDown && ElevatorClearForElbowDown && WristClearforElbowDown)
-      if (ElbowDown && CanMoveElbowDec()){
-      SetElbowAngle(goalelbow);
-      }
-
-    Boolean ElbowClearForWristUp = false;
-    Boolean ElbowClearForWristDown = false;
-    // if (GetElbowAngle() >0 && GetElbowAngle() <190)
-    if (GetElbowAngle() < 15 && GetWristAngleWorldCoordinates() < -60)
-    {
-     ElbowClearForWristUp = true;
-      ElbowClearForWristDown = false;
-    }
-    else{
-      ElbowClearForWristUp = true;
-      ElbowClearForWristDown = true;
-    }
-    if (WristUp && ElbowClearForWristUp)
-    {
-      SetWristAngle(goalwrist);
-    }
-    if (WristDown && ElbowClearForWristDown)
-    {
-      SetWristAngle(goalwrist);
-    }
-      *****/
-
-      SetElevatorPosition(goalheight);
-      SetElbowAngle(goalelbow);
-      SetWristAngle(goalwrist);
+      SetElevatorPosition(height);
+      SetElbowAngle(elbow);
+      SetWristAngle(wrist);
   }
 
   public double getFilteredElevatorHeight(){
@@ -671,6 +532,9 @@ public class CoralElevatorSubsystem extends SubsystemBase {
     DogLog.log("CoralElevatorSS/Intake/HasCoral", isCoralPresent());
     DogLog.log("CoralElevatorSS/Intake/IntakeSpeed", CoralIntakeMotor.get());
     DogLog.log("CoralElevatorSS/Check/ScoreSelection", ScoreSelection);
+    DogLog.log("CoralElevatorSS/Check/SetpointsFrozen", SetpointsFrozen);
+    DogLog.log("CoralElevatorSS/Check/ElevatorUpStop", getUpStop());
+    DogLog.log("CoralElevatorSS/Check/ElevatorDownStop", getDownStop());
 
     DogLog.log("CoralElevatorSS/Check/IsElevatorAtSetpoint", IsElevatorAtSetpoint());
     DogLog.log("CoralElevatorSS/Check/IsElbowAtSetpoint", IsElbowAtSetpoint());
@@ -814,13 +678,13 @@ public class CoralElevatorSubsystem extends SubsystemBase {
   }
 
   
-  public double getHeightMeters()
-  {
-    double elevatorHeight = (ElevatorEncoder.getPosition() / PIDs.CoralElevator.Elevator.elevatorReduction) *
-    (2 * Math.PI * PIDs.CoralElevator.Elevator.pulleyRadius);
-    // DogLog.log("Elevator Height", elevatorHeight);
-    return elevatorHeight;
-  }
+  // public double getHeightMeters()
+  // {
+  //   double elevatorHeight = (ElevatorEncoder.getPosition() / PIDs.CoralElevator.Elevator.elevatorReduction) *
+  //   (2 * Math.PI * PIDs.CoralElevator.Elevator.pulleyRadius);
+  //   // DogLog.log("Elevator Height", elevatorHeight);
+  //   return elevatorHeight;
+  // }
 
   public double getHeightLaserMeters(){
     

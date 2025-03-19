@@ -49,6 +49,7 @@ import frc.robot.commands.Elevator.Auto.CmdA_Level4;
 import frc.robot.commands.Elevator.Auto.CmdA_Station;
 import frc.robot.commands.Elevator.TeleOp.*;
 import frc.robot.commands.ReefSurvey.AddToReefTest;
+import frc.robot.commands.swervedrive.auto.CmdA_DriveToFeederPosition_Relative;
 import frc.robot.commands.swervedrive.auto.CmdA_DriveToReefPosition;
 import frc.robot.commands.swervedrive.auto.CmdA_DriveToReefPositionV2;
 import frc.robot.commands.swervedrive.auto.CmdA_DriveToReefPositionV3_Relative;
@@ -171,12 +172,12 @@ public class RobotContainer
     NamedCommands.registerCommand("CmdA_CoralIntake", new CmdA_CoralIntake (CoralElevatorSS));
     NamedCommands.registerCommand("CmdA_DriveToReefPositionR", new CmdA_DriveToReefPositionV3_Relative(drivebase, 2));
     NamedCommands.registerCommand("CmdA_DriveToReefPositionL", new CmdA_DriveToReefPositionV3_Relative(drivebase, 1));
+    NamedCommands.registerCommand("CmdA_DriveToFeederRelative", new CmdA_DriveToFeederPosition_Relative(drivebase));
 
 
-    if (Robot.isSimulation()) 
-      DogLog.setOptions(new DogLogOptions().withNtPublish(true));
-    else
-      DogLog.setOptions(new DogLogOptions().withNtPublish(true));
+
+    DogLog.setOptions(new DogLogOptions().withNtPublish(true));
+    DogLog.setOptions(new DogLogOptions().withCaptureDs(true));
 
     DogLog.setPdh(new PowerDistribution());
     DogLog.setEnabled(true);
@@ -304,6 +305,7 @@ public class RobotContainer
   /****************Start of Teleop Controls*****************************/
   
   //Default Commands
+    
 
   drivebase.setDefaultCommand(driveFieldOrientedAnglularVelocity); // Overrides drive command above!
   CoralElevatorSS.setDefaultCommand(new CmdT_Def_Elevator(CoralElevatorSS));
@@ -322,7 +324,7 @@ public class RobotContainer
   driverXbox.y().whileTrue(new CmdT_CoralOutTake(CoralElevatorSS ));
 
   driverXbox.a().whileTrue(new CmdT_DriveToFeederPositionV2(drivebase));
-  // driverXbox.b().whileTrue(new CmdA_DriveToReefPositionV3_Relative(drivebase, 2));
+  driverXbox.b().whileTrue(new CmdA_DriveToFeederPosition_Relative(drivebase));
 
   // Button 1: Abort climb
   OperatorJoystick.button(1 ).whileTrue(new CmdT_ClimberIn(ClimberSS));

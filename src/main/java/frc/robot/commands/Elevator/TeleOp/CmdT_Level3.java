@@ -39,6 +39,6 @@ public class CmdT_Level3 extends Command {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return (Math.abs(m_ElevatorSubsystem.getHeightLaserMeters() - Level3.height) < 0.1) && (Math.abs(m_ElevatorSubsystem.GetElbowAngle() - Level3.elbow) < 5) && (Math.abs(m_ElevatorSubsystem.GetWristAngleWorldCoordinates() - Level3.wrist) < 5) ;
+    return (m_ElevatorSubsystem.IsElevatorAtSetpoint() && m_ElevatorSubsystem.IsWristAtSetpoint() && m_ElevatorSubsystem.IsElbowAtSetpoint());
   }
 }

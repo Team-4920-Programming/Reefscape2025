@@ -48,6 +48,6 @@ public class CmdA_Station extends Command {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return (Math.abs(m_ElevatorSubsystem.getHeightLaserMeters() - CoralStation.height) < 0.1) && (Math.abs(m_ElevatorSubsystem.GetElbowAngle() - CoralStation.elbow) < 5) && (Math.abs(m_ElevatorSubsystem.GetWristAngleWorldCoordinates() - CoralStation.wrist) < 5) ;
+    return m_ElevatorSubsystem.IsElbowAtSetpoint() && m_ElevatorSubsystem.IsElevatorAtSetpoint() && m_ElevatorSubsystem.IsWristAtSetpoint() ;
   }
 }
