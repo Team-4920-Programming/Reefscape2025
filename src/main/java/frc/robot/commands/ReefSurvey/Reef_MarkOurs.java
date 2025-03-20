@@ -19,7 +19,7 @@ public class Reef_MarkOurs extends Command {
     // Use addRequirements() here to declare subsystem dependencies.
     Reef_SS = reefss;
     
-    Rside = side;
+    Rside = side ; 
   }
 
   // Called when the command is initially scheduled.
