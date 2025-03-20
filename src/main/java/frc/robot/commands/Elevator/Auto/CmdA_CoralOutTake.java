@@ -7,7 +7,7 @@ package frc.robot.commands.Elevator.Auto;
 import dev.doglog.DogLog;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.BoltLog;
+
 import frc.robot.Robot;
 import frc.robot.subsystems.CoralElevator.CoralElevatorSubsystem;
 
@@ -16,7 +16,7 @@ import frc.robot.subsystems.CoralElevator.CoralElevatorSubsystem;
 public class CmdA_CoralOutTake extends Command {
   /** Creates a new Cmd_Shoot_TeleOp. */
   CoralElevatorSubsystem CoralElevatorSS; 
-    private final BoltLog BoltLogger = new BoltLog();
+
     private Timer PresentTimer = new Timer();
   boolean CoralOut = false;
   public CmdA_CoralOutTake(CoralElevatorSubsystem CoralElevator_Subsystem) {

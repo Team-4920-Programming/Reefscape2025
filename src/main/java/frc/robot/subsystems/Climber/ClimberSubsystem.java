@@ -4,34 +4,21 @@
 
 package frc.robot.subsystems.Climber;
 
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
+
+
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
-import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
-import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Config;
-import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
+
+
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.units.measure.MutAngle;
-import edu.wpi.first.units.measure.MutAngularVelocity;
-import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj.RobotController;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
-import static edu.wpi.first.units.Units.Degrees;
-import static edu.wpi.first.units.Units.DegreesPerSecond;
-import static edu.wpi.first.units.Units.Minute;
-import static edu.wpi.first.units.Units.Rotations;
-import static edu.wpi.first.units.Units.RotationsPerSecond;
-import static edu.wpi.first.units.Units.Volts;
+import edu.wpi.first.wpilibj.DigitalInput;
+
 
 import com.revrobotics.AbsoluteEncoder;
-import com.revrobotics.spark.SparkAbsoluteEncoder;
-import com.revrobotics.spark.SparkBase;
-import com.revrobotics.spark.SparkLimitSwitch;
+
 import com.revrobotics.spark.SparkMax;
-import com.revrobotics.spark.SparkRelativeEncoder;
+
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 
@@ -41,12 +28,9 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
-import frc.robot.Constants;
+
 import frc.robot.Constants.CanIDs;
 import frc.robot.Constants.DIO;
-import frc.robot.Constants.PIDs;
-import frc.robot.Constants.RobotLimits;
-import frc.robot.commands.swervedrive.drivebase.AbsoluteDrive;
 
 public class ClimberSubsystem extends SubsystemBase {
   private SparkMax climberMotor;
@@ -168,12 +152,6 @@ public class ClimberSubsystem extends SubsystemBase {
     ClimberIdle = true;
   }
 
-  private Boolean CanMoveClimberIn(){
-    return climberAngle > RobotLimits.Climber.minAngle;
-  }
-  private Boolean CanMoveClimberOut(){
-    return climberAngle < RobotLimits.Climber.maxAngle;
-  }
   public void SetRightFlap(double Angle)
   {
     RightFlapPID.setSetpoint(Angle);

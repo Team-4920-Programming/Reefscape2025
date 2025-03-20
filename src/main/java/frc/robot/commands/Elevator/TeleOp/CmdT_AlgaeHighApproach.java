@@ -6,7 +6,7 @@ package frc.robot.commands.Elevator.TeleOp;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.CoralElevator.CoralElevatorSubsystem;
-import frc.robot.Constants.RobotPositions;
+
 import frc.robot.Constants.RobotPositions.*;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */

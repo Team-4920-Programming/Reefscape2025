@@ -12,7 +12,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.units.measure.Current;
+
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 
@@ -104,7 +104,7 @@ public class CmdT_DriveToFeederPosition extends Command {
     }
     if (CurrentLocation.getX() < 2.5 && CurrentLocation.getY() > 5.5 && DriveSS.DH_OUT_isBlueAlliance)
     {
-      double OffsetX = 0;
+
       double OffsetY = 8;
       StartingPositionOK = true;
       s1x =  s1x + RobotOffsetX;
@@ -201,7 +201,6 @@ public class CmdT_DriveToFeederPosition extends Command {
     double DistanceS6 = Math.sqrt(Math.pow((CurrentX - s6x),2)+Math.pow((CurrentY - s6y),2));
     double DistanceS7 = Math.sqrt(Math.pow((CurrentX - s7x),2)+Math.pow((CurrentY - s7y),2));
 
-  Translation2d CurrentTranslation = CurrentLocation.getTranslation();
   Translation2d S1 = new Translation2d(s1x,s1y);
   Translation2d S2 = new Translation2d(s2x,s2y);
   Translation2d S3 = new Translation2d(s3x,s3y);

@@ -5,17 +5,13 @@ package frc.robot.subsystems.DataHighway;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
-import edu.wpi.first.hal.PWMJNI;
+
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
-import edu.wpi.first.wpilibj.DriverStation;
+
 import edu.wpi.first.wpilibj.LEDPattern;
-import edu.wpi.first.wpilibj.RobotController;
-import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.smartdashboard.Field2d;
-import edu.wpi.first.wpilibj.smartdashboard.FieldObject2d;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Robot;
@@ -23,19 +19,19 @@ import frc.robot.subsystems.CoralElevator.CoralElevatorSubsystem;
 import frc.robot.subsystems.ReefSurvey.ReefSurveySubsystem;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 
-import static edu.wpi.first.units.Units.Rotation;
+
 import static edu.wpi.first.units.Units.Seconds;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Observable;
+
 
 import dev.doglog.*;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
-import edu.wpi.first.math.geometry.Twist2d;
+
 public class DataHighwaySubsystem extends SubsystemBase {
   /** Creates a new DataHighwaySubsystem. */
   AddressableLED m_led = new AddressableLED(0);

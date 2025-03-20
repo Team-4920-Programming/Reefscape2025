@@ -6,7 +6,7 @@ package frc.robot.subsystems.swervedrive;
 
 import static edu.wpi.first.units.Units.Meter;
 
-import com.ctre.phoenix6.ISerializable;
+
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.pathplanner.lib.commands.PathfindingCommand;
@@ -26,7 +26,7 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
-import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -38,9 +38,9 @@ import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Distance;
-import edu.wpi.first.units.measure.Velocity;
+
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
+
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -60,9 +60,9 @@ import java.util.function.Supplier;
 
 import org.ironmaple.simulation.IntakeSimulation;
 import org.ironmaple.simulation.SimulatedArena;
-import org.ironmaple.simulation.seasonspecific.reefscape2025.ReefscapeCoralAlgaeStack;
+
 import org.json.simple.parser.ParseException;
-import org.opencv.features2d.FlannBasedMatcher;
+
 import org.photonvision.targeting.PhotonPipelineResult;
 import swervelib.SwerveController;
 import swervelib.SwerveDrive;
@@ -73,10 +73,10 @@ import swervelib.parser.SwerveDriveConfiguration;
 import swervelib.parser.SwerveParser;
 import swervelib.telemetry.SwerveDriveTelemetry;
 import swervelib.telemetry.SwerveDriveTelemetry.TelemetryVerbosity;
-import edu.wpi.first.math.Matrix;
+
 import frc.robot.Vision4920;
 
-import static edu.wpi.first.units.Units.Degrees;
+
 import static edu.wpi.first.units.Units.Inches;
 
 public class SwerveSubsystem extends SubsystemBase
@@ -192,9 +192,9 @@ public class SwerveSubsystem extends SubsystemBase
     swerveDrive.setModuleEncoderAutoSynchronize(false,
                                                 1); // Enable if you want to resynchronize your absolute encoders and motor encoders periodically when they are not moving.
     //swerveDrive.pushOffsetsToEncoders(); // Set the absolute encoder to be used over the internal encoder and push the offsets onto it. Throws warning if not possible
-    if (visionDriveTest)
+    if (visionDriveTest && Robot.isReal())
     {
-      setupPhotonVision();
+        setupPhotonVision();
       // Stop the odometry thread if we are using vision that way we can synchronize updates better.
       swerveDrive.stopOdometryThread();
     }
@@ -939,18 +939,13 @@ private void ProcessVision4920()
 
   private double getRotationVelocity()
   {
-    Pose2d ReefPose;
-    double CenterofReefX  = 4.481; //wall to wall
-    double CenterofReefY = 4.0; //aliance Wall to Alliance Wall
-    double ReefRadius = Units.inchesToMeters(65.5)/2;
+
     //onshape cordinates of blue 
     //y along alliance wall 
     //x from blue to red
-    double LeftOffsetAng=-8;
-    double RightOFfsetAng=8;
-    double RobotOffset = Units.inchesToMeters(15); 
+
     double CurrentRot = getPose().getRotation().getDegrees();
-    double offsetAng = 0;
+
     //  //System.out.println("Initializing Drive to Reef *****************");
     int ReefSegment = getReefSegment();
   

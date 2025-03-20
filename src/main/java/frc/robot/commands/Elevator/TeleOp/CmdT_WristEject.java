@@ -4,17 +4,13 @@
 
 package frc.robot.commands.Elevator.TeleOp;
 
-import javax.xml.transform.stax.StAXResult;
 
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.CoralElevator.CoralElevatorSubsystem;
-import frc.robot.Constants.RobotPositions;
+
 import frc.robot.Constants.RobotPositions.CoralStation;
-import frc.robot.Constants.RobotPositions.Level2;
-import frc.robot.Constants.RobotPositions.Level3;
-import frc.robot.Constants.RobotPositions.Level4;
+
 import frc.robot.Constants.RobotPositions.WristEject;
 import frc.robot.Robot;
 

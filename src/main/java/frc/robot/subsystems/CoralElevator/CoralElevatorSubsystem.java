@@ -4,29 +4,16 @@
 
 package frc.robot.subsystems.CoralElevator;
 
-import static edu.wpi.first.units.Units.Degrees;
-import static edu.wpi.first.units.Units.DegreesPerSecond;
 import static edu.wpi.first.units.Units.Meters;
-import static edu.wpi.first.units.Units.MetersPerSecond;
+
 import static edu.wpi.first.units.Units.Minute;
 import static edu.wpi.first.units.Units.Rotations;
-import static edu.wpi.first.units.Units.RotationsPerSecond;
-import static edu.wpi.first.units.Units.Seconds;
-import static edu.wpi.first.units.Units.Volts;
 
-import java.util.concurrent.ThreadPoolExecutor.AbortPolicy;
-
-import javax.lang.model.util.ElementScanner14;
-
-import org.dyn4j.geometry.decompose.EarClipping;
-import org.opencv.core.Mat;
-
-import com.fasterxml.jackson.databind.BeanProperty;
 import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.sim.SparkMaxSim;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
-import com.revrobotics.spark.config.SparkBaseConfig;
+
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.SparkBase;
@@ -38,45 +25,37 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.controller.ProfiledPIDController;
+
 import edu.wpi.first.math.filter.LinearFilter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.system.plant.DCMotor;
-import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
-import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
-import edu.wpi.first.units.LinearVelocityUnit;
-import edu.wpi.first.units.VoltageUnit;
+
+import edu.wpi.first.math.util.Units;
+
+
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.LinearVelocity;
-import edu.wpi.first.units.measure.MutAngle;
-import edu.wpi.first.units.measure.MutAngularVelocity;
-import edu.wpi.first.units.measure.MutDistance;
-import edu.wpi.first.units.measure.MutLinearVelocity;
-import edu.wpi.first.units.measure.MutVoltage;
-import edu.wpi.first.units.measure.Velocity;
+
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.RobotController;
+
+import edu.wpi.first.wpilibj.simulation.BatterySim;
 import edu.wpi.first.wpilibj.simulation.ElevatorSim;
+import edu.wpi.first.wpilibj.simulation.RoboRioSim;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
+
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
-import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Config;
-import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
-import frc.robot.BoltLog;
-import frc.robot.Constants;
-import frc.robot.Constants.CanIDs.CoralElevator;
+
+
+
 import frc.robot.Constants.PIDs.CoralElevator.Elevator;
-import frc.robot.Constants.PIDs.CoralElevator.LeftFlap;
-import frc.robot.Constants.PIDs.CoralElevator.RightFlap;
+
 import frc.robot.Constants.RobotPositions.CoralStation;
 import frc.robot.Constants.CanIDs;
 import frc.robot.Constants.DIO;
@@ -87,15 +66,14 @@ import frc.robot.Robot;
 
 import au.grapplerobotics.LaserCan;
 import dev.doglog.DogLog;
-import au.grapplerobotics.ConfigurationFailedException;
-import edu.wpi.first.wpilibj.TimedRobot;
+
 import edu.wpi.first.wpilibj.Ultrasonic;
 
 public class CoralElevatorSubsystem extends SubsystemBase {
 
   /** Creates a new ShooterSubsystem. */
-  private final BoltLog BoltLogger = new BoltLog();
-  private Mechanism2d SimElevator = new Mechanism2d(1, 1);
+
+  private Mechanism2d SimElevator = new Mechanism2d(1.5, 3);
   private MechanismRoot2d SimElevatorRoot;
   private MechanismLigament2d Stage1;
   private MechanismLigament2d Elbow;
@@ -180,7 +158,36 @@ public class CoralElevatorSubsystem extends SubsystemBase {
   DCMotor CoralIntakeGearbox = DCMotor.getNEO(1);
 
   // simulated motors were here
+ SparkMaxSim ElevatorUpDownMotorSim = new SparkMaxSim(ElevatorStageMotor, ElevatorStageGearbox);
+ SparkMaxSim ElbowMotorSim = new SparkMaxSim(ElbowMotor, ElbowGearbox);
+ SparkMaxSim WristMotorSim = new SparkMaxSim(WristMotor, WristGearbox);
+ SparkMaxSim CoralIntakeSim = new SparkMaxSim(CoralIntakeMotor, CoralIntakeGearbox);
+ ElevatorSim m_ElevatorSim = new ElevatorSim(ElevatorStageGearbox, 16, 
+  30, 
+    Units.inchesToMeters(2), 0, 
+    0.65, 
+    true, 
+    0,
+     0.01,0.0);
+SingleJointedArmSim m_ElbowSim = new SingleJointedArmSim(ElbowGearbox,
+  25,
+  SingleJointedArmSim.estimateMOI(.7, 8),
+  .7, 
+  Units.degreesToRadians(-90),
+  Units.degreesToRadians(200), 
+  true, Units.degreesToRadians(-90),0.01,0.0);
 
+  SingleJointedArmSim m_WristSim = new SingleJointedArmSim(WristGearbox,
+  25,
+  SingleJointedArmSim.estimateMOI(.7, 3),
+  .7, 
+  Units.degreesToRadians(-90),
+  Units.degreesToRadians(200), 
+  true, Units.degreesToRadians(-90),0.01,0.0);
+ 
+  double simHeight = 0;
+  double simElbowAngle = 0;
+  double simWristAngle = 0;
   /** SIM Robot Init END */
 
   // states
@@ -244,6 +251,9 @@ public class CoralElevatorSubsystem extends SubsystemBase {
     
 
     ScoreSelection = 4; //default to level 4
+    if (Robot.isSimulation()){
+      SetupSimulation();
+    }
 
   }
   //Flap Functions
@@ -691,7 +701,8 @@ public class CoralElevatorSubsystem extends SubsystemBase {
   // }
 
   public double getHeightLaserMeters(){
-    
+    if (Robot.isReal())
+    {
     LaserCan.Measurement measurement= LaserCan.getMeasurement();
 
     double elevatorHeight = 0;
@@ -702,7 +713,15 @@ public class CoralElevatorSubsystem extends SubsystemBase {
     } catch (Exception e) {
       // TODO: handle exception
     }
-    return elevatorHeight;
+    return elevatorHeight;  
+    }
+    else
+    {
+
+      simHeight = simHeight + ElevatorStageMotor.get() *0.02;
+      return simHeight;
+    }
+    
   }
 
   public double getVelocityMetersPerSecond()
@@ -726,11 +745,26 @@ public class CoralElevatorSubsystem extends SubsystemBase {
   @Override
   public void simulationPeriodic() {
     // This method will be called once per scheduler run
-    if (Robot.isSimulation()){}
-    // DogLog.log("Simulation/Elevator",SimElevator);
+    
+       WristMotorSim.getAbsoluteEncoderSim();
+    double elevatorInputSim = ElevatorUpDownMotorSim.getAppliedOutput() * RoboRioSim.getVInVoltage();
+    m_ElevatorSim.setInput(elevatorInputSim);
 
+    // Next, we update it. The standard loop time is 20ms.
+    m_ElevatorSim.update(0.02);
+      RoboRioSim.setVInVoltage(
+        BatterySim.calculateDefaultBatteryLoadedVoltage(m_ElevatorSim.getCurrentDrawAmps()));
+
+    SmartDashboard.putData("ElevatorMech",SimElevator);
   }
 
+  private void SetupSimulation(){
+    SimElevatorRoot = SimElevator.getRoot("elevator", 0.5, 0);
+    Stage1 = SimElevatorRoot.append(new MechanismLigament2d("Stage1", 0.9, 90));
+    Elbow = Stage1.append(new MechanismLigament2d("Elbow",0.5,170));
+    Wrist = Elbow.append(new MechanismLigament2d("Wrist",0.2,90));
+
+  }
   /*     if (Robot.isSimulation())
   {
     SimElevatorRoot = SimElevator.getRoot("elevator", 0.1, 0);
@@ -740,10 +774,7 @@ public class CoralElevatorSubsystem extends SubsystemBase {
   }
  */
 
- SparkMaxSim ElevatorUpDownMotorSim = new SparkMaxSim(ElevatorStageMotor, ElevatorStageGearbox);
- SparkMaxSim ElbowMotorSim = new SparkMaxSim(ElbowMotor, ElbowGearbox);
- SparkMaxSim WristMotorSim = new SparkMaxSim(WristMotor, WristGearbox);
- SparkMaxSim CoralIntakeSim = new SparkMaxSim(CoralIntakeMotor, CoralIntakeGearbox);
+ 
 
  // SingleJointedArmSim m_armSim = new SingleJointedArmSim(ElbowGearbox, 1, 0.1, .1, 0, .5*3.145, false, 0, null) ;
  // ElevatorSim m_ElevSim = new ElevatorSim(null, ElbowGearbox, 0, .25, false, 0, null);

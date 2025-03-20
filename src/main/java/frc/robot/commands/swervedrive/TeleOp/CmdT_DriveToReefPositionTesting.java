@@ -5,19 +5,16 @@
 package frc.robot.commands.swervedrive.TeleOp;
 
 import static edu.wpi.first.units.Units.DegreesPerSecond;
-import static edu.wpi.first.units.Units.DegreesPerSecondPerSecond;
+
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecondPerSecond;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import com.pathplanner.lib.trajectory.PathPlannerTrajectory;
 
 import dev.doglog.DogLog;
-import edu.wpi.first.apriltag.AprilTagFieldLayout;
-import edu.wpi.first.apriltag.AprilTagFields;
-import edu.wpi.first.math.MathUtil;
+
 import edu.wpi.first.math.controller.HolonomicDriveController;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
@@ -32,9 +29,9 @@ import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.DataHighway.DataHighwaySubsystem;
+
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 
 

@@ -12,13 +12,12 @@ import dev.doglog.DogLogOptions;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
+
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.RobotBase;
-import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.XboxController.Axis;
+
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -26,10 +25,9 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
-import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Config;
+
 import frc.robot.Constants.OperatorConstants;
-import frc.robot.Constants.AbsoluteEncoderID.Climber;
+
 import frc.robot.commands.Cmd_SeqRemoveLowAlgea;
 import frc.robot.commands.Cmd_SeqClimb;
 import frc.robot.commands.Cmd_SeqClimbV2;
@@ -49,14 +47,13 @@ import frc.robot.commands.Elevator.Auto.CmdA_CoralOutTake;
 import frc.robot.commands.Elevator.Auto.CmdA_Level4;
 import frc.robot.commands.Elevator.Auto.CmdA_Station;
 import frc.robot.commands.Elevator.TeleOp.*;
-import frc.robot.commands.ReefSurvey.AddToReefTest;
+
 import frc.robot.commands.swervedrive.auto.CmdA_DriveToFeederPosition_Relative;
-import frc.robot.commands.swervedrive.auto.CmdA_DriveToReefPosition;
-import frc.robot.commands.swervedrive.auto.CmdA_DriveToReefPositionV2;
+
 import frc.robot.commands.swervedrive.auto.CmdA_DriveToReefPositionV3_Relative;
 import frc.robot.commands.swervedrive.auto.CmdA_DriveToReefPositionV3_RelativeTest;
 import frc.robot.commands.swervedrive.TeleOp.*;
-import swervelib.SwerveDriveTest;
+
 import frc.robot.commands.Climber.Auto.CmdA_BridgeOut;
 import frc.robot.commands.Climber.TeleOp.*;
 import swervelib.SwerveInputStream;

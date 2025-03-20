@@ -7,7 +7,7 @@ package frc.robot.commands.Elevator.Auto;
 import dev.doglog.DogLog;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.BoltLog;
+
 import frc.robot.Robot;
 import frc.robot.subsystems.CoralElevator.CoralElevatorSubsystem;
 
@@ -18,7 +18,7 @@ public class CmdA_CoralIntake extends Command {
   
   private Timer PresentTimer = new Timer();
   
-    private final BoltLog BoltLogger = new BoltLog();
+
   boolean CoralOut = false;
   public CmdA_CoralIntake(CoralElevatorSubsystem CoralElevator_Subsystem) {
     // Use addRequirements() here to declare subsystem dependencies.
