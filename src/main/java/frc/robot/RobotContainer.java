@@ -55,6 +55,7 @@ import frc.robot.commands.swervedrive.auto.CmdA_DriveToReefPosition;
 import frc.robot.commands.swervedrive.auto.CmdA_DriveToReefPositionV2;
 import frc.robot.commands.swervedrive.auto.CmdA_DriveToReefPositionV3_Relative;
 import frc.robot.commands.swervedrive.auto.CmdA_DriveToReefPositionV3_RelativeTest;
+import frc.robot.commands.swervedrive.auto.CmdA_DriveToReefPositionV4_Test;
 import frc.robot.commands.swervedrive.TeleOp.*;
 import swervelib.SwerveDriveTest;
 import frc.robot.commands.Climber.Auto.CmdA_BridgeOut;
@@ -331,7 +332,7 @@ public class RobotContainer
   driverXbox.y().whileTrue(new CmdT_CoralOutTake(CoralElevatorSS ));
 
   driverXbox.a().whileTrue(new CmdA_DriveToFeederPosition_Relative(drivebase));
-  // driverXbox.b().whileTrue(new CmdA_DriveToFeederPosition_Relative(drivebase));
+  driverXbox.b().whileTrue(new CmdA_DriveToReefPositionV4_Test(drivebase));
 
   // Button 1: Abort climb
   OperatorJoystick.button(1 ).whileTrue(new CmdT_ClimberIn(ClimberSS));

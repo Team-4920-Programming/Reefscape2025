@@ -130,6 +130,21 @@ public final class Constants
         public static final double ki = 0;
         public static final double kd = 0;
       }
+
+      public static class DriveToPose{
+        public static final double drivekP = 2.0;
+        public static final double drivekD = 0.0;
+        public static final double thetakP = 6.0;
+        public static final double thetakD = 0.0;
+        public static final double driveMaxVelocity = 3.8;
+        public static final double driveMaxAcceleration = 3.0;
+        public static final double thetaMaxVelocity = Units.degreesToRadians(360);
+        public static final double thetaMaxAcceleration = 8.0;
+        public static final double driveTolerance = 0.01;
+        public static final double thetaTolerance = Units.degreesToRadians(1);
+        public static final double ffMinRadius = 0.05;
+        public static final double ffMaxRadius = 0.1;
+      }
       
     }
     public static class AlgaeIntake {

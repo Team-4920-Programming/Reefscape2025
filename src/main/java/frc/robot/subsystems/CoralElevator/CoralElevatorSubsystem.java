@@ -41,9 +41,12 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.filter.LinearFilter;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.LinearVelocityUnit;
 import edu.wpi.first.units.VoltageUnit;
 import edu.wpi.first.units.measure.Angle;
@@ -58,6 +61,7 @@ import edu.wpi.first.units.measure.Velocity;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.simulation.AnalogInputSim;
 import edu.wpi.first.wpilibj.simulation.ElevatorSim;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
@@ -86,6 +90,7 @@ import frc.robot.Constants.RobotMotionLimits;
 import frc.robot.Robot;
 
 import au.grapplerobotics.LaserCan;
+import au.grapplerobotics.simulation.MockLaserCan;
 import dev.doglog.DogLog;
 import au.grapplerobotics.ConfigurationFailedException;
 import edu.wpi.first.wpilibj.TimedRobot;
@@ -745,11 +750,9 @@ public class CoralElevatorSubsystem extends SubsystemBase {
  SparkMaxSim WristMotorSim = new SparkMaxSim(WristMotor, WristGearbox);
  SparkMaxSim CoralIntakeSim = new SparkMaxSim(CoralIntakeMotor, CoralIntakeGearbox);
 
- // SingleJointedArmSim m_armSim = new SingleJointedArmSim(ElbowGearbox, 1, 0.1, .1, 0, .5*3.145, false, 0, null) ;
- // ElevatorSim m_ElevSim = new ElevatorSim(null, ElbowGearbox, 0, .25, false, 0, null);
-
-
-
+//  SingleJointedArmSim m_elbowSim = new SingleJointedArmSim(ElbowGearbox, 45, 1, 0.30, Units.degreesToRadians(-10) , Units.degreesToRadians(195), true, Units.degreesToRadians(0), null);
+//  ElevatorSim m_ElevSim = new ElevatorSim(null, ElbowGearbox, 0, .25, false, 0, null);
+//  SingleJointedArmSim m_wristSim = new SingleJointedArmSim(ElbowGearbox, 16, 1, Units.inchesToMeters(12), Units.degreesToRadians(-90) , Units.degreesToRadians(180), true, Units.degreesToRadians(90), null);
   /*******************************
 
   // SysID nonsense
