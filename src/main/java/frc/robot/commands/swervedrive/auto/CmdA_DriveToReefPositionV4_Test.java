@@ -204,9 +204,9 @@ public class CmdA_DriveToReefPositionV4_Test extends Command {
 
   public Pose2d GetTargetPose(Pose2d targetPose){
     double branchoffset = AutoAlignReef.branchOffset;
-    double distanceFromFace = AutoAlignReef.distanceFromFace-Units.inchesToMeters(0.25);
+    double distanceFromFace = AutoAlignReef.distanceFromFace-Units.inchesToMeters(2);
 
-    Transform2d offset = new Transform2d(distanceFromFace, branchoffset + Units.inchesToMeters(1) , new Rotation2d(Units.degreesToRadians(180)));
+    Transform2d offset = new Transform2d(distanceFromFace, branchoffset - Units.inchesToMeters(1) , new Rotation2d(Units.degreesToRadians(180)));
     Pose2d targetAprilTagPose = DriveSS.GetClosestReefSegment();
     target = targetAprilTagPose.plus(offset);
     // target = target.rotateAround(target.getTranslation(), new Rotation2d(Units.degreesToRadians(180)));

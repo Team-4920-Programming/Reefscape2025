@@ -84,9 +84,9 @@ public final class Constants
     }
     public static class CoralElevator {
       public static class Elevator{
-        public static final double kp = 3.0;//3.5
+        public static final double kp = 2.75;//3.5
         public static final double ki = 0.0;
-        public static final double kd = 0.01;
+        public static final double kd = 0.00;
 
         public static final double ks = 0.6016;
         public static final double kv = 11.991;
@@ -99,7 +99,7 @@ public final class Constants
         public static final double elevatorReduction = 16;
       }
       public static class Elbow{
-        public static final double kp = 0.03;
+        public static final double kp = 0.008;
         public static final double ki = 0.0;
         public static final double kd = 0.0;
 
@@ -110,7 +110,7 @@ public final class Constants
         public static final double maxVelocity = 0.01;
       }
       public static class Wrist{
-        public static final double kp = 0.008;//was .01 mjd 3/18 4:47pm
+        public static final double kp = 0.005;//was .01 mjd 3/18 4:47pm
         public static final double ki = 0;
         public static final double kd = 0;
         
@@ -132,17 +132,17 @@ public final class Constants
       }
 
       public static class DriveToPose{
-        public static final double drivekP = 2.0;
+        public static final double drivekP = 2.5;
         public static final double drivekD = 0.0;
-        public static final double thetakP = 6.0;
+        public static final double thetakP = 3.0;
         public static final double thetakD = 0.0;
         public static final double driveMaxVelocity = 3.8;
         public static final double driveMaxAcceleration = 3.0;
         public static final double thetaMaxVelocity = Units.degreesToRadians(360);
-        public static final double thetaMaxAcceleration = 8.0;
-        public static final double driveTolerance = 0.01;
+        public static final double thetaMaxAcceleration = 5.0;
+        public static final double driveTolerance = 0.02;
         public static final double thetaTolerance = Units.degreesToRadians(1);
-        public static final double ffMinRadius = 0.05;
+        public static final double ffMinRadius = 0.02;
         public static final double ffMaxRadius = 0.1;
       }
       
@@ -282,23 +282,23 @@ public final class Constants
 }
     public static class Level2 {
         public static final double wrist = 0; //degrees
-        public static final double elbow =0; //degrees
+        public static final double elbow =10; //degrees
         public static final double height = 0.375; //meters
     }
     public static class Level3 {
       public static final double wrist = 0; //degrees -35
-      public static final double elbow =0; //degrees 170
-      public static final double height = 0.725; //meters 0.12
+      public static final double elbow =10; //degrees 170
+      public static final double height = 0.6; //meters 0.12
   }
   public static class Level4 {
-    public static final double wrist = -37; //degrees-38
-    public static final double elbow =180; //degrees 185
-    public static final double height = 0.725; //meters
+    public static final double wrist = -37; //degrees-37
+    public static final double elbow =180; //degrees 180
+    public static final double height = 0.62; //meters
 }
   public static class Level4_Far {
     public static final double wrist = -36; //degrees
     public static final double elbow =180; //degrees
-    public static final double height = 0.625; //meters
+    public static final double height = 0.55; //meters
   }
   public static class AlgaeL3{
 

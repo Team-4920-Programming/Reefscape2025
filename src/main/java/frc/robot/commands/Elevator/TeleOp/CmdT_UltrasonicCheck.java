@@ -43,6 +43,7 @@ public class CmdT_UltrasonicCheck extends Command {
   @Override
   public void end(boolean interrupted) {
     css.OverrideRedZone = false;
+    System.out.println("This ran");
   }
 
   // Returns true when the command should end.

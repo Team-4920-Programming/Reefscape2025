@@ -15,6 +15,7 @@ import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
 
 import java.util.concurrent.ThreadPoolExecutor.AbortPolicy;
+import java.util.function.BooleanSupplier;
 
 import javax.lang.model.util.ElementScanner14;
 
@@ -30,7 +31,9 @@ import com.revrobotics.spark.config.SparkBaseConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.SparkBase;
+import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.SparkSim;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 
@@ -120,9 +123,9 @@ public class CoralElevatorSubsystem extends SubsystemBase {
   
   // Motors
 
-  SparkMax ElevatorStageMotor = new SparkMax(CanIDs.CoralElevator.ElevatorStage, MotorType.kBrushless);
+  SparkFlex ElevatorStageMotor = new SparkFlex(CanIDs.CoralElevator.ElevatorStage, MotorType.kBrushless);
   SparkMaxConfig elevatorConfig = new SparkMaxConfig();
-  SparkMax ElbowMotor = new SparkMax(CanIDs.CoralElevator.Elbow, MotorType.kBrushless);
+  SparkFlex ElbowMotor = new SparkFlex(CanIDs.CoralElevator.Elbow, MotorType.kBrushless);
   SparkMaxConfig elbowConfig = new SparkMaxConfig();
   SparkMax WristMotor = new SparkMax(CanIDs.CoralElevator.Wrist, MotorType.kBrushless);
   SparkMax CoralIntakeMotor = new SparkMax(CanIDs.CoralElevator.CoralIntake, MotorType.kBrushless);
@@ -138,6 +141,7 @@ public class CoralElevatorSubsystem extends SubsystemBase {
   ArmFeedforward ElbowFF = new ArmFeedforward(PIDs.CoralElevator.Elbow.ks, PIDs.CoralElevator.Elbow.kg, PIDs.CoralElevator.Elbow.kv);
   // ProfiledPIDController ElevatorPID = new ProfiledPIDController(PIDs.CoralElevator.Elevator.kp, PIDs.CoralElevator.Elevator.ki, PIDs.CoralElevator.Elevator.kd, new Constraints(PIDs.CoralElevator.Elevator.maxVelocity,PIDs.CoralElevator.Elevator.maxAcceleration));
   PIDController ElevatorPID = new PIDController(PIDs.CoralElevator.Elevator.kp, PIDs.CoralElevator.Elevator.ki, PIDs.CoralElevator.Elevator.kd);
+  
   PIDController ElbowPID = new PIDController(PIDs.CoralElevator.Elbow.kp, PIDs.CoralElevator.Elbow.ki, PIDs.CoralElevator.Elbow.kd);
 
   PIDController WristPID = new PIDController(PIDs.CoralElevator.Wrist.kp, PIDs.CoralElevator.Wrist.ki, PIDs.CoralElevator.Wrist.kd);
@@ -165,7 +169,7 @@ public class CoralElevatorSubsystem extends SubsystemBase {
   int elevatorHeightMM = 15;
 
   //Elevator Low Pass Filter
-  LinearFilter elevatorFilter = LinearFilter.singlePoleIIR(0.1, 0.02);
+  LinearFilter elevatorFilter = LinearFilter.singlePoleIIR(0.03, 0.02);
   double filteredelevatorHeight = 0.15;
 
   //MotorOutputs
@@ -205,7 +209,7 @@ public class CoralElevatorSubsystem extends SubsystemBase {
   public CoralElevatorSubsystem() {
 
 
-    ElevatorPID.setTolerance(0.01);
+    ElevatorPID.setTolerance(0.015);
     //ElevatorPID.setSetpoint(Constants.RobotLimits.Elevator.offset);
     // ElevatorPID.setGoal(new State(Constants.RobotLimits.Elevator.offset, 0));
     elevatorConfig.idleMode(IdleMode.kBrake);
@@ -298,6 +302,10 @@ public class CoralElevatorSubsystem extends SubsystemBase {
   public boolean IsElbowAtSetpoint(){
     return ElbowPID.atSetpoint();
   }
+  public BooleanSupplier test(){
+    BooleanSupplier b = () -> true;
+      return b;
+    };
   
   private Boolean ElevatorClearToMoveCheck(){
     Boolean elbowClear = false;
@@ -378,7 +386,11 @@ public class CoralElevatorSubsystem extends SubsystemBase {
 
   public Double GetElbowAngle() {
     //Angle Offset of 25 Degree when zero against inside hardstop
-    return ElbowAbsoluteEncoder.getPosition()-25;
+    double pos = ElbowAbsoluteEncoder.getPosition(); 
+    pos -= 90;
+
+    return pos;
+    
   }
 
   /* Wrist */
@@ -562,20 +574,29 @@ public class CoralElevatorSubsystem extends SubsystemBase {
           EmotorSpd = 0.05;
         if (EmotorSpd > -0.05 && EmotorSpd<0)
           EmotorSpd = -0.05;  
-        ElevatorStageMotor.set(EmotorSpd); 
+        ElevatorStageMotor.set(EmotorSpd); //10% speed for testing 
       
       }
       else{ 
-        ElevatorStageMotor.set(0.0);
+        ElevatorStageMotor.set(0.00);
         EmotorSpd = 0;
       }
 
 
+
       DogLog.log("CoralElevatorSS/Elevator/ActualElevatorMotorOutput", EmotorSpd);
 
+      if (GetElbowAngle() < 60 && elbowOutput > 0){
+        elbowOutput *= 0.35;
+        
+      }
+      if (GetElbowAngle() > 135 && elbowOutput < 0){
+        elbowOutput *= 0.75;
+        
+      }
       if (!ElbowPID.atSetpoint() && ((CanMoveElbowDec() && elbowOutput > 0) || (CanMoveElbowInc() && elbowOutput < 0))) 
       {
-        ElbowMotor.set(elbowOutput);
+        ElbowMotor.set(elbowOutput); // 10% speed for testing;
         DogLog.log("CoralElevatorSS/Elbow/ActualElbowMotorOutput", elbowOutput);
       }
       else{
@@ -584,23 +605,6 @@ public class CoralElevatorSubsystem extends SubsystemBase {
       }
 
 
-        
-      if (WristPID.getSetpoint() > GetWristAngleWorldCoordinates()){
-        wristOutput = MathUtil.clamp(wristOutput,0,0.75);
-        
-      }
-      if (WristPID.getSetpoint() < GetWristAngleWorldCoordinates()){
-        wristOutput = MathUtil.clamp(wristOutput, -0.75,0);
-        
-      }
-      if (WristPID.getSetpoint() < -90 && GetWristAngleWorldCoordinates() >0){
-        wristOutput = 0.5;
-        
-      }
-      if (GetWristAngleWorldCoordinates() < -180 && isCoralPresent() && !WristPID.atSetpoint())
-      {
-        wristOutput = MathUtil.clamp(wristOutput, -0.5,0);
-      }
 
       if (!WristPID.atSetpoint()){
         DogLog.log("CoralElevatorSS/Wrist/ActualWristMotorOutput", wristOutput); 
@@ -745,8 +749,8 @@ public class CoralElevatorSubsystem extends SubsystemBase {
   }
  */
 
- SparkMaxSim ElevatorUpDownMotorSim = new SparkMaxSim(ElevatorStageMotor, ElevatorStageGearbox);
- SparkMaxSim ElbowMotorSim = new SparkMaxSim(ElbowMotor, ElbowGearbox);
+ SparkSim ElevatorUpDownMotorSim = new SparkSim(ElevatorStageMotor, ElevatorStageGearbox);
+ SparkSim ElbowMotorSim = new SparkSim(ElbowMotor, ElbowGearbox);
  SparkMaxSim WristMotorSim = new SparkMaxSim(WristMotor, WristGearbox);
  SparkMaxSim CoralIntakeSim = new SparkMaxSim(CoralIntakeMotor, CoralIntakeGearbox);
 

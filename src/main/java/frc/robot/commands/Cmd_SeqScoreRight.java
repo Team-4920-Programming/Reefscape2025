@@ -5,6 +5,7 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.commands.Elevator.TeleOp.*;
 import frc.robot.commands.ReefSurvey.Reef_MarkOurs;
@@ -28,7 +29,8 @@ public class Cmd_SeqScoreRight extends SequentialCommandGroup {
     // Add your commands in the addCommands() call, e.g.
     // addCommands(new FooCommand(), new BarCommand());
     addCommands(new CmdT_MoveToLevel(Coral_SS),
-      new CmdA_DriveToReefPositionV3_Relative(Drive_SS,2).withTimeout(3),
+      new CmdA_DriveToReefPositionV3_Relative(Drive_SS,2).withTimeout(0.1),
+      new ConditionalCommand(new CmdT_UltrasonicCheck(Coral_SS), new CmdT_CoralOutTake(Coral_SS), Coral_SS.test()),
       new CmdT_CoralOutTake(Coral_SS),
       new Reef_MarkOurs(Reef_SS, 1),
       new CmdT_DriveToReefPosition(Drive_SS,4),
