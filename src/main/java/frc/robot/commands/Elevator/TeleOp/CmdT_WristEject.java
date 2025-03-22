@@ -51,7 +51,7 @@ public class CmdT_WristEject extends Command {
           hasCoral = false;
       }
 
-        if(m_ElevatorSubsystem.IsWristAtSetpoint()){
+        if(m_ElevatorSubsystem.IsWristAtSetpoint(WristEject.wrist)){
             m_ElevatorSubsystem.setIntakeSpeed(-1.0);
         }
       }

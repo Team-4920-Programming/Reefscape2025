@@ -26,6 +26,7 @@ public class CmdT_Level4 extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
+    m_ElevatorSubsystem.setIsScoring(true);
     DogLog.log("Tele/Level4Cmd/CommandStatus", "initialized");
 
     
@@ -50,6 +51,6 @@ public class CmdT_Level4 extends Command {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return (m_ElevatorSubsystem.IsElevatorAtSetpoint() && m_ElevatorSubsystem.IsWristAtSetpoint() && m_ElevatorSubsystem.IsElbowAtSetpoint());
+    return (m_ElevatorSubsystem.IsElevatorAtSetpoint(Level4.height) && m_ElevatorSubsystem.IsWristAtSetpoint(Level4.wrist) && m_ElevatorSubsystem.IsElbowAtSetpoint(Level4.elbow));
   }
 }

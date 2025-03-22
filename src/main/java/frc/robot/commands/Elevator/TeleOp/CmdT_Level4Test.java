@@ -33,6 +33,7 @@ public class CmdT_Level4Test extends Command {
     height = SmartDashboard.getNumber("ElevatorTestingHeight", 0.725);
     elbow = SmartDashboard.getNumber("ElbowTestingAngle", 180);
     wrist = SmartDashboard.getNumber("WristTestingAngle", -33.0);
+    m_ElevatorSubsystem.setIsScoring(true);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -50,6 +51,6 @@ public class CmdT_Level4Test extends Command {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return (m_ElevatorSubsystem.IsElevatorAtSetpoint() && m_ElevatorSubsystem.IsWristAtSetpoint() && m_ElevatorSubsystem.IsElbowAtSetpoint());
+    return (m_ElevatorSubsystem.IsElevatorAtSetpoint(height) && m_ElevatorSubsystem.IsWristAtSetpoint(wrist) && m_ElevatorSubsystem.IsElbowAtSetpoint(elbow));
   }
 }

@@ -46,7 +46,7 @@ public class CmdT_CoralOutTake extends Command {
         speed = 0.35;
       }
       else{
-        speed = 0.5;
+        speed = 0.75;
       }
   
       DogLog.log("Tele/CoralOutTakeCmd/Exec/IntakeSpeed", -speed);
@@ -62,6 +62,8 @@ public class CmdT_CoralOutTake extends Command {
     DogLog.log("Tele/CoralOutTakeCmd/CommandWasInterrupted", interrupted);
 
     CoralElevatorSS.setIntakeSpeed(0.0);
+    CoralElevatorSS.setJustScored(true);
+    CoralElevatorSS.setIsScoring(false);
     // BoltLogger.Log(BoltLogger.HighLog, getSubsystem(), getName(), "Execute", "Executing", false);
     DogLog.log("Tele/CoralOutTakeCmd/End/RobotPose",CoralElevatorSS.DH_In_RobotPose);
     DogLog.log("Tele/CoralOutTakeCmd/End/RobotHeading",CoralElevatorSS.DH_In_RobotPose.getRotation().getDegrees());

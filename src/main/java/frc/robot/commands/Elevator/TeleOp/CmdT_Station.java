@@ -23,12 +23,14 @@ public class CmdT_Station extends Command {
 
   // Called when the command is initially scheduled.
   @Override
-  public void initialize() {}
+  public void initialize() {
+    m_ElevatorSubsystem.setIsScoring(false);
+  }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-
+    
         m_ElevatorSubsystem.setArmPosition(CoralStation.height, CoralStation.elbow, CoralStation.wrist);
       }
 
@@ -39,6 +41,6 @@ public class CmdT_Station extends Command {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return (m_ElevatorSubsystem.IsElevatorAtSetpoint() && m_ElevatorSubsystem.IsWristAtSetpoint() && m_ElevatorSubsystem.IsElbowAtSetpoint());
+    return (m_ElevatorSubsystem.IsElevatorAtSetpoint(CoralStation.height) && m_ElevatorSubsystem.IsWristAtSetpoint(CoralStation.wrist) && m_ElevatorSubsystem.IsElbowAtSetpoint(CoralStation.elbow));
   }
 }

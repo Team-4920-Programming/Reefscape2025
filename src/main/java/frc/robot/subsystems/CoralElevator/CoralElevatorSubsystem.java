@@ -28,6 +28,7 @@ import com.revrobotics.RelativeEncoder;
 import com.revrobotics.sim.SparkMaxSim;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkBaseConfig;
+import com.revrobotics.spark.config.SparkFlexConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.SparkBase;
@@ -124,10 +125,11 @@ public class CoralElevatorSubsystem extends SubsystemBase {
   // Motors
 
   SparkFlex ElevatorStageMotor = new SparkFlex(CanIDs.CoralElevator.ElevatorStage, MotorType.kBrushless);
-  SparkMaxConfig elevatorConfig = new SparkMaxConfig();
+  SparkFlexConfig elevatorConfig = new SparkFlexConfig();
   SparkFlex ElbowMotor = new SparkFlex(CanIDs.CoralElevator.Elbow, MotorType.kBrushless);
-  SparkMaxConfig elbowConfig = new SparkMaxConfig();
+  SparkFlexConfig elbowConfig = new SparkFlexConfig();
   SparkMax WristMotor = new SparkMax(CanIDs.CoralElevator.Wrist, MotorType.kBrushless);
+  SparkMaxConfig wristConfig = new SparkMaxConfig();
   SparkMax CoralIntakeMotor = new SparkMax(CanIDs.CoralElevator.CoralIntake, MotorType.kBrushless);
   SparkMaxConfig CoralIntakeConfig = new SparkMaxConfig();
  // SparkMax CoralFlapLeft = new SparkMax(CanIDs.CoralElevator.CoralFlapLeft, MotorType.kBrushless);
@@ -137,16 +139,10 @@ public class CoralElevatorSubsystem extends SubsystemBase {
 
   // PIDs
 
-  ElevatorFeedforward ElevFF = new ElevatorFeedforward(Elevator.ks, Elevator.kg, Elevator.kv,Elevator.ka);
-  ArmFeedforward ElbowFF = new ArmFeedforward(PIDs.CoralElevator.Elbow.ks, PIDs.CoralElevator.Elbow.kg, PIDs.CoralElevator.Elbow.kv);
-  // ProfiledPIDController ElevatorPID = new ProfiledPIDController(PIDs.CoralElevator.Elevator.kp, PIDs.CoralElevator.Elevator.ki, PIDs.CoralElevator.Elevator.kd, new Constraints(PIDs.CoralElevator.Elevator.maxVelocity,PIDs.CoralElevator.Elevator.maxAcceleration));
   PIDController ElevatorPID = new PIDController(PIDs.CoralElevator.Elevator.kp, PIDs.CoralElevator.Elevator.ki, PIDs.CoralElevator.Elevator.kd);
-  
   PIDController ElbowPID = new PIDController(PIDs.CoralElevator.Elbow.kp, PIDs.CoralElevator.Elbow.ki, PIDs.CoralElevator.Elbow.kd);
-
   PIDController WristPID = new PIDController(PIDs.CoralElevator.Wrist.kp, PIDs.CoralElevator.Wrist.ki, PIDs.CoralElevator.Wrist.kd);
   
- // PIDController LeftFlapPID = new PIDController(PIDs.CoralElevator.LeftFlap.kp,PIDs.CoralElevator.LeftFlap.ki,PIDs.CoralElevator.LeftFlap.kd );
   // Limit Switch
 
   DigitalInput ElevatorUpStop = new DigitalInput(DIO.CoralElevator.UpStop);
@@ -162,7 +158,6 @@ public class CoralElevatorSubsystem extends SubsystemBase {
   RelativeEncoder ElbowRelativeEncoder = ElbowMotor.getEncoder();
   AbsoluteEncoder WristAbsoluteEncoder = WristMotor.getAbsoluteEncoder();
   RelativeEncoder WristRelative = WristMotor.getEncoder();
- // AbsoluteEncoder CoralFlapLeftEncoder = CoralFlapLeft.getAbsoluteEncoder();
  
   // LaserCan
   private LaserCan LaserCan = new LaserCan(CanIDs.Sensor.LaserCAN);
@@ -178,9 +173,18 @@ public class CoralElevatorSubsystem extends SubsystemBase {
   double elbowOutput;
   double wristOutput;
   boolean SetpointsFrozen = false;
+  boolean PabloOverride = false;
+  boolean justScored = false;
+  boolean isScoring = false;
+
   /** Physical Robot Init END**/
 
   double tmpElbowSetpointHolder = 999;
+  double tmpElevatorSetpointHolder = 999;
+  double tmpWristSetpointHolder = 999;
+
+  double tmpMotionProfileElbowHolder = 999;
+  double tmpMotionProfileWristHolder = 999;
 
   /** SIM Robot Init START */
   DCMotor ElevatorStageGearbox = DCMotor.getNEO(1);
@@ -193,8 +197,6 @@ public class CoralElevatorSubsystem extends SubsystemBase {
   /** SIM Robot Init END */
 
   // states
-  boolean SetFlapIntake = true;
-  boolean SetFlapClimb = false;
 
 
   private int ScoreSelection = 4; //default score level is 4
@@ -210,19 +212,31 @@ public class CoralElevatorSubsystem extends SubsystemBase {
 
 
     ElevatorPID.setTolerance(0.015);
-    //ElevatorPID.setSetpoint(Constants.RobotLimits.Elevator.offset);
-    // ElevatorPID.setGoal(new State(Constants.RobotLimits.Elevator.offset, 0));
     elevatorConfig.idleMode(IdleMode.kBrake);
     elevatorConfig.inverted(false);
+    elevatorConfig.smartCurrentLimit(80);
+    elevatorConfig.openLoopRampRate(0.5);
     ElevatorStageMotor.configure(elevatorConfig, SparkBase.ResetMode.kResetSafeParameters, SparkBase.PersistMode.kPersistParameters);
     
     ElbowPID.setTolerance(3);
-    //ElbowPID.setSetpoint(5);
-   // ElbowPID.enableContinuousInput(0, 360);
-
+ 
     elbowConfig.idleMode(IdleMode.kBrake);
     elbowConfig.inverted(true);
     elbowConfig.absoluteEncoder.positionConversionFactor(360);
+    elbowConfig.absoluteEncoder.inverted(true);
+    elbowConfig.smartCurrentLimit(40);
+    elbowConfig.openLoopRampRate(0.25);
+    ElbowMotor.configure(elbowConfig, SparkBase.ResetMode.kNoResetSafeParameters, SparkBase.PersistMode.kPersistParameters);
+
+
+    wristConfig.idleMode(IdleMode.kBrake);
+    wristConfig.inverted(false);
+    wristConfig.absoluteEncoder.positionConversionFactor(360);
+    wristConfig.absoluteEncoder.inverted(false);
+    wristConfig.smartCurrentLimit(20);
+    WristMotor.configure(wristConfig, SparkBase.ResetMode.kNoResetSafeParameters, SparkBase.PersistMode.kPersistParameters);
+
+
     //   360/468.75 (1 revolation on the Elbow = 430 Revolutions of the Motor) 
     // 54/16 = 3.375
     // 125:1 Gearbox
@@ -237,9 +251,6 @@ public class CoralElevatorSubsystem extends SubsystemBase {
     // 151.875 rotations of the motor is one rotation of the wrist
     // 360/151.875 is conversion factor
 
-    //elbowConfig.encoder.positionConversionFactor(2.37);
-    elbowConfig.inverted(true);
-    ElbowMotor.configure(elbowConfig, SparkBase.ResetMode.kNoResetSafeParameters, SparkBase.PersistMode.kPersistParameters);
 
     WristPID.setTolerance(3);
     // if robot.issimulation was here
@@ -248,24 +259,10 @@ public class CoralElevatorSubsystem extends SubsystemBase {
     CoralIntakeConfig.inverted(true);
     CoralIntakeMotor.configure(CoralIntakeConfig, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
     WristPID.setSetpoint(GetWristAngleWorldCoordinates());
-    // WristPID.enableContinuousInput(-180, 180);
-    // WristPID
     
 
     ScoreSelection = 4; //default to level 4
 
-  }
-  //Flap Functions
-  
-  public void SetLeftFlap(double Angle)
-  {
-   // LeftFlapPID.setSetpoint(Angle);
-  }
-
-
-  public double GetLeftFlap()
-  {
-    return 0;//CoralFlapLeftEncoder.getPosition();
   }
 
 
@@ -284,68 +281,127 @@ public class CoralElevatorSubsystem extends SubsystemBase {
 
   public void SetElevatorPosition(double height)
   {
-    if (!SetpointsFrozen){
+    if (!SetpointsFrozen || (SetpointsFrozen && OverrideRedZone)){
       ElevatorPID.setSetpoint(height);
+      tmpElevatorSetpointHolder = 999;
+    }
+    else{
+      tmpElevatorSetpointHolder = height;
     }
   }
 
-  public boolean IsElevatorAtSetpoint(){
-    boolean check =  (ElevatorPID.atSetpoint() || (ElevatorPID.getSetpoint() > getFilteredElevatorHeight() && getUpStop()) || (ElevatorPID.getSetpoint() < getFilteredElevatorHeight() && getDownStop()) || (ElevatorStageMotor.get() > 0 && getFilteredElevatorHeight() >= 0.57) || (ElevatorStageMotor.get() < 0 && getFilteredElevatorHeight() <= 0.1) );
-    // if (check && ((getUpStop() && ElevatorStageMotor.get() > 0) || (getDownStop() && ElevatorStageMotor.get() < 0) || (getFilteredElevatorHeight() >= 0.58 && ElevatorStageMotor.get() > 0))){
-      // ElevatorPID.setSetpoint(getFilteredElevatorHeight());
-    // }
-    return check;
+  public boolean IsElevatorAtSetpoint(double target){
+    boolean b1 = Math.abs(getFilteredElevatorHeight() - target) <= ElevatorPID.getErrorTolerance();
+    boolean b2 = ElevatorPID.getSetpoint() > getFilteredElevatorHeight() && getUpStop();
+    boolean b3 = ElevatorPID.getSetpoint() < getFilteredElevatorHeight() && getDownStop();
+    boolean b4 = ElevatorStageMotor.get() > 0 && getFilteredElevatorHeight() >= RobotLimits.Elevator.maxHeight;
+    boolean b5 = ElevatorStageMotor.get() < 0 && getFilteredElevatorHeight() <= RobotLimits.Elevator.minHeight;
+    return b1 || b2 || b3 || b4 || b5;
   }
-  public boolean IsWristAtSetpoint(){
-    return WristPID.atSetpoint();
+  public boolean IsWristAtSetpoint(double target){
+    return Math.abs(GetWristAngleWorldCoordinates() - target) <= WristPID.getErrorTolerance();
   }
-  public boolean IsElbowAtSetpoint(){
-    return ElbowPID.atSetpoint();
+  public boolean IsElbowAtSetpoint(double target){
+    return Math.abs(GetElbowAngle() - target) <= ElbowPID.getErrorTolerance();
   }
   public BooleanSupplier test(){
     BooleanSupplier b = () -> true;
       return b;
     };
+
+  private Boolean ElevatorClearToMoveDown(){
+    double wristAngle = GetWristAngleWorldCoordinates();
+    double elbowAngle = GetElbowAngle();
+    double height = getFilteredElevatorHeight();
+    boolean hascoral = isCoralPresent();
+    boolean EClear = false;
+
+      if (height <= 0.275){
+        EClear = true;
+      }
+      return EClear;
+  }
+  private Boolean ElevatorClearToMoveUp(){
+    double wristAngle = GetWristAngleWorldCoordinates();
+    double elbowAngle = GetElbowAngle();
+    double height = getFilteredElevatorHeight();
+    boolean hascoral = isCoralPresent();
+    boolean EClear = false;
+
+      if (height >= 0.43 || (height <= 0.2 && !hascoral)){
+        EClear = true;
+      }
+      return EClear;
+  }
   
   private Boolean ElevatorClearToMoveCheck(){
     Boolean elbowClear = false;
     boolean wristClear = false;
-    if (GetElbowAngle() > RobotMotionLimits.Elbow.minAngle && GetElbowAngle() < RobotMotionLimits.Elbow.maxAngle )
+    // if (GetElbowAngle() > RobotMotionLimits.Elbow.minAngle && GetElbowAngle() < RobotMotionLimits.Elbow.maxAngle )
+    // {
+    //   elbowClear = true;
+    // }
+
+    // //wrist > 90 0.36 cant go up
+    // //0.55 cant go down
+    double wristAngle = GetWristAngleWorldCoordinates();
+    double elbowAngle = GetElbowAngle();
+    // if (wristAngle > RobotMotionLimits.Wrist.minAngle  && GetWristAngleWorldCoordinates() < 180 )
+    // {
+    //   wristClear = true;
+    // }
+
+    if (elbowAngle >= 35)
     {
       elbowClear = true;
-    }
-
-    //wrist > 90 0.36 cant go up
-    //0.55 cant go down
-    if (GetWristAngleWorldCoordinates() > RobotMotionLimits.Wrist.minAngle  && GetWristAngleWorldCoordinates() < 180 )
-    {
       wristClear = true;
     }
+    else{
+      if (wristAngle >= 80 && wristAngle <= 100){
+        wristClear = true;
+      }
+      else if (elbowAngle >= 10 && wristAngle <= 95 && wristAngle >= -55){
+        wristClear = true;
+      }
+      if (elbowAngle >= 10){
+        elbowClear = true;
+      }
+      if (elbowAngle >= -2)
+        elbowClear = true;
+        if(wristAngle >= 70 && wristAngle <= 95){
+          wristClear = true;
+        }
+    }
+
 
     return elbowClear && wristClear;
   }
   
   private Boolean CanMoveElevatorUp(){
-    return (!getUpStop() && ElevatorClearToMoveCheck() && !isWristPassingThroughVertical());
+    return (!getUpStop() && (ElevatorClearToMoveCheck() || ElevatorClearToMoveUp())); //&& !isWristPassingThroughVertical());
   }
 
   private Boolean CanMoveElevatorDown(){
-    return (!getDownStop() && ElevatorClearToMoveCheck() && !isWristPassingThroughVertical());
+    return !getDownStop() && (ElevatorClearToMoveCheck() || ElevatorClearToMoveDown());// && !isWristPassingThroughVertical());
   }
 
   /* Elbow */
 
   public void SetElbowAngle(double angle)
   {
-    if (!SetpointsFrozen){
-      ElbowPID.setSetpoint(angle);
+    if (!SetpointsFrozen || (SetpointsFrozen && OverrideRedZone)){
+      if (tmpElbowSetpointHolder == 999){
+        ElbowPID.setSetpoint(angle);
+      }
+      else{
+        ElbowPID.setSetpoint(tmpElbowSetpointHolder);
+      }
+      
+      tmpElbowSetpointHolder = 999;
     }
-    // if (angle >= GetElbowAngle()&& !SetpointsFrozen) {
-    //   ElbowPID.setSetpoint(angle);
-    // }
-    // if (angle <= GetElbowAngle()&& !SetpointsFrozen){
-    //   ElbowPID.setSetpoint(angle);
-    // }
+    else{
+      tmpElbowSetpointHolder = angle;
+    }
   }
   
   private Boolean CanMoveElbowInc(){
@@ -396,9 +452,18 @@ public class CoralElevatorSubsystem extends SubsystemBase {
   /* Wrist */
 
   public void SetWristAngle(double angle)
-  {
-    if (!SetpointsFrozen){
-      WristPID.setSetpoint(angle);
+  { 
+    if (!SetpointsFrozen || (SetpointsFrozen && OverrideRedZone)){
+      if (tmpWristSetpointHolder == 999){
+        WristPID.setSetpoint(angle);
+      }
+      else{
+        WristPID.setSetpoint(tmpWristSetpointHolder);
+      }
+      tmpWristSetpointHolder = 999; 
+    }
+    else{
+      tmpWristSetpointHolder = angle;
     }
   }
 
@@ -429,7 +494,6 @@ public class CoralElevatorSubsystem extends SubsystemBase {
   public void setIntakeSpeed(double speed)
   {
     CoralIntakeMotor.set(speed);
-    // DogLog.log("CoralElevatorSS/Intake/IntakeSpeed", speed);
   }
 
   public boolean isIntakeRunning() {
@@ -458,14 +522,30 @@ public class CoralElevatorSubsystem extends SubsystemBase {
   public double getUltrasonic(){
       return DistanceSensor.getRangeInches();
   }
+  public void setPabloOverride(boolean b){
+    PabloOverride = b;
+  }
+  public boolean getPableOverride(){
+    return PabloOverride;
+  }
 
+  public void setIsScoring(boolean b){
+    isScoring = b;
+  }
+  public boolean getIsScoring(){
+    return isScoring;
+  }
+
+  public void setJustScored(boolean b){
+    justScored = b;
+  }
+  public boolean getJustScored(){
+    return justScored;
+  }
 
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-    // getElevatorHeightMM();
-    // readSensorValues();
-    // elevatorOutput = ElevatorPID.calculate(elevatorHeightMM) + ElevFF.calculate(PIDs.CoralElevator.Elevator.maxVelocity)/RobotController.getBatteryVoltage();
     
     DistanceSensor.setAutomaticMode(true);
     DistanceSensor.setEnabled(true);
@@ -474,61 +554,68 @@ public class CoralElevatorSubsystem extends SubsystemBase {
       DogLog.log("CoralElevatorSS/UltasonicDistanceInches", DistanceSensor.getRangeInches());
     }
     filteredelevatorHeight = elevatorFilter.calculate(getHeightLaserMeters());
+    
     if (DH_In_RedZone && !OverrideRedZone  && !SetpointsFrozen){
+      
       //Freeze PIDs at current positon
-      ElbowPID.setSetpoint(GetElbowAngle());
-      ElevatorPID.setSetpoint(getFilteredElevatorHeight());
-      WristPID.setSetpoint(GetWristAngleWorldCoordinates());
+      FreezeSetpoints(false,false,false);
 
-      SetpointsFrozen = true;
     }
     if (!DH_In_RedZone){
-      SetpointsFrozen = false;
+
+      UnfreezeSetPoints();
+
     }
     if (DH_In_RedZone && OverrideRedZone ){
-      SetpointsFrozen = false;
+      
+      UnfreezeSetPoints();
+
     }
-
-    if ((isElevatorPassingThroughRedZone() || isElevatorInRedZone()) && (ElbowPID.getSetpoint() < 0 || WristPID.getSetpoint() >= 90)){
-        if (tmpElbowSetpointHolder == 999){
-          tmpElbowSetpointHolder = ElbowPID.getSetpoint();
-          ElbowPID.setSetpoint(35);
-        }
-      }
-      else if (tmpElbowSetpointHolder != 999){
-        ElbowPID.setSetpoint(tmpElbowSetpointHolder);
-        tmpElbowSetpointHolder = 999 ;
-      }
-
+/****************** LOOK AT *************************
+ */
+    // if ((isElevatorPassingThroughRedZone() || isElevatorInRedZone()) && WristPID.getSetpoint() >= 90){
+    //     if (tmpWristSetpointHolder == 999){
+    //       tmpWristSetpointHolder = WristPID.getSetpoint();
+    //       WristPID.setSetpoint(90);
+    //     }
+    //   }
+    //   else if (tmpWristSetpointHolder != 999){
+    //     WristPID.setSetpoint(tmpWristSetpointHolder);
+    //     tmpWristSetpointHolder = 999 ;
+    //   }
+ /*
+*****************************************************/
     filteredelevatorHeight = elevatorFilter.calculate(getHeightLaserMeters());
     double elevatorPIDValue = ElevatorPID.calculate(filteredelevatorHeight);
     double linearVelocity = getVelocityMetersPerSecond();
-    double elevatorFFValue = 0.6;//ElevFF.calculate(linearVelocity);
+    double elevatorFFValue = 0.6;
+    double elbowOutputFF=0;
     if (DriverStation.isEnabled()){
-      //elevatorOutput = MathUtil.clamp(elevatorPIDValue + elevatorFFValue,-7,7);
       elevatorOutput = MathUtil.clamp(elevatorPIDValue,-1,1);
       elbowOutput = ElbowPID.calculate(GetElbowAngle());
       elbowOutput = -elbowOutput;
       elbowOutput = MathUtil.clamp(elbowOutput, -1.0, 1.0);//was -.5 and .5
+      if (ElbowPID.getSetpoint() > GetElbowAngle())
+        elbowOutputFF = Math.abs(Math.sin(Units.degreesToRadians(GetElbowAngle())))* 2.0;
+      else
+        elbowOutputFF = Math.abs(Math.sin(Units.degreesToRadians(GetElbowAngle())))*.8;
+      elbowOutput = elbowOutput * Math.max(elbowOutputFF,0.15);
+      if (elbowOutput < 0){
+        Math.min(elbowOutput, -0.2);
+      }
+      if (elbowOutput > 0){
+        Math.max(elbowOutput, 0.2);
+      }
       wristOutput = WristPID.calculate(GetWristAngleWorldCoordinates());
     }
-    else
-    {
-        // ElevatorPID.setSetpoint(getFilteredElevatorHeight());
-    }
-    //double leftFlapOutput = LeftFlapPID.calculate(GetLeftFlap());
-    
-    
+   
+    DogLog.log ("CoralElevatorSS/Elbow/FF", elbowOutputFF);
     DogLog.log("CoralElevatorSS/Elevator/ElevatorPIDOutput", elevatorPIDValue);
     DogLog.log("CoralElevatorSS/Elevator/ClampedElevatorPIDOutput", elevatorOutput);
     DogLog.log("CoralElevatorSS/Elevator/ElevatorPIDSetpoint", ElevatorPID.getSetpoint());
     DogLog.log("CoralElevatorSS/Elevator/ElevatorPIDError", ElevatorPID.getError());
     DogLog.log("CoralElevatorSS/Elevator/ElevatorHeight", getFilteredElevatorHeight());
 
-    DogLog.log("CoralElevatorSS/Elevator/CanMoveElevatorUp", CanMoveElevatorUp());
-    DogLog.log("CoralElevatorSS/Elevator/CanMoveElevatorDown", CanMoveElevatorDown());
-    DogLog.log("CoralElevatorSS/Elevator/ElevatorAtSetpoint", ElevatorPID.atSetpoint());
-  
     //Elbow Data
     DogLog.log("CoralElevatorSS/Elbow/ElbowAngle",GetElbowAngle());
     DogLog.log("CoralElevatorSS/Elbow/ElbowPIDSetpoint",ElbowPID.getSetpoint());
@@ -546,54 +633,133 @@ public class CoralElevatorSubsystem extends SubsystemBase {
     DogLog.log("CoralElevatorSS/Wrist/CanWristInc", CanMoveWristInc());
     DogLog.log("CoralElevatorSS/Wrist/CanWirstDec", CanMoveWristDec());
 
-    DogLog.log("CoralElevatorSS/Check/ElevatorClearToMove",ElevatorClearToMoveCheck());
-    DogLog.log("CoralElevatorSS/Check/isWristPassingThroughVertical",isWristPassingThroughVertical());
-    DogLog.log("CoralElevatorSS/Check/isElevatorInRedZone", isElevatorInRedZone());
-    DogLog.log("CoralElevatorSS/Check/isElevatorPassingThroughRedZone", isElevatorPassingThroughRedZone());
     DogLog.log("CoralElevatorSS/Intake/HasCoral", isCoralPresent());
     DogLog.log("CoralElevatorSS/Intake/IntakeSpeed", CoralIntakeMotor.get());
+
+    DogLog.log("CoralElevatorSS/Check/Elevator/CanMoveElevatorUp", CanMoveElevatorUp());
+    DogLog.log("CoralElevatorSS/Check/Elevator/CanMoveElevatorDown", CanMoveElevatorDown());
+    DogLog.log("CoralElevatorSS/Check/Elevator/ElevatorClearToMove",ElevatorClearToMoveCheck());
+    DogLog.log("CoralElevatorSS/Check/Elevator/ElevatorClearToMoveUp", ElevatorClearToMoveUp());
+    DogLog.log("CoralElevatorSS/Check/Elevator/ElevatorClearToMoveDown", ElevatorClearToMoveDown());
+
+    DogLog.log("CoralElevatorSS/Check/Wrist/isWristPassingThroughVertical",isWristPassingThroughVertical());
+    DogLog.log("CoralElevatorSS/Check/Elevator/isElevatorInRedZone", isElevatorInRedZone());
+    DogLog.log("CoralElevatorSS/Check/Elevator/isElevatorPassingThroughRedZone", isElevatorPassingThroughRedZone());
     DogLog.log("CoralElevatorSS/Check/ScoreSelection", ScoreSelection);
     DogLog.log("CoralElevatorSS/Check/SetpointsFrozen", SetpointsFrozen);
-    DogLog.log("CoralElevatorSS/Check/ElevatorUpStop", getUpStop());
-    DogLog.log("CoralElevatorSS/Check/ElevatorDownStop", getDownStop());
+    DogLog.log("CoralElevatorSS/Check/OverrideRedZone", OverrideRedZone);
+    DogLog.log("CoralElevatorSS/Check/PabloOverride", PabloOverride);
+    DogLog.log("CoralElevatorSS/Check/IsScoring", isScoring);
+    DogLog.log("CoralElevatorSS/Check/JustScored", justScored);
+    DogLog.log("CoralElevatorSS/Check/Elevator/ElevatorUpStop", getUpStop());
+    DogLog.log("CoralElevatorSS/Check/Elevator/ElevatorDownStop", getDownStop());
 
-    DogLog.log("CoralElevatorSS/Check/IsElevatorAtSetpoint", IsElevatorAtSetpoint());
-    DogLog.log("CoralElevatorSS/Check/IsElbowAtSetpoint", IsElbowAtSetpoint());
-    DogLog.log("CoralElevatorSS/Check/ScoreSelection", IsWristAtSetpoint());
+    DogLog.log("CoralElevatorSS/Check/IsElevatorAtSetpoint", IsElevatorAtSetpoint(ElevatorPID.getSetpoint()));
+    DogLog.log("CoralElevatorSS/Check/IsElbowAtSetpoint", IsElbowAtSetpoint(ElbowPID.getSetpoint()));
+    DogLog.log("CoralElevatorSS/Check/IsWristAtSetpoint", IsWristAtSetpoint(WristPID.getSetpoint()));
+
+    DogLog.log("CoralElevatorSS/Check/tmpElbow", tmpElbowSetpointHolder);
+    DogLog.log("CoralElevatorSS/Check/tmpElevator", tmpElevatorSetpointHolder);
+    DogLog.log("CoralElevatorSS/Check/tmpWrist", tmpWristSetpointHolder);
+    DogLog.log("CoralElevatorSS/Check/tmpMotionElbow", tmpMotionProfileElbowHolder);
+    DogLog.log("CoralElevatorSS/Check/tmpMotionWrist", tmpMotionProfileWristHolder);
 
     double  EmotorSpd =0;
-   
-      if (!ElevatorPID.atSetpoint() && ((CanMoveElevatorUp() && elevatorOutput > 0) || (CanMoveElevatorDown() && elevatorOutput < 0)))
+    boolean atSet = true;
+    double setpoint = 999;
+    double EleFF = 0.0;
+    if (getFilteredElevatorHeight() >= 0.5)
+      EleFF = 0.03;
+      else
+      EleFF = 0.0;
+     if (tmpElevatorSetpointHolder == 999){
+      atSet = IsElevatorAtSetpoint(ElevatorPID.getSetpoint());
+      setpoint = ElevatorPID.getSetpoint();
+
+     }
+     else{
+      atSet = IsElevatorAtSetpoint(tmpElevatorSetpointHolder);
+      setpoint = tmpElevatorSetpointHolder;
+     }
+      if (!atSet)
       { 
-        double EleveFF = 0.025;
-        if (getFilteredElevatorHeight() > 0.30 && getFilteredElevatorHeight() <0.5)
-          EleveFF = 0.01;
+        if ((CanMoveElevatorUp() && getFilteredElevatorHeight() < setpoint ) || (CanMoveElevatorDown() && getFilteredElevatorHeight() > setpoint)){
+          double EleveFF = 0.025;
+          if (tmpMotionProfileElbowHolder != 999){
+            SetElbowAngle(tmpMotionProfileElbowHolder);
+            tmpMotionProfileElbowHolder = 999;
+          }
+          if (tmpMotionProfileWristHolder != 999){
+            SetWristAngle(tmpMotionProfileWristHolder);
+            tmpMotionProfileWristHolder = 999;
+          }
+          // if (getFilteredElevatorHeight() > 0.30 && getFilteredElevatorHeight() < 0.5)
+          //   EleveFF = 0.01;
 
-        EmotorSpd = elevatorOutput + EleveFF;
-        if (EmotorSpd < 0.05 && EmotorSpd>0)
-          EmotorSpd = 0.05;
-        if (EmotorSpd > -0.05 && EmotorSpd<0)
-          EmotorSpd = -0.05;  
-        ElevatorStageMotor.set(EmotorSpd); //10% speed for testing 
-      
+          // EmotorSpd = elevatorOutput + EleveFF;
+          // if (EmotorSpd < 0.05 && EmotorSpd>0)
+          //   EmotorSpd = 0.05;
+          // if (EmotorSpd > -0.05 && EmotorSpd<0)
+          //   EmotorSpd = -0.05;  
+          if (GetWristAngleWorldCoordinates() > 100 && isCoralPresent() && isElevatorPassingThroughRedZone())
+          {
+            ElevatorStageMotor.set(0 + EleFF);
+          }
+          else{
+            // if (Math.abs(elevatorOutput) < 0.04){
+            //   ElevatorStageMotor.set(0);
+            // }
+            // else{
+          ElevatorStageMotor.set(elevatorOutput);
+            // }
+          } //10% speed for testing 
       }
-      else{ 
-        ElevatorStageMotor.set(0.00);
-        EmotorSpd = 0;
+      else if (((!CanMoveElevatorUp() && getFilteredElevatorHeight() < setpoint ) || (!CanMoveElevatorDown() && getFilteredElevatorHeight() > setpoint)) || isElevatorPassingThroughRedZone()){
+        if (tmpMotionProfileWristHolder == 999){
+          tmpMotionProfileWristHolder = WristPID.getSetpoint();
+          SetWristAngle(90);
+        }
+        else{
+          SetWristAngle(tmpMotionProfileElbowHolder);
+        }
+        if (tmpMotionProfileElbowHolder == 999){
+          tmpMotionProfileElbowHolder = ElbowPID.getSetpoint();
+          SetElbowAngle(15);  
+        }
+        else{
+          SetElbowAngle(tmpMotionProfileElbowHolder);
+        }
+        ElevatorStageMotor.set(0 + EleFF);
+      }
+    }
+    else{ 
+      ElevatorStageMotor.set(0 + EleFF);
+
+      if (tmpMotionProfileElbowHolder != 999){
+        SetElbowAngle(tmpMotionProfileElbowHolder);
+        tmpMotionProfileElbowHolder = 999;
       }
 
-
-
-      DogLog.log("CoralElevatorSS/Elevator/ActualElevatorMotorOutput", EmotorSpd);
-
-      if (GetElbowAngle() < 60 && elbowOutput > 0){
-        elbowOutput *= 0.35;
-        
+      if (tmpMotionProfileWristHolder != 999){
+        SetWristAngle(tmpMotionProfileWristHolder);
+        tmpMotionProfileWristHolder = 999;
       }
-      if (GetElbowAngle() > 135 && elbowOutput < 0){
-        elbowOutput *= 0.75;
-        
-      }
+
+    }
+
+    
+
+
+
+
+        // if (GetElbowAngle() < 60 && elbowOutput > 0){
+        //   elbowOutput *= 0.35;
+          
+        // }
+        // if (GetElbowAngle() > 135 && elbowOutput < 0){
+        //   elbowOutput *= 0.75;
+          
+        // }
       if (!ElbowPID.atSetpoint() && ((CanMoveElbowDec() && elbowOutput > 0) || (CanMoveElbowInc() && elbowOutput < 0))) 
       {
         ElbowMotor.set(elbowOutput); // 10% speed for testing;
@@ -652,11 +818,40 @@ public class CoralElevatorSubsystem extends SubsystemBase {
     }
   }
 
+  private void FreezeSetpoints(boolean oElevator, boolean oElbow, boolean oWrist){
+      if (!oElbow){
+      tmpElbowSetpointHolder = ElbowPID.getSetpoint();
+      ElbowPID.setSetpoint(GetElbowAngle());
+      }
+      if (!oElevator){
+        tmpElevatorSetpointHolder = ElevatorPID.getSetpoint();
+      ElevatorPID.setSetpoint(getFilteredElevatorHeight());
+      }
+      if (!oWrist){
+        tmpWristSetpointHolder = WristPID.getSetpoint();
+        WristPID.setSetpoint(GetWristAngleWorldCoordinates());
+      }
+      SetpointsFrozen = true;
+  }
+
+  private void UnfreezeSetPoints(){
+    if (tmpElbowSetpointHolder != 999){
+      SetElbowAngle(tmpElbowSetpointHolder);
+    }
+    if (tmpElevatorSetpointHolder != 999){
+      SetElevatorPosition(tmpElevatorSetpointHolder);
+    }
+    if (tmpWristSetpointHolder != 999){
+      SetElevatorPosition(tmpWristSetpointHolder);
+    }
+    SetpointsFrozen = false;
+  }
+
   //helper functions to facilitate crossing the impassable zone (make the impossible possible)
 
 
   private Boolean isElevatorPassingThroughRedZone(){
-    return ((getFilteredElevatorHeight() <= RobotLimits.Elevator.elevatorRedZoneLowerHeight && ElevatorPID.getSetpoint() >= RobotLimits.Elevator.elevatorRedZoneUpperHeight ) || (getFilteredElevatorHeight() >= RobotLimits.Elevator.elevatorRedZoneUpperHeight && ElevatorPID.getSetpoint() <= RobotLimits.Elevator.elevatorRedZoneLowerHeight ));
+    return ((getFilteredElevatorHeight() <= RobotLimits.Elevator.elevatorRedZoneLowerHeight && ElevatorPID.getSetpoint() >= RobotLimits.Elevator.elevatorRedZoneLowerHeight ) || (getFilteredElevatorHeight() >= RobotLimits.Elevator.elevatorRedZoneUpperHeight && ElevatorPID.getSetpoint() <= RobotLimits.Elevator.elevatorRedZoneUpperHeight ));
   }
 
   private Boolean isElevatorInRedZone(){

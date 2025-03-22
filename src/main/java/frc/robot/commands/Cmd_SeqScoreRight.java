@@ -12,8 +12,10 @@ import frc.robot.commands.ReefSurvey.Reef_MarkOurs;
 import frc.robot.commands.swervedrive.TeleOp.CmdT_DriveToReefPosition;
 import frc.robot.commands.swervedrive.TeleOp.CmdT_DriveToReefPositionV2;
 import frc.robot.commands.swervedrive.TeleOp.CmdT_EnableAutoAim;
+import frc.robot.commands.swervedrive.TeleOp.CmdT_StopDrive;
 import frc.robot.commands.swervedrive.auto.CmdA_DriveToReefPositionV2;
 import frc.robot.commands.swervedrive.auto.CmdA_DriveToReefPositionV3_Relative;
+import frc.robot.commands.swervedrive.auto.CmdA_DriveToReefPositionV4_Test;
 import frc.robot.subsystems.CoralElevator.CoralElevatorSubsystem;
 import frc.robot.subsystems.DataHighway.DataHighwaySubsystem;
 import frc.robot.subsystems.ReefSurvey.ReefSurveySubsystem;
@@ -28,13 +30,17 @@ public class Cmd_SeqScoreRight extends SequentialCommandGroup {
   public Cmd_SeqScoreRight(CoralElevatorSubsystem Coral_SS, SwerveSubsystem Drive_SS,ReefSurveySubsystem Reef_SS) {
     // Add your commands in the addCommands() call, e.g.
     // addCommands(new FooCommand(), new BarCommand());
-    addCommands(new CmdT_MoveToLevel(Coral_SS),
-      new CmdA_DriveToReefPositionV3_Relative(Drive_SS,2).withTimeout(0.1),
-      new ConditionalCommand(new CmdT_UltrasonicCheck(Coral_SS), new CmdT_CoralOutTake(Coral_SS), Coral_SS.test()),
+    addCommands(
+      new CmdT_StopDrive(Drive_SS),
+      new CmdT_MoveToLevel(Coral_SS),
+      // new CmdT_IsScoring(Coral_SS, true),
+      new CmdA_DriveToReefPositionV4_Test(Drive_SS,2).withTimeout(3),
+      // new ConditionalCommand(new CmdT_UltrasonicCheck(Coral_SS), new CmdT_CoralOutTake(Coral_SS), Coral_SS.test()),
       new CmdT_CoralOutTake(Coral_SS),
       new Reef_MarkOurs(Reef_SS, 1),
       new CmdT_DriveToReefPosition(Drive_SS,4),
       new CmdT_Station(Coral_SS),
       new CmdT_EnableAutoAim(Drive_SS));
+      new CmdT_IsScoring(Coral_SS, false);
   }
 }

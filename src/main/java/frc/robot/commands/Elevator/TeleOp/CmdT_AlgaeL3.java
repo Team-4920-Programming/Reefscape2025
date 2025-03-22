@@ -42,6 +42,6 @@ public class CmdT_AlgaeL3 extends Command {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return (m_ElevatorSubsystem.IsElevatorAtSetpoint() && m_ElevatorSubsystem.IsWristAtSetpoint() && m_ElevatorSubsystem.IsElbowAtSetpoint()) ;
+    return (m_ElevatorSubsystem.IsElevatorAtSetpoint(AlgaeL3.height) && m_ElevatorSubsystem.IsWristAtSetpoint(AlgaeL3.wrist) && m_ElevatorSubsystem.IsElbowAtSetpoint(AlgaeL3.elbow)) ;
   }
 }

@@ -53,10 +53,11 @@ public class CmdA_DriveToReefPositionV4_Test extends Command {
   private double lastTime = 0.0;
   private double distanceFromTarget = 0.0;
   private double thetaFromTarget = 0.0;
-
+  private int pos;
   
-  public CmdA_DriveToReefPositionV4_Test(SwerveSubsystem DriveSubsystem) {
+  public CmdA_DriveToReefPositionV4_Test(SwerveSubsystem DriveSubsystem, int position) {
     DriveSS = DriveSubsystem;
+    pos = position;
   }
 
   // Called when the command is initially scheduled.
@@ -106,7 +107,7 @@ public class CmdA_DriveToReefPositionV4_Test extends Command {
     double ffScaler = MathUtil.clamp(
         (currentDistance - DriveToPose.ffMinRadius) / (DriveToPose.ffMaxRadius - DriveToPose.ffMinRadius),
         0.0,
-        3.0);
+        1.0);
 
     DogLog.log("Auto/Test/Exec/currentPose", currentPose);
     DogLog.log("Auto/Test/Exec/targetPose", targetPose);
@@ -204,9 +205,15 @@ public class CmdA_DriveToReefPositionV4_Test extends Command {
 
   public Pose2d GetTargetPose(Pose2d targetPose){
     double branchoffset = AutoAlignReef.branchOffset;
-    double distanceFromFace = AutoAlignReef.distanceFromFace-Units.inchesToMeters(2);
+    double distanceFromFace = AutoAlignReef.distanceFromFace;
+    Transform2d offset;
+    if (pos == 2){
+      offset = new Transform2d(distanceFromFace, branchoffset, new Rotation2d(Units.degreesToRadians(180)));
+    }
+      else{
+      offset = new Transform2d(distanceFromFace, -branchoffset, new Rotation2d(Units.degreesToRadians(180)));
 
-    Transform2d offset = new Transform2d(distanceFromFace, branchoffset - Units.inchesToMeters(1) , new Rotation2d(Units.degreesToRadians(180)));
+    }
     Pose2d targetAprilTagPose = DriveSS.GetClosestReefSegment();
     target = targetAprilTagPose.plus(offset);
     // target = target.rotateAround(target.getTranslation(), new Rotation2d(Units.degreesToRadians(180)));
