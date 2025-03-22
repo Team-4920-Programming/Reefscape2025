@@ -142,7 +142,7 @@ public final class Constants
         public static final double thetaMaxAcceleration = 5.0;
         public static final double driveTolerance = 0.02;
         public static final double thetaTolerance = Units.degreesToRadians(1);
-        public static final double ffMinRadius = 0.02;
+        public static final double ffMinRadius = 0.05;
         public static final double ffMaxRadius = 0.1;
       }
       
