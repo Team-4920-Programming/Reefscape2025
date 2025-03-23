@@ -192,7 +192,9 @@ public class CoralElevatorSubsystem extends SubsystemBase {
   double ElevatorGoal = 0.0;
   double WristGoal = 0.0;
   double ElbowGoal = 0.0;
-
+  boolean SawElbowGoal = false;
+  boolean SawWristGoal = false;
+  boolean SawElevatorGoal = false;
 
   /** SIM Robot Init START */
   DCMotor ElevatorStageGearbox = DCMotor.getNEO(1);
@@ -301,14 +303,19 @@ public class CoralElevatorSubsystem extends SubsystemBase {
 
   public void SetElevatorPosition(double height)
   {
-    if (!SetpointsFrozen || (SetpointsFrozen && OverrideRedZone)){
-      ElevatorPID.setSetpoint(height);
-      tmpElevatorSetpointHolder = 999;
+    // if (!SetpointsFrozen || (SetpointsFrozen && OverrideRedZone)){
+    //   ElevatorPID.setSetpoint(height);
+    //   tmpElevatorSetpointHolder = 999;
+    // }
+    // else{
+    //   tmpElevatorSetpointHolder = height;
+    // }
+    if (ElevatorGoal != height)
+    {
+      ElevatorGoal = height;
+      SawElevatorGoal = false;
     }
-    else{
-      tmpElevatorSetpointHolder = height;
-    }
-    ElevatorGoal = height;
+    
   }
 
   public boolean IsElevatorAtSetpoint(double target){
@@ -410,20 +417,25 @@ public class CoralElevatorSubsystem extends SubsystemBase {
 
   public void SetElbowAngle(double angle)
   {
-    if (!SetpointsFrozen || (SetpointsFrozen && OverrideRedZone)){
-      if (tmpElbowSetpointHolder == 999){
-        ElbowPID.setSetpoint(angle);
-      }
-      else{
-        ElbowPID.setSetpoint(tmpElbowSetpointHolder);
-      }
+    //if (!SetpointsFrozen || (SetpointsFrozen && OverrideRedZone)){
+    //   if (tmpElbowSetpointHolder == 999){
+    //     //ElbowPID.setSetpoint(angle);
+    //   }
+    //   else{
+    //     ElbowPID.setSetpoint(tmpElbowSetpointHolder);
+    //   }
       
-      tmpElbowSetpointHolder = 999;
+    //   tmpElbowSetpointHolder = 999;
+    // }
+    // else{
+    //   tmpElbowSetpointHolder = angle;
+    // }
+    if (ElbowGoal != angle)
+    {
+      ElbowGoal = angle;
+      SawElbowGoal = false;
     }
-    else{
-      tmpElbowSetpointHolder = angle;
-    }
-    ElbowGoal = angle;
+    
   }
   
   private Boolean CanMoveElbowInc(){
@@ -484,7 +496,7 @@ public class CoralElevatorSubsystem extends SubsystemBase {
   { 
     if (!SetpointsFrozen || (SetpointsFrozen && OverrideRedZone)){
       if (tmpWristSetpointHolder == 999){
-        WristPID.setSetpoint(angle);
+        //WristPID.setSetpoint(angle);
       }
       else{
         WristPID.setSetpoint(tmpWristSetpointHolder);
@@ -494,8 +506,12 @@ public class CoralElevatorSubsystem extends SubsystemBase {
     else{
       tmpWristSetpointHolder = angle;
     }
-    WristGoal = angle;
-  }
+    if (angle != WristGoal){
+      WristGoal = angle;
+      SawWristGoal = false;
+    }
+    }
+    
 
   private Boolean CanMoveWristInc(){
     return GetWristAngleWorldCoordinates() < RobotMotionLimits.Wrist.maxAngle;
@@ -582,19 +598,34 @@ public class CoralElevatorSubsystem extends SubsystemBase {
   {
     double curElevPos = getFilteredElevatorHeight();
     double curElevTol = ElevatorPID.getErrorTolerance();
-    return (Math.abs(curElevPos - ElevatorGoal) < curElevTol);
+    boolean atGoal = (Math.abs(curElevPos - ElevatorGoal) < curElevTol);
+    if (atGoal)
+      {
+        SawElevatorGoal = true;
+      }
+    return atGoal;
   }
   public boolean isElbowAtGoal()
   {
     double curElbowPos = GetElbowAngle();
     double curElbowTol = ElbowPID.getErrorTolerance();
-    return (Math.abs(curElbowPos - ElbowGoal) < curElbowTol);
+    boolean atGoal =  (Math.abs(curElbowPos - ElbowGoal) < curElbowTol);
+    if (atGoal)
+      {
+        SawElbowGoal = true;
+      }
+    return atGoal;
   }
   public boolean isWristAtGoal()
   {
     double curWristPos = GetWristAngleWorldCoordinates();
     double curWristTol = WristPID.getErrorTolerance();
-    return (Math.abs(curWristPos - WristGoal) < curWristTol);
+    boolean atGoal =   (Math.abs(curWristPos - WristGoal) < curWristTol);
+    if (atGoal)
+      {
+        SawWristGoal = true;
+      }
+    return atGoal;
   }
 
   @Override
@@ -742,7 +773,7 @@ public class CoralElevatorSubsystem extends SubsystemBase {
     boolean MoveElevator = false;
     if (!SetpointsFrozen)
     {
-      if (isElevatorAtGoal())
+      if (isElevatorAtGoal() || (SawElevatorGoal && Math.abs(ElevatorPID.getError()) < 2* ElevatorPID.getErrorTolerance()))
       {
         WristPID.setSetpoint(WristGoal);
         ElbowPID.setSetpoint(ElbowGoal);
@@ -751,7 +782,9 @@ public class CoralElevatorSubsystem extends SubsystemBase {
       {
         WristPID.setSetpoint(RobotPositions.SafePosition.wrist);
         ElbowPID.setSetpoint(RobotPositions.SafePosition.elbow);
-        if (WristPID.atSetpoint() && ElbowPID.atSetpoint() && WristPID.getSetpoint() == RobotPositions.SafePosition.wrist && ElbowPID.getSetpoint() == RobotPositions.SafePosition.elbow){
+        boolean WristCloseEnough = Math.abs(WristPID.getError()) < 2* WristPID.getErrorTolerance();
+        boolean ArmCloseEnought = Math.abs(ElbowPID.getError()) < 2* ElbowPID.getErrorTolerance();
+        if (WristCloseEnough && ArmCloseEnought && WristPID.getSetpoint() == RobotPositions.SafePosition.wrist && ElbowPID.getSetpoint() == RobotPositions.SafePosition.elbow){
           ElevatorPID.setSetpoint(ElevatorGoal);
           MoveElevator = true;
         }
