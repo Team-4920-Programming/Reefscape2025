@@ -51,6 +51,6 @@ public class CmdA_Level4 extends Command {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return m_ElevatorSubsystem.IsElbowAtSetpoint() && m_ElevatorSubsystem.IsElevatorAtSetpoint() && m_ElevatorSubsystem.IsWristAtSetpoint() ;
+    return m_ElevatorSubsystem.IsElbowAtSetpoint(Level4.elbow) && m_ElevatorSubsystem.IsElevatorAtSetpoint(Level4.height) && m_ElevatorSubsystem.IsWristAtSetpoint(Level4.wrist) ;
   }
 }

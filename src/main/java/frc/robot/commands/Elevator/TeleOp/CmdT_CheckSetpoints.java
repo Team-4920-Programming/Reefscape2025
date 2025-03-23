@@ -6,41 +6,46 @@ package frc.robot.commands.Elevator.TeleOp;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.CoralElevator.CoralElevatorSubsystem;
-import frc.robot.Constants.RobotPositions;
-import frc.robot.Constants.RobotPositions.*;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
-public class CmdT_AlgaeTestUp extends Command {
-  /** Creates a new CmdT_Level1. */
-  CoralElevatorSubsystem m_ElevatorSubsystem;
-  public CmdT_AlgaeTestUp(CoralElevatorSubsystem elevatorSS) {
-    // Use addRequirements() here to declare subsystem dependencies.
-    m_ElevatorSubsystem = elevatorSS;
-    addRequirements(m_ElevatorSubsystem);
+public class CmdT_CheckSetpoints extends Command {
 
+  CoralElevatorSubsystem CoralSS;
+  /** Creates a new CmdT_CheckSetpoints. */
+  public CmdT_CheckSetpoints(CoralElevatorSubsystem css) {
+    CoralSS = css;
+    addRequirements(CoralSS);
+    // Use addRequirements() here to declare subsystem dependencies.
   }
 
   // Called when the command is initially scheduled.
   @Override
-  public void initialize() {}
+  public void initialize() {
+    boolean b = CoralSS.isElbowAtGoal() && CoralSS.isWristAtGoal() && CoralSS.isElevatorAtGoal();
+    if (!b){
+      CoralSS.OverrideRedZone = true;
+    }
+  }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-
-        m_ElevatorSubsystem.setArmPosition(AlgaeL3.height+0.3, AlgaeL3.elbow+10, AlgaeL3.wrist+30);
-         m_ElevatorSubsystem.OverrideRedZone = true;
-      }
+    boolean b = CoralSS.isElbowAtGoal() && CoralSS.isWristAtGoal() && CoralSS.isElevatorAtGoal();
+    if (b){
+      CoralSS.OverrideRedZone = false;
+    }
+  }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    m_ElevatorSubsystem.OverrideRedZone = false;
+    CoralSS.OverrideRedZone = false;
+
   }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return (m_ElevatorSubsystem.IsElevatorAtSetpoint() && m_ElevatorSubsystem.IsWristAtSetpoint() && m_ElevatorSubsystem.IsElbowAtSetpoint());
+    return CoralSS.isElbowAtGoal() && CoralSS.isWristAtGoal() && CoralSS.isElevatorAtGoal() && CoralSS.OverrideRedZone == false;
   }
 }

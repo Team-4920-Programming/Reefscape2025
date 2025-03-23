@@ -23,7 +23,9 @@ public class CmdT_Level1 extends Command {
 
   // Called when the command is initially scheduled.
   @Override
-  public void initialize() {}
+  public void initialize() {
+    m_ElevatorSubsystem.setIsScoring(true);
+  }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
@@ -39,6 +41,6 @@ public class CmdT_Level1 extends Command {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return (m_ElevatorSubsystem.IsElevatorAtSetpoint() && m_ElevatorSubsystem.IsWristAtSetpoint() && m_ElevatorSubsystem.IsElbowAtSetpoint());
+    return (m_ElevatorSubsystem.IsElevatorAtSetpoint(Level1.height) && m_ElevatorSubsystem.IsWristAtSetpoint(Level1.wrist) && m_ElevatorSubsystem.IsElbowAtSetpoint(Level1.elbow));
   }
 }

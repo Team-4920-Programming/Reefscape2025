@@ -13,6 +13,9 @@ import frc.robot.subsystems.CoralElevator.CoralElevatorSubsystem;
 public class CmdT_UltrasonicCheck extends Command {
   /** Creates a new CmdT_UltrasonicCheck. */
   CoralElevatorSubsystem css;
+  double height;
+  double wrist;
+  double elbow;
   public CmdT_UltrasonicCheck(CoralElevatorSubsystem CoralSS) {
     // Use addRequirements() here to declare subsystem dependencies.
     css = CoralSS;
@@ -20,7 +23,12 @@ public class CmdT_UltrasonicCheck extends Command {
 
   // Called when the command is initially scheduled.
   @Override
-  public void initialize() {}
+  public void initialize() {
+    height = css.getFilteredElevatorHeight();
+    wrist = css.GetWristAngleWorldCoordinates();
+    elbow = css.GetElbowAngle();
+
+  }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
@@ -31,10 +39,16 @@ public class CmdT_UltrasonicCheck extends Command {
     if(targetScore == 4){
       if (css.getUltrasonic() >= 10){
         css.OverrideRedZone = true;
-        css.setArmPosition(Level4_Far.height, Level4_Far.elbow, Level4_Far.wrist);
+        height = Level4_Far.height;
+        wrist = Level4_Far.wrist;
+        elbow = Level4_Far.elbow;
+        css.setArmPosition(height, elbow, wrist);
       }
       else{
-        css.setArmPosition(Level4.height, Level4.elbow, Level4.wrist);
+        height = Level4.height;
+        wrist = Level4.wrist;
+        elbow = Level4.elbow;
+        css.setArmPosition(height, elbow, wrist);
       }
     }
   }
@@ -43,11 +57,12 @@ public class CmdT_UltrasonicCheck extends Command {
   @Override
   public void end(boolean interrupted) {
     css.OverrideRedZone = false;
+    System.out.println("This ran");
   }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return css.IsElevatorAtSetpoint() && css.IsWristAtSetpoint() && css.IsElbowAtSetpoint();
+    return css.IsElevatorAtSetpoint(height) && css.IsWristAtSetpoint(wrist) && css.IsElbowAtSetpoint(elbow);
   }
 }

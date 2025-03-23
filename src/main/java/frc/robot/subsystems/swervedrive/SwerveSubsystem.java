@@ -75,6 +75,7 @@ import swervelib.telemetry.SwerveDriveTelemetry;
 import swervelib.telemetry.SwerveDriveTelemetry.TelemetryVerbosity;
 import edu.wpi.first.math.Matrix;
 import frc.robot.Vision4920;
+import frc.robot.Constants.PIDs.CoralElevator.DriveToPose;
 
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Inches;
@@ -119,6 +120,7 @@ public class SwerveSubsystem extends SubsystemBase
   public boolean DH_OUT_isRedAlliance = false;
   public boolean DH_Out_AtCoralStation = false;
   public boolean DH_Out_isAutoAimEnabled = true;
+  public boolean DH_Out_DriveToPose = false;
 
   public Pose2d DH_In_LeftCoralPose;
   public Pose2d DH_In_RightCoralPose;
@@ -369,6 +371,7 @@ private void ProcessVision4920()
           GreyFeederVisionTimestamp = visionEst.get().timestampSeconds;
           DogLog.log("SwerveSS/Vision/GreyFeederCameraPose", GreyFeederCameraPose3d);
           DogLog.log("SwerveSS/Vision/GreyFeederTimeStamp",GreyFeederVisionTimestamp);
+          if (!DH_Out_DriveToPose)
             VisionReading(GreyFeederPose, GreyFeederVisionTimestamp, GreyFeederCamera.confidenceCalculator(visionEst.get()));
       }
   
@@ -434,7 +437,7 @@ private void ProcessVision4920()
           RedGeneralVisionTimestamp = visionEst.get().timestampSeconds;
           DogLog.log("SwerveSS/Vision/RedGeneralCameraPose", RedGeneralCameraPose3d);
           DogLog.log("SwerveSS/Vision/RedGeneralTimeStamp",RedGeneralVisionTimestamp);
-          if (!DriverStation.isAutonomous())
+          if (!DriverStation.isAutonomous() && !DH_Out_DriveToPose)
           VisionReading(RedGeneralPose, RedGeneralVisionTimestamp, RedGeneralCamera.confidenceCalculator(visionEst.get()));
       }
   
@@ -456,7 +459,7 @@ private void ProcessVision4920()
           BlueFrontVisionTimestamp = visionEst.get().timestampSeconds;
           DogLog.log("SwerveSS/Vision/BlueFrontCameraPose", BlueFrontCameraPose3d);
           DogLog.log("SwerveSS/Vision/BlueFrontTimeStamp",BlueFrontVisionTimestamp);
-          if(!DriverStation.isAutonomous())
+          if(!DriverStation.isAutonomous() && !DH_Out_DriveToPose)
             VisionReading(BlueFrontPose, BlueFrontVisionTimestamp, BlueFrontCamera.confidenceCalculator(visionEst.get()));
       }
   
@@ -478,7 +481,7 @@ private void ProcessVision4920()
           BlueGeneralVisionTimestamp = visionEst.get().timestampSeconds;
           DogLog.log("SwerveSS/Vision/BlueGeneralCameraPose", BlueGeneralCameraPose3d);
           DogLog.log("SwerveSS/Vision/BlueGeneralTimeStamp",BlueGeneralVisionTimestamp);
-          if (!DriverStation.isAutonomous())
+          if (!DriverStation.isAutonomous() && !DH_Out_DriveToPose)
           VisionReading(BlueGeneralPose, BlueGeneralVisionTimestamp, BlueGeneralCamera.confidenceCalculator(visionEst.get()));
       }
   
