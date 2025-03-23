@@ -91,6 +91,7 @@ import frc.robot.Constants.DIO;
 import frc.robot.Constants.PIDs;
 import frc.robot.Constants.RobotLimits;
 import frc.robot.Constants.RobotMotionLimits;
+import frc.robot.Constants.RobotPositions;
 import frc.robot.Robot;
 
 import au.grapplerobotics.LaserCan;
@@ -185,6 +186,13 @@ public class CoralElevatorSubsystem extends SubsystemBase {
 
   double tmpMotionProfileElbowHolder = 999;
   double tmpMotionProfileWristHolder = 999;
+
+
+//Mike's new logic for Setpoints - March 22
+  double ElevatorGoal = 0.0;
+  double WristGoal = 0.0;
+  double ElbowGoal = 0.0;
+
 
   /** SIM Robot Init START */
   DCMotor ElevatorStageGearbox = DCMotor.getNEO(1);
@@ -288,6 +296,7 @@ public class CoralElevatorSubsystem extends SubsystemBase {
     else{
       tmpElevatorSetpointHolder = height;
     }
+    ElevatorGoal = height;
   }
 
   public boolean IsElevatorAtSetpoint(double target){
@@ -402,6 +411,7 @@ public class CoralElevatorSubsystem extends SubsystemBase {
     else{
       tmpElbowSetpointHolder = angle;
     }
+    ElbowGoal = angle;
   }
   
   private Boolean CanMoveElbowInc(){
@@ -465,6 +475,7 @@ public class CoralElevatorSubsystem extends SubsystemBase {
     else{
       tmpWristSetpointHolder = angle;
     }
+    WristGoal = angle;
   }
 
   private Boolean CanMoveWristInc(){
@@ -541,6 +552,24 @@ public class CoralElevatorSubsystem extends SubsystemBase {
   }
   public boolean getJustScored(){
     return justScored;
+  }
+  public boolean isElevatorAtGoal()
+  {
+    double curElevPos = getFilteredElevatorHeight();
+    double curElevTol = ElevatorPID.getErrorTolerance();
+    return (Math.abs(curElevPos - ElevatorGoal) < curElevTol);
+  }
+  public boolean isElbowAtGoal()
+  {
+    double curElbowPos = GetElbowAngle();
+    double curElbowTol = ElbowPID.getErrorTolerance();
+    return (Math.abs(curElbowPos - ElbowGoal) < curElbowTol);
+  }
+  public boolean isWristAtGoal()
+  {
+    double curWristPos = GetWristAngleWorldCoordinates();
+    double curWristTol = WristPID.getErrorTolerance();
+    return (Math.abs(curWristPos - WristGoal) < curWristTol);
   }
 
   @Override
@@ -668,119 +697,171 @@ public class CoralElevatorSubsystem extends SubsystemBase {
     boolean atSet = true;
     double setpoint = 999;
     double EleFF = 0.0;
-    if (getFilteredElevatorHeight() >= 0.5)
+   if (getFilteredElevatorHeight() >= 0.5)
       EleFF = 0.03;
       else
       EleFF = 0.0;
-     if (tmpElevatorSetpointHolder == 999){
-      atSet = IsElevatorAtSetpoint(ElevatorPID.getSetpoint());
-      setpoint = ElevatorPID.getSetpoint();
-
-     }
-     else{
-      atSet = IsElevatorAtSetpoint(tmpElevatorSetpointHolder);
-      setpoint = tmpElevatorSetpointHolder;
-     }
-      if (!atSet)
-      { 
-        if ((CanMoveElevatorUp() && getFilteredElevatorHeight() < setpoint ) || (CanMoveElevatorDown() && getFilteredElevatorHeight() > setpoint)){
-          double EleveFF = 0.025;
-          if (tmpMotionProfileElbowHolder != 999){
-            SetElbowAngle(tmpMotionProfileElbowHolder);
-            tmpMotionProfileElbowHolder = 999;
-          }
-          if (tmpMotionProfileWristHolder != 999){
-            SetWristAngle(tmpMotionProfileWristHolder);
-            tmpMotionProfileWristHolder = 999;
-          }
-          // if (getFilteredElevatorHeight() > 0.30 && getFilteredElevatorHeight() < 0.5)
-          //   EleveFF = 0.01;
-
-          // EmotorSpd = elevatorOutput + EleveFF;
-          // if (EmotorSpd < 0.05 && EmotorSpd>0)
-          //   EmotorSpd = 0.05;
-          // if (EmotorSpd > -0.05 && EmotorSpd<0)
-          //   EmotorSpd = -0.05;  
-          if (GetWristAngleWorldCoordinates() > 100 && isCoralPresent() && isElevatorPassingThroughRedZone())
-          {
-            ElevatorStageMotor.set(0 + EleFF);
-          }
-          else{
-            // if (Math.abs(elevatorOutput) < 0.04){
-            //   ElevatorStageMotor.set(0);
-            // }
-            // else{
-          ElevatorStageMotor.set(elevatorOutput);
-            // }
-          } //10% speed for testing 
+//**********************************************
+// Mike D Rework of Setpoint buffering - March 22
+// If elevator needs to move - move Wrist/Elbow to safe first
+// if  Wrist/Elbow are in safe position - move elevator
+// if Elevator in position - move Wrist/Elbow
+//******************************************* 
+    boolean MoveElevator = false;
+    if (!SetpointsFrozen)
+    {
+      if (isElevatorAtGoal())
+      {
+        WristPID.setSetpoint(WristGoal);
+        ElbowPID.setSetpoint(ElbowGoal);
       }
-      else if (((!CanMoveElevatorUp() && getFilteredElevatorHeight() < setpoint ) || (!CanMoveElevatorDown() && getFilteredElevatorHeight() > setpoint)) || isElevatorPassingThroughRedZone()){
-        if (tmpMotionProfileWristHolder == 999){
-          tmpMotionProfileWristHolder = WristPID.getSetpoint();
-          SetWristAngle(90);
+      else
+      {
+        WristPID.setSetpoint(RobotPositions.SafePosition.wrist);
+        ElbowPID.setSetpoint(RobotPositions.SafePosition.elbow);
+        if (WristPID.atSetpoint() && ElbowPID.atSetpoint() && WristPID.getSetpoint() == RobotPositions.SafePosition.wrist && ElbowPID.getSetpoint() == RobotPositions.SafePosition.elbow){
+          ElevatorPID.setSetpoint(ElevatorGoal);
+          MoveElevator = true;
         }
-        else{
-          SetWristAngle(tmpMotionProfileElbowHolder);
-        }
-        if (tmpMotionProfileElbowHolder == 999){
-          tmpMotionProfileElbowHolder = ElbowPID.getSetpoint();
-          SetElbowAngle(15);  
-        }
-        else{
-          SetElbowAngle(tmpMotionProfileElbowHolder);
-        }
+      }
+      
+    }
+    
+    if (MoveElevator)
+    {
+      //Elevator move requested - make sure we are not on a overtravel switch before moving
+      if ((elevatorOutput > 0 && !getUpStop()) || (elevatorOutput < 0 && !getDownStop()))
+      {
+        ElevatorStageMotor.set(elevatorOutput);
+      }
+      else
+      {
+        //On a overtravel don't move in requested direction
         ElevatorStageMotor.set(0 + EleFF);
       }
     }
-    else{ 
+    else
+    {
+      //not requested to move - so stop
       ElevatorStageMotor.set(0 + EleFF);
+    } 
+    // may need to add if at setpoint to stop moving.. hopefully the PID stops us.
+    ElbowMotor.set(elbowOutput); 
+    WristMotor.set(wristOutput);
+    DogLog.log("CoralElevatorSS/Elbow/ActualElbowMotorOutput", elbowOutput);
+    DogLog.log("CoralElevatorSS/Wrist/ActualWristMotorOutput", wristOutput); 
+    
+//End of Mike's Changes
+ 
+    //  if (tmpElevatorSetpointHolder == 999){
+    //   atSet = IsElevatorAtSetpoint(ElevatorPID.getSetpoint());
+    //   setpoint = ElevatorPID.getSetpoint();
 
-      if (tmpMotionProfileElbowHolder != 999){
-        SetElbowAngle(tmpMotionProfileElbowHolder);
-        tmpMotionProfileElbowHolder = 999;
-      }
+    //  }
+    //  else{
+    //   atSet = IsElevatorAtSetpoint(tmpElevatorSetpointHolder);
+    //   setpoint = tmpElevatorSetpointHolder;
+    //  }
+    //   if (!atSet)
+    //   { 
+    //     if ((CanMoveElevatorUp() && getFilteredElevatorHeight() < setpoint ) || (CanMoveElevatorDown() && getFilteredElevatorHeight() > setpoint)){
+    //       double EleveFF = 0.025;
+    //       if (tmpMotionProfileElbowHolder != 999){
+    //         SetElbowAngle(tmpMotionProfileElbowHolder);
+    //         tmpMotionProfileElbowHolder = 999;
+    //       }
+    //       if (tmpMotionProfileWristHolder != 999){
+    //         SetWristAngle(tmpMotionProfileWristHolder);
+    //         tmpMotionProfileWristHolder = 999;
+    //       }
+    //       // if (getFilteredElevatorHeight() > 0.30 && getFilteredElevatorHeight() < 0.5)
+    //       //   EleveFF = 0.01;
 
-      if (tmpMotionProfileWristHolder != 999){
-        SetWristAngle(tmpMotionProfileWristHolder);
-        tmpMotionProfileWristHolder = 999;
-      }
+    //       // EmotorSpd = elevatorOutput + EleveFF;
+    //       // if (EmotorSpd < 0.05 && EmotorSpd>0)
+    //       //   EmotorSpd = 0.05;
+    //       // if (EmotorSpd > -0.05 && EmotorSpd<0)
+    //       //   EmotorSpd = -0.05;  
+    //       if (GetWristAngleWorldCoordinates() > 100 && isCoralPresent() && isElevatorPassingThroughRedZone())
+    //       {
+    //         ElevatorStageMotor.set(0 + EleFF);
+    //       }
+    //       else{
+    //         // if (Math.abs(elevatorOutput) < 0.04){
+    //         //   ElevatorStageMotor.set(0);
+    //         // }
+    //         // else{
+    //       ElevatorStageMotor.set(elevatorOutput);
+    //         // }
+    //       } //10% speed for testing 
+    //   }
+    //   else if (((!CanMoveElevatorUp() && getFilteredElevatorHeight() < setpoint ) || (!CanMoveElevatorDown() && getFilteredElevatorHeight() > setpoint)) || isElevatorPassingThroughRedZone()){
+    //     if (tmpMotionProfileWristHolder == 999){
+    //       tmpMotionProfileWristHolder = WristPID.getSetpoint();
+    //       SetWristAngle(90);
+    //     }
+    //     else{
+    //       SetWristAngle(tmpMotionProfileElbowHolder);
+    //     }
+    //     if (tmpMotionProfileElbowHolder == 999){
+    //       tmpMotionProfileElbowHolder = ElbowPID.getSetpoint();
+    //       SetElbowAngle(15);  
+    //     }
+    //     else{
+    //       SetElbowAngle(tmpMotionProfileElbowHolder);
+    //     }
+    //     ElevatorStageMotor.set(0 + EleFF);
+    //   }
+    // }
+    // else{ 
+    //   ElevatorStageMotor.set(0 + EleFF);
 
-    }
+    //   if (tmpMotionProfileElbowHolder != 999){
+    //     SetElbowAngle(tmpMotionProfileElbowHolder);
+    //     tmpMotionProfileElbowHolder = 999;
+    //   }
+
+    //   if (tmpMotionProfileWristHolder != 999){
+    //     SetWristAngle(tmpMotionProfileWristHolder);
+    //     tmpMotionProfileWristHolder = 999;
+    //   }
+
+    // }
 
     
 
 
 
 
-        // if (GetElbowAngle() < 60 && elbowOutput > 0){
-        //   elbowOutput *= 0.35;
+    //     // if (GetElbowAngle() < 60 && elbowOutput > 0){
+    //     //   elbowOutput *= 0.35;
           
-        // }
-        // if (GetElbowAngle() > 135 && elbowOutput < 0){
-        //   elbowOutput *= 0.75;
+    //     // }
+    //     // if (GetElbowAngle() > 135 && elbowOutput < 0){
+    //     //   elbowOutput *= 0.75;
           
-        // }
-      if (!ElbowPID.atSetpoint() && ((CanMoveElbowDec() && elbowOutput > 0) || (CanMoveElbowInc() && elbowOutput < 0))) 
-      {
-        ElbowMotor.set(elbowOutput); // 10% speed for testing;
-        DogLog.log("CoralElevatorSS/Elbow/ActualElbowMotorOutput", elbowOutput);
-      }
-      else{
-        ElbowMotor.set(0);
-        DogLog.log("CoralElevatorSS/Elbow/ActualElbowMotorOutput", 0);
-      }
+    //     // }
+    //   if (!ElbowPID.atSetpoint() && ((CanMoveElbowDec() && elbowOutput > 0) || (CanMoveElbowInc() && elbowOutput < 0))) 
+    //   {
+    //     ElbowMotor.set(elbowOutput); // 10% speed for testing;
+    //     DogLog.log("CoralElevatorSS/Elbow/ActualElbowMotorOutput", elbowOutput);
+    //   }
+    //   else{
+    //     ElbowMotor.set(0);
+    //     DogLog.log("CoralElevatorSS/Elbow/ActualElbowMotorOutput", 0);
+    //   }
 
 
 
-      if (!WristPID.atSetpoint()){
-        DogLog.log("CoralElevatorSS/Wrist/ActualWristMotorOutput", wristOutput); 
-        WristMotor.set(wristOutput);
-      }
-      else{
-        WristMotor.set(0);
-        DogLog.log("CoralElevatorSS/Wrist/ActualWristMotorOutput", 0); 
+    //   if (!WristPID.atSetpoint()){
+    //     DogLog.log("CoralElevatorSS/Wrist/ActualWristMotorOutput", wristOutput); 
+    //     WristMotor.set(wristOutput);
+    //   }
+    //   else{
+    //     WristMotor.set(0);
+    //     DogLog.log("CoralElevatorSS/Wrist/ActualWristMotorOutput", 0); 
 
-      }
+    //   }
   
     // Datahighway
 

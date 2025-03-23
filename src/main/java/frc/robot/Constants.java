@@ -265,6 +265,11 @@ public final class Constants
     }
   }
   public static class RobotPositions{
+    public static class SafePosition {
+      public static final double wrist = 90;
+      public static final double elbow = 0;
+      
+    }
     public static class CoralStation {
       public static final double wrist = 160; //degrees //-202
       public static final double elbow = 0; //degrees
