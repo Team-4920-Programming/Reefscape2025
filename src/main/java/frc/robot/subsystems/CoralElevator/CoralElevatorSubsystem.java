@@ -14,6 +14,7 @@ import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
 
+
 import java.util.concurrent.ThreadPoolExecutor.AbortPolicy;
 import java.util.function.BooleanSupplier;
 
@@ -72,6 +73,8 @@ import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.util.Color;
+import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -105,7 +108,7 @@ public class CoralElevatorSubsystem extends SubsystemBase {
 
   /** Creates a new ShooterSubsystem. */
   private final BoltLog BoltLogger = new BoltLog();
-  private Mechanism2d SimElevator = new Mechanism2d(1, 2);
+  private Mechanism2d SimElevator = new Mechanism2d(1.5, 3);
   private MechanismRoot2d SimElevatorRoot;
   private MechanismLigament2d SimStage1;
   private MechanismLigament2d SimElbow;
@@ -430,10 +433,12 @@ public class CoralElevatorSubsystem extends SubsystemBase {
     // else{
     //   tmpElbowSetpointHolder = angle;
     // }
+    
     if (ElbowGoal != angle)
     {
       ElbowGoal = angle;
       SawElbowGoal = false;
+      System.out.println("ElbowGoal Set "+ angle);
     }
     
   }
@@ -483,7 +488,7 @@ public class CoralElevatorSubsystem extends SubsystemBase {
     }
     else
     {
-      pos = SimElbowAngle-180;
+      pos = SimElbowAngle;
     }
     
     return pos;
@@ -526,7 +531,7 @@ public class CoralElevatorSubsystem extends SubsystemBase {
       return WristAbsoluteEncoder.getPosition();
     else
     {
-      return SimWristAngle;
+      return SimWristAngle+90;
     }
   
   }
@@ -652,12 +657,12 @@ public class CoralElevatorSubsystem extends SubsystemBase {
       FreezeSetpoints(false,false,false);
 
     }
-    if (!DH_In_RedZone){
+    if (!DH_In_RedZone && SetpointsFrozen){
 
       UnfreezeSetPoints();
 
     }
-    if (DH_In_RedZone && OverrideRedZone ){
+    if (DH_In_RedZone && OverrideRedZone && SetpointsFrozen){
       
       UnfreezeSetPoints();
 
@@ -707,6 +712,7 @@ public class CoralElevatorSubsystem extends SubsystemBase {
     DogLog.log("CoralElevatorSS/Elevator/ElevatorPIDSetpoint", ElevatorPID.getSetpoint());
     DogLog.log("CoralElevatorSS/Elevator/ElevatorPIDError", ElevatorPID.getError());
     DogLog.log("CoralElevatorSS/Elevator/ElevatorHeight", getFilteredElevatorHeight());
+    DogLog.log("CoralElevatorSS/Elevator/ElevatorGoal", ElevatorGoal);
 
     //Elbow Data
     DogLog.log("CoralElevatorSS/Elbow/ElbowAngle",GetElbowAngle());
@@ -715,12 +721,13 @@ public class CoralElevatorSubsystem extends SubsystemBase {
     DogLog.log("CoralElevatorSS/Elbow/ElbowPIDOutput",elbowOutput);
     DogLog.log("CoralElevatorSS/Elbow/CanElbowInc", CanMoveElbowInc());
     DogLog.log("CoralElevatorSS/Elbow/CanElbowDec", CanMoveElbowDec());
+    DogLog.log("CoralElevatorSS/Elbow/ElbowGoal", ElbowGoal);
 
     DogLog.log("CoralElevatorSS/Wrist/WristPIDOutput", wristOutput);
     DogLog.log("CoralElevatorSS/Wrist/WristPIDSetpoint", WristPID.getSetpoint());
     DogLog.log("CoralElevatorSS/Wrist/WristAbsoluteAngle", WristAbsoluteEncoder.getPosition());
     DogLog.log("CoralElevatorSS/Wrist/WristPIDError", WristPID.getError());
-    
+    DogLog.log("CoralElevatorSS/Wrist/WristGoal", WristGoal);
     DogLog.log("CoralElevatorSS/Wrist/WristWorldAngle", GetWristAngleWorldCoordinates());
     DogLog.log("CoralElevatorSS/Wrist/CanWristInc", CanMoveWristInc());
     DogLog.log("CoralElevatorSS/Wrist/CanWirstDec", CanMoveWristDec());
@@ -1095,27 +1102,32 @@ public class CoralElevatorSubsystem extends SubsystemBase {
 
   private void setupSim()
   {
-    SimElevatorRoot = SimElevator.getRoot("elevator", 0.1, 0);
+    SimElevatorRoot = SimElevator.getRoot("elevator", 0.6, 0.0);
     SimStage1 = SimElevatorRoot.append(new MechanismLigament2d("Stage1", 0.9, 90));
     SimElbow = SimStage1.append(new MechanismLigament2d("Elbow",0.5,170));
     SimWrist = SimElbow.append(new MechanismLigament2d("Wrist",0.2,90));
+
+    SimStage1.setColor(new Color8Bit(Color.kBlue));
+    SimElbow.setColor(new Color8Bit(Color.kGreen));
+    SimWrist.setColor(new Color8Bit(Color.kOrange));
   }
   private void applyOutputToSim()
   {
     double ElevatorSpd = ElevatorStageMotor.get();
     double ElbowSpd = -ElbowMotor.get();
     double WristSpd = -WristMotor.get();
-    SimElevatorHeight = SimElevatorHeight + 0.01*ElevatorSpd;
-    SimElbowAngle = SimElbowAngle + 1*ElbowSpd;        
+    SimElevatorHeight = SimElevatorHeight + 0.1*ElevatorSpd;
+    if (SimElevatorHeight > 0.665) SimElevatorHeight = 0.665; 
+    SimElbowAngle = SimElbowAngle + 2*ElbowSpd;        
     if (SimElbowAngle > 360) SimElbowAngle = SimElbowAngle -360;
     if (SimElbowAngle < -360) SimElbowAngle = SimElbowAngle +360;
     
-    SimWristAngle = SimWristAngle + 1.0*WristSpd;
+    SimWristAngle = SimWristAngle + 1.5*WristSpd;
     if (SimWristAngle > 360) SimWristAngle = SimWristAngle -360;
-    SimStage1.setLength(SimElevatorHeight);
-    SimElbow.setAngle(SimElbowAngle);
+    SimStage1.setLength(SimElevatorHeight+0.9);
+    SimElbow.setAngle(SimElbowAngle+180);
     
-    SimWrist.setAngle(SimWristAngle);
+    SimWrist.setAngle(SimWristAngle-90);
     SmartDashboard.putData("Elevator",SimElevator);
   }
   
