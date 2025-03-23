@@ -177,7 +177,7 @@ public class CoralElevatorSubsystem extends SubsystemBase {
   double elbowOutput;
   double wristOutput;
   boolean SetpointsFrozen = false;
-  boolean PabloOverride = false;
+  boolean PabloOverride = true;
   boolean justScored = false;
   boolean isScoring = false;
 
@@ -237,6 +237,7 @@ public class CoralElevatorSubsystem extends SubsystemBase {
     elevatorConfig.inverted(false);
     elevatorConfig.smartCurrentLimit(80);
     elevatorConfig.openLoopRampRate(0.5);
+    elevatorConfig.voltageCompensation(12);
     ElevatorStageMotor.configure(elevatorConfig, SparkBase.ResetMode.kResetSafeParameters, SparkBase.PersistMode.kPersistParameters);
     
     ElbowPID.setTolerance(3);
@@ -313,8 +314,9 @@ public class CoralElevatorSubsystem extends SubsystemBase {
     // else{
     //   tmpElevatorSetpointHolder = height;
     // }
-    if (ElevatorGoal != height)
+    if (ElevatorGoal != height && height <= RobotLimits.Elevator.maxHeight)
     {
+      //if (height < 0.7)
       ElevatorGoal = height;
       SawElevatorGoal = false;
     }
@@ -636,7 +638,7 @@ public class CoralElevatorSubsystem extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-    
+    resetEncoderCount();
     DistanceSensor.setAutomaticMode(true);
     DistanceSensor.setEnabled(true);
     if (DistanceSensor.isRangeValid())
@@ -692,16 +694,24 @@ public class CoralElevatorSubsystem extends SubsystemBase {
       elbowOutput = ElbowPID.calculate(GetElbowAngle());
       elbowOutput = -elbowOutput;
       elbowOutput = MathUtil.clamp(elbowOutput, -1.0, 1.0);//was -.5 and .5
-      if (ElbowPID.getSetpoint() > GetElbowAngle())
-        elbowOutputFF = Math.abs(Math.sin(Units.degreesToRadians(GetElbowAngle())))* 2.0;
-      else
-        elbowOutputFF = Math.abs(Math.sin(Units.degreesToRadians(GetElbowAngle())))*.8;
-      elbowOutput = elbowOutput * Math.max(elbowOutputFF,0.15);
-      if (elbowOutput < 0){
-        Math.min(elbowOutput, -0.2);
-      }
-      if (elbowOutput > 0){
-        Math.max(elbowOutput, 0.2);
+      // if (ElbowPID.getSetpoint() > GetElbowAngle())
+        // elbowOutputFF = Math.abs(Math.sin(Units.degreesToRadians(GetElbowAngle())))* 2.0;
+      // else
+        // elbowOutputFF = Math.abs(Math.sin(Units.degreesToRadians(GetElbowAngle())))*.8;
+      // elbowOutput = elbowOutput * Math.max(elbowOutputFF,0.15);
+      double elbowMinSpeed = 0.02;
+      if (GetElbowAngle() >= -15 && GetElbowAngle() <= 15 && elbowOutput < 0){
+        elbowMinSpeed = 0.02;
+    }
+    // if (elbowOutput < 0){
+    //   elbowOutput = Math.min(elbowOutput, -elbowMinSpeed); //wasn't assigned back to the elbow output
+    // }
+    // if (elbowOutput > 0){
+    //   elbowOutput = Math.max(elbowOutput, elbowMinSpeed);
+    // }
+      if (ElbowPID.atSetpoint())
+      {
+          elbowOutput = 0;
       }
       wristOutput = WristPID.calculate(GetWristAngleWorldCoordinates());
     }
@@ -712,6 +722,7 @@ public class CoralElevatorSubsystem extends SubsystemBase {
     DogLog.log("CoralElevatorSS/Elevator/ElevatorPIDSetpoint", ElevatorPID.getSetpoint());
     DogLog.log("CoralElevatorSS/Elevator/ElevatorPIDError", ElevatorPID.getError());
     DogLog.log("CoralElevatorSS/Elevator/ElevatorHeight", getFilteredElevatorHeight());
+    DogLog.log("CoralElevatorSS/Elevator/RawElevatorHeight", getHeightLaserMeters());
     DogLog.log("CoralElevatorSS/Elevator/ElevatorGoal", ElevatorGoal);
 
     //Elbow Data
@@ -780,23 +791,32 @@ public class CoralElevatorSubsystem extends SubsystemBase {
     boolean MoveElevator = false;
     if (!SetpointsFrozen)
     {
-      if (isElevatorAtGoal() || (SawElevatorGoal && Math.abs(ElevatorPID.getError()) < 2* ElevatorPID.getErrorTolerance()))
+      if (isWristAtGoal() && isElbowAtGoal())
+        {
+          MoveElevator = true;
+        }
+      if(ElevatorGoal < getFilteredElevatorHeight() && !DH_In_RedZone){
+        MoveElevator = true;
+        ElevatorPID.setSetpoint(ElevatorGoal);
+      }
+      if (isElevatorAtGoal() || (SawElevatorGoal && Math.abs(ElevatorPID.getError()) < 3* ElevatorPID.getErrorTolerance()))
       {
         WristPID.setSetpoint(WristGoal);
         ElbowPID.setSetpoint(ElbowGoal);
+        
       }
       else
       {
         WristPID.setSetpoint(RobotPositions.SafePosition.wrist);
         ElbowPID.setSetpoint(RobotPositions.SafePosition.elbow);
-        boolean WristCloseEnough = Math.abs(WristPID.getError()) < 2* WristPID.getErrorTolerance();
-        boolean ArmCloseEnought = Math.abs(ElbowPID.getError()) < 2* ElbowPID.getErrorTolerance();
+        boolean WristCloseEnough = Math.abs(WristPID.getError()) < 3* WristPID.getErrorTolerance();
+        boolean ArmCloseEnought = (Math.abs(ElbowPID.getError()) < 4* ElbowPID.getErrorTolerance());
         if (WristCloseEnough && ArmCloseEnought && WristPID.getSetpoint() == RobotPositions.SafePosition.wrist && ElbowPID.getSetpoint() == RobotPositions.SafePosition.elbow){
           ElevatorPID.setSetpoint(ElevatorGoal);
           MoveElevator = true;
         }
       }
-      
+            
     }
     
     if (MoveElevator)
@@ -804,6 +824,18 @@ public class CoralElevatorSubsystem extends SubsystemBase {
       //Elevator move requested - make sure we are not on a overtravel switch before moving
       if ((elevatorOutput > 0 && !getUpStop()) || (elevatorOutput < 0 && !getDownStop()))
       {
+        double elevatorMinSpeed = 0.0;
+        if (getFilteredElevatorHeight() >= 0.7){
+          elevatorMinSpeed = 0.04;/// (RobotController.getBatteryVoltage()/13);
+          
+        if (elevatorOutput < 0){
+
+          elevatorOutput = Math.min(elevatorOutput,-elevatorMinSpeed);
+        }
+        else{
+          elevatorOutput = Math.max(elevatorOutput, elevatorMinSpeed);
+        }
+      }
         ElevatorStageMotor.set(elevatorOutput);
       }
       else
@@ -991,13 +1023,13 @@ public class CoralElevatorSubsystem extends SubsystemBase {
 
   private void UnfreezeSetPoints(){
     if (tmpElbowSetpointHolder != 999){
-      SetElbowAngle(tmpElbowSetpointHolder);
+     // SetElbowAngle(tmpElbowSetpointHolder);
     }
     if (tmpElevatorSetpointHolder != 999){
-      SetElevatorPosition(tmpElevatorSetpointHolder);
+      //SetElevatorPosition(tmpElevatorSetpointHolder);
     }
     if (tmpWristSetpointHolder != 999){
-      SetElevatorPosition(tmpWristSetpointHolder);
+      //SetElevatorPosition(tmpWristSetpointHolder); /// this is very very very wrong!!!!!
     }
     SetpointsFrozen = false;
   }
@@ -1040,14 +1072,40 @@ public class CoralElevatorSubsystem extends SubsystemBase {
                       (PIDs.CoralElevator.Elevator.pulleyRadius * 2 * Math.PI));
   }
 
+  public void resetEncoderCount(){
+    double encoderCount = (getHeightLaserMeters() / (2 * Math.PI * PIDs.CoralElevator.Elevator.pulleyRadius)) * PIDs.CoralElevator.Elevator.elevatorReduction;
+      double elevatorHeight = (encoderCount / PIDs.CoralElevator.Elevator.elevatorReduction) *
+      (2 * Math.PI * PIDs.CoralElevator.Elevator.pulleyRadius);
+    DogLog.log("CoralElevatorSS/Calibration/CalculatedResetEncoder", encoderCount);
+    DogLog.log("CoralElevatorSS/Calibration/LaserHeightM", getHeightLaserMeters());
+    DogLog.log("CoralElevatorSS/Calibration/CurrentEncoderCount", ElevatorEncoder.getPosition());
+    DogLog.log("CoralElevatorSS/Calibration/EncoderHeightM", getHeightMeters());
+    DogLog.log("CoralElevatorSS/Calibration/CalculatedEncoderHeightM", elevatorHeight);
+
+    
+  }
+  public void setBrake(){
+    if (ElevatorStageMotor.configAccessor.getIdleMode() != IdleMode.kBrake){
+      elevatorConfig.idleMode(IdleMode.kBrake);
+      ElevatorStageMotor.configure(elevatorConfig, SparkBase.ResetMode.kResetSafeParameters, SparkBase.PersistMode.kPersistParameters);
+    }
+ 
+    
+  }
+  public void setCoast(){
+    elevatorConfig.idleMode(IdleMode.kCoast);
+    ElevatorStageMotor.configure(elevatorConfig, SparkBase.ResetMode.kResetSafeParameters, SparkBase.PersistMode.kPersistParameters);
+  }
+
   
-  // public double getHeightMeters()
-  // {
-  //   double elevatorHeight = (ElevatorEncoder.getPosition() / PIDs.CoralElevator.Elevator.elevatorReduction) *
-  //   (2 * Math.PI * PIDs.CoralElevator.Elevator.pulleyRadius);
-  //   // DogLog.log("Elevator Height", elevatorHeight);
-  //   return elevatorHeight;
-  // }
+  public double getHeightMeters()
+  {
+    double elevatorHeight = (ElevatorEncoder.getPosition() / PIDs.CoralElevator.Elevator.elevatorReduction) *
+    (2 * Math.PI * PIDs.CoralElevator.Elevator.pulleyRadius);
+    // DogLog.log("Elevator Height", elevatorHeight);
+    // elevatorHeight = ElevatorEncoder.getPosition() * 0.0104;
+    return elevatorHeight;
+  }
 
   public double getHeightLaserMeters(){
     
@@ -1061,7 +1119,8 @@ public class CoralElevatorSubsystem extends SubsystemBase {
     } catch (Exception e) {
       // TODO: handle exception
     }
-    return elevatorHeight;
+    // return elevatorHeight;
+    return getHeightMeters();
   }
 
   public double getVelocityMetersPerSecond()

@@ -89,6 +89,8 @@ public class Robot extends TimedRobot
     m_robotContainer.setMotorBrake(true);
     disabledTimer.reset();
     disabledTimer.start();
+
+    m_robotContainer.SetElevatorCoast();
   }
 
   @Override
@@ -123,6 +125,8 @@ public class Robot extends TimedRobot
       m_autonomousCommand.schedule();
     }
 
+    m_robotContainer.SetElevatorBrake();
+
   }
 
   /**
@@ -155,6 +159,7 @@ public class Robot extends TimedRobot
     }
     m_robotContainer.setDriveMode();
     m_robotContainer.setMotorBrake(true);
+    m_robotContainer.SetElevatorBrake();
   }
 
   /**
@@ -176,6 +181,7 @@ public class Robot extends TimedRobot
     // Cancels all running commands at the start of test mode.
     CommandScheduler.getInstance().cancelAll();
     m_robotContainer.setDriveMode();
+    m_robotContainer.SetElevatorBrake();
   }
 
   /**
@@ -192,6 +198,7 @@ public class Robot extends TimedRobot
   @Override
   public void simulationInit()
   {
+    m_robotContainer.SetElevatorBrake();
   }
 
   /**

@@ -64,6 +64,7 @@ public class CmdT_CoralOutTake extends Command {
     CoralElevatorSS.setIntakeSpeed(0.0);
     CoralElevatorSS.setJustScored(true);
     CoralElevatorSS.setIsScoring(false);
+    CoralElevatorSS.OverrideRedZone = false;
     // BoltLogger.Log(BoltLogger.HighLog, getSubsystem(), getName(), "Execute", "Executing", false);
     DogLog.log("Tele/CoralOutTakeCmd/End/RobotPose",CoralElevatorSS.DH_In_RobotPose);
     DogLog.log("Tele/CoralOutTakeCmd/End/RobotHeading",CoralElevatorSS.DH_In_RobotPose.getRotation().getDegrees());

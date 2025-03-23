@@ -52,7 +52,7 @@ public class CmdA_DriveToFeederPosition_Relative extends Command {
   public void initialize() {
 
     inter = false;
-    Pose2d targetAprilTagPose = DriveSS.GetClosestReefSegment();
+    Pose2d targetAprilTagPose = DriveSS.GetClosestPickupSlot();
 
     targetPose = new Pose2d();
     targetPose = targetAprilTagPose;

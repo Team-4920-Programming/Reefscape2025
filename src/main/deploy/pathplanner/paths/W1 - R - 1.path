@@ -1,0 +1,54 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 6.940881147540983,
+        "y": 0.6864241803278684
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 6.300179273686964,
+        "y": 1.5091163768617197
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 5.610245901639344,
+        "y": 2.0650102459016386
+      },
+      "prevControl": {
+        "x": 5.83822793479528,
+        "y": 1.7583282082938023
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": null
+    }
+  ],
+  "rotationTargets": [],
+  "constraintZones": [],
+  "pointTowardsZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 3.5,
+    "maxAcceleration": 1.5,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0.5,
+    "rotation": 119.99999999999999
+  },
+  "reversed": false,
+  "folder": "Windsor 1 - R - 3pc",
+  "idealStartingState": {
+    "velocity": 0.0,
+    "rotation": 126.94899312700007
+  },
+  "useDefaultConstraints": true
+}

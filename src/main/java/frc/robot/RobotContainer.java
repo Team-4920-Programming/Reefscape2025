@@ -56,6 +56,8 @@ import frc.robot.commands.swervedrive.auto.CmdA_DriveToReefPositionV2;
 import frc.robot.commands.swervedrive.auto.CmdA_DriveToReefPositionV3_Relative;
 import frc.robot.commands.swervedrive.auto.CmdA_DriveToReefPositionV3_RelativeTest;
 import frc.robot.commands.swervedrive.auto.CmdA_DriveToReefPositionV4_Test;
+import frc.robot.commands.swervedrive.auto.CmdA_DriveToReefPositionV5_WinningWindsor;
+import frc.robot.commands.swervedrive.auto.CmdA_DriveToReefPositionV6_ActuallyWinningWindsor;
 import frc.robot.commands.swervedrive.TeleOp.*;
 import swervelib.SwerveDriveTest;
 import frc.robot.commands.Climber.Auto.CmdA_BridgeOut;
@@ -176,8 +178,9 @@ public class RobotContainer
     NamedCommands.registerCommand("CmdA_DriveToReefPositionR", new CmdA_DriveToReefPositionV3_Relative(drivebase, 2));
     NamedCommands.registerCommand("CmdA_DriveToReefPositionL", new CmdA_DriveToReefPositionV3_Relative(drivebase, 1));
     NamedCommands.registerCommand("CmdA_DriveToFeederRelative", new CmdA_DriveToFeederPosition_Relative(drivebase));
-    NamedCommands.registerCommand("CmdA_DriveToReefPositionRTest", new CmdA_DriveToReefPositionV3_RelativeTest(drivebase, 2));
-    NamedCommands.registerCommand("CmdA_DriveToReefPositionLTest", new CmdA_DriveToReefPositionV3_RelativeTest(drivebase, 1));
+    NamedCommands.registerCommand("CmdA_DriveToReefPositionRTest", new CmdA_DriveToReefPositionV6_ActuallyWinningWindsor(drivebase, 2));
+    NamedCommands.registerCommand("CmdA_DriveToReefPositionLTest", new CmdA_DriveToReefPositionV6_ActuallyWinningWindsor(drivebase, 1));
+    NamedCommands.registerCommand("CmdA_BackupFromReef", new CmdT_DriveToPoseRelativeBackAwayFromReef(drivebase, 3.0, -1.0, 0, 0));
     
 
 
@@ -317,7 +320,7 @@ public class RobotContainer
   // ClimberSS.setDefaultCommand(new CmdT_ClimberIn(ClimberSS));
 
   //Driver Controller
-  driverXbox.leftTrigger().whileTrue(new Cmd_SeqScoreLeft(CoralElevatorSS, drivebase, ReefSurveySS));//.onFalse(new CmdT_IsScoring(CoralElevatorSS, false));
+  driverXbox.leftTrigger().whileTrue(new Cmd_SeqScoreLeft(CoralElevatorSS, drivebase, ReefSurveySS)).onFalse(new CmdT_IsScoring(CoralElevatorSS, false));
   driverXbox.rightTrigger().whileTrue(new Cmd_SeqScoreRight(CoralElevatorSS, drivebase,ReefSurveySS)).onFalse(new CmdT_IsScoring(CoralElevatorSS, false));
 
   // driverXbox.leftBumper().whileTrue(new Cmd_SeqScoreLeftBak(CoralElevatorSS, drivebase, ReefSurveySS));
@@ -332,7 +335,7 @@ public class RobotContainer
   driverXbox.y().whileTrue(new CmdT_CoralOutTake(CoralElevatorSS ));
 
   driverXbox.a().whileTrue(new CmdA_DriveToFeederPosition_Relative(drivebase));
-  driverXbox.b().whileTrue(new CmdA_DriveToReefPositionV4_Test(drivebase, 2));
+  driverXbox.b().whileTrue(new CmdA_DriveToReefPositionV6_ActuallyWinningWindsor(drivebase, 2));
 
   // Button 1: Abort climb
   OperatorJoystick.button(1 ).whileTrue(new CmdT_ClimberIn(ClimberSS));
@@ -414,5 +417,11 @@ public class RobotContainer
 
   public void EnableLimelight(){
     LimelightHelpers.setLEDMode_ForceOn("limelight");
+  }
+  public void SetElevatorCoast(){
+    CoralElevatorSS.setCoast();
+  }
+  public void SetElevatorBrake(){
+    CoralElevatorSS.setBrake();
   }
 }

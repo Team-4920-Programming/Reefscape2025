@@ -99,8 +99,10 @@ public class CmdT_MoveToLevel extends Command {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
+    
     DogLog.log("Tele/MoveToLevelCmd/CommandWasInterrupted", interrupted);
     DogLog.log("Tele/MoveToLevelCmd/CommandStatus", "finished");
+    // Coral_SS.OverrideRedZone = true;
     //System.out.println("Move to Level End");
   }
 
@@ -113,6 +115,6 @@ public class CmdT_MoveToLevel extends Command {
     DogLog.log("Tele/MoveToLevelCmd/FinishedCondition/ElbowAtSetpoint", Coral_SS.IsElbowAtSetpoint(TargetElbowAng));
     DogLog.log("Tele/MoveToLevelCmd/FinishedCondition/WristAtSetpoint", Coral_SS.IsWristAtSetpoint(TargetWristAng));
 
-    return (Coral_SS.IsElevatorAtSetpoint(TargetHeight) && Math.abs(Coral_SS.GetElbowAngle() - TargetElbowAng) <= 20 && Coral_SS.IsWristAtSetpoint(TargetWristAng)) || (!Coral_SS.DH_In_YellowZone && !Coral_SS.DH_In_RedZone);
+    return (Coral_SS.IsElevatorAtSetpoint(TargetHeight) && Math.abs(Coral_SS.GetElbowAngle() - TargetElbowAng) <= 20 && Math.abs(Coral_SS.GetWristAngleWorldCoordinates() - TargetWristAng) <= 20 ) || Coral_SS.DH_In_RedZone;
   }
 }
