@@ -84,7 +84,7 @@ public final class Constants
     }
     public static class CoralElevator {
       public static class Elevator{
-        public static final double kp = 2.5;
+        public static final double kp = 2.5;//real is 2.5
         public static final double ki = 0.0;
         public static final double kd = 0.01;
 

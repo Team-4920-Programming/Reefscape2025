@@ -88,6 +88,7 @@ import frc.robot.Constants.CanIDs.CoralElevator;
 import frc.robot.Constants.PIDs.CoralElevator.Elevator;
 import frc.robot.Constants.PIDs.CoralElevator.LeftFlap;
 import frc.robot.Constants.PIDs.CoralElevator.RightFlap;
+import frc.robot.Constants.PIDs.CoralElevator.Wrist;
 import frc.robot.Constants.RobotPositions.CoralStation;
 import frc.robot.Constants.CanIDs;
 import frc.robot.Constants.DIO;
@@ -533,7 +534,7 @@ public class CoralElevatorSubsystem extends SubsystemBase {
       return WristAbsoluteEncoder.getPosition();
     else
     {
-      return SimWristAngle+90;
+      return SimWristAngle;
     }
   
   }
@@ -789,11 +790,16 @@ public class CoralElevatorSubsystem extends SubsystemBase {
 // if Elevator in position - move Wrist/Elbow
 //******************************************* 
     boolean MoveElevator = false;
+    if (SetpointsFrozen)
+    {
+      MoveElevator = true;
+    }
     if (!SetpointsFrozen)
     {
       if (isWristAtGoal() && isElbowAtGoal())
         {
           MoveElevator = true;
+         ElevatorPID.setSetpoint(ElevatorGoal);
         }
       if(ElevatorGoal < getFilteredElevatorHeight() && !DH_In_RedZone){
         MoveElevator = true;
@@ -803,12 +809,13 @@ public class CoralElevatorSubsystem extends SubsystemBase {
       {
         WristPID.setSetpoint(WristGoal);
         ElbowPID.setSetpoint(ElbowGoal);
-        
+        MoveElevator = true;
       }
       else
       {
         WristPID.setSetpoint(RobotPositions.SafePosition.wrist);
         ElbowPID.setSetpoint(RobotPositions.SafePosition.elbow);
+        //MoveElevator = false;
         boolean WristCloseEnough = Math.abs(WristPID.getError()) < 3* WristPID.getErrorTolerance();
         boolean ArmCloseEnought = (Math.abs(ElbowPID.getError()) < 4* ElbowPID.getErrorTolerance());
         if (WristCloseEnough && ArmCloseEnought && WristPID.getSetpoint() == RobotPositions.SafePosition.wrist && ElbowPID.getSetpoint() == RobotPositions.SafePosition.elbow){
@@ -818,7 +825,10 @@ public class CoralElevatorSubsystem extends SubsystemBase {
       }
             
     }
-    
+    if (MoveElevator == false)
+    {
+      ElevatorPID.setSetpoint(getFilteredElevatorHeight());
+    }
     if (MoveElevator)
     {
       //Elevator move requested - make sure we are not on a overtravel switch before moving
@@ -854,6 +864,11 @@ public class CoralElevatorSubsystem extends SubsystemBase {
     WristMotor.set(wristOutput);
     DogLog.log("CoralElevatorSS/Elbow/ActualElbowMotorOutput", elbowOutput);
     DogLog.log("CoralElevatorSS/Wrist/ActualWristMotorOutput", wristOutput); 
+    DogLog.log("CoralElevatorSS/Elevator/MoveElevator", MoveElevator); 
+    DogLog.log("CoralElevatorSS/Elevator/ElevatorAtGoal", isElevatorAtGoal()); 
+    DogLog.log("CoralElevatorSS/Elbow/ElbowAtGoal", isElbowAtGoal()); 
+    DogLog.log("CoralElevatorSS/Wrist/WristAtGoal", isWristAtGoal()); 
+    
     if (Robot.isSimulation()){
       applyOutputToSim();
     }
@@ -1161,7 +1176,7 @@ public class CoralElevatorSubsystem extends SubsystemBase {
 
   private void setupSim()
   {
-    SimElevatorRoot = SimElevator.getRoot("elevator", 0.6, 0.0);
+    SimElevatorRoot = SimElevator.getRoot("elevator", .95, 0.0);
     SimStage1 = SimElevatorRoot.append(new MechanismLigament2d("Stage1", 0.9, 90));
     SimElbow = SimStage1.append(new MechanismLigament2d("Elbow",0.5,170));
     SimWrist = SimElbow.append(new MechanismLigament2d("Wrist",0.2,90));
@@ -1175,18 +1190,25 @@ public class CoralElevatorSubsystem extends SubsystemBase {
     double ElevatorSpd = ElevatorStageMotor.get();
     double ElbowSpd = -ElbowMotor.get();
     double WristSpd = -WristMotor.get();
-    SimElevatorHeight = SimElevatorHeight + 0.1*ElevatorSpd;
-    if (SimElevatorHeight > 0.665) SimElevatorHeight = 0.665; 
-    SimElbowAngle = SimElbowAngle + 2*ElbowSpd;        
+    if (DriverStation.isDisabled())
+    { 
+      ElevatorSpd = 0;
+      ElbowSpd = 0;
+      WristSpd = 0;
+    }
+   // if (ElevatorSpd > 0.3 || ElevatorSpd < 0.3)
+       SimElevatorHeight = SimElevatorHeight + 0.55*ElevatorSpd;
+    if (SimElevatorHeight > 0.9) SimElevatorHeight = 0.9; 
+    SimElbowAngle = SimElbowAngle + 3*ElbowSpd;        
     if (SimElbowAngle > 360) SimElbowAngle = SimElbowAngle -360;
     if (SimElbowAngle < -360) SimElbowAngle = SimElbowAngle +360;
     
-    SimWristAngle = SimWristAngle + 1.5*WristSpd;
+    SimWristAngle = SimWristAngle + 3*WristSpd;
     if (SimWristAngle > 360) SimWristAngle = SimWristAngle -360;
     SimStage1.setLength(SimElevatorHeight+0.9);
     SimElbow.setAngle(SimElbowAngle+180);
     
-    SimWrist.setAngle(SimWristAngle-90);
+    SimWrist.setAngle(SimWristAngle-45);
     SmartDashboard.putData("Elevator",SimElevator);
   }
   
