@@ -141,6 +141,7 @@ public class DataHighwaySubsystem extends SubsystemBase {
     DogLog.log("DataHighwaySS/Zones/RightCoralPose", RightCoralStationPose);
     DogLog.log("DataHighwaySS/Zones/CenterOfReefPose", ReefPose);
     DogLog.log("DataHighwaySS/MatchTime", Timer.getMatchTime());
+    DogLog.log("DataHighwaySS/FPGATime", Timer.getFPGATimestamp());
 
     
     if (inReefRedZone || inCageRedZone || inCoralStationRedZone){

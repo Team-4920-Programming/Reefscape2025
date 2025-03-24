@@ -282,6 +282,7 @@ public class SwerveSubsystem extends SubsystemBase
 
     DogLog.log("SwerveSS/RobotOdo",swerveDrive.getPose());
     DogLog.log("SwerveSS/RoboSpeed", swerveDrive.getRobotVelocity());
+    DogLog.log("SwerveSS/FieldVelocity", swerveDrive.getFieldVelocity());
     DogLog.log("SwerveSS/isRedAlliance", isRedAlliance());
     DogLog.log("SwerveSS/isAutoAim", isAutoAim());
     // DogLog.log("SwerveSS/Reefposition",getReefSegment());
