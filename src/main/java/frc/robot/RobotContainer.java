@@ -58,6 +58,7 @@ import frc.robot.commands.swervedrive.auto.CmdA_DriveToReefPositionV3_RelativeTe
 import frc.robot.commands.swervedrive.auto.CmdA_DriveToReefPositionV4_Test;
 import frc.robot.commands.swervedrive.auto.CmdA_DriveToReefPositionV5_WinningWindsor;
 import frc.robot.commands.swervedrive.auto.CmdA_DriveToReefPositionV6_ActuallyWinningWindsor;
+import frc.robot.commands.swervedrive.auto.CmdA_DriveToReefPositionV7_Test;
 import frc.robot.commands.swervedrive.TeleOp.*;
 import swervelib.SwerveDriveTest;
 import frc.robot.commands.Climber.Auto.CmdA_BridgeOut;
@@ -181,7 +182,8 @@ public class RobotContainer
     NamedCommands.registerCommand("CmdA_DriveToReefPositionRTest", new CmdA_DriveToReefPositionV6_ActuallyWinningWindsor(drivebase, 2));
     NamedCommands.registerCommand("CmdA_DriveToReefPositionLTest", new CmdA_DriveToReefPositionV6_ActuallyWinningWindsor(drivebase, 1));
     NamedCommands.registerCommand("CmdA_BackupFromReef", new CmdT_DriveToPoseRelativeBackAwayFromReef(drivebase, 3.0, -1.0, 0, 0));
-    
+    NamedCommands.registerCommand("CmdA_DRTest2", new CmdA_DriveToReefPositionV7_Test(drivebase, 2));
+    NamedCommands.registerCommand("CmdA_DLTest2", new CmdA_DriveToReefPositionV7_Test(drivebase, 1));
 
 
     DogLog.setOptions(new DogLogOptions().withNtPublish(true));
