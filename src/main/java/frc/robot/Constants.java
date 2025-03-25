@@ -43,7 +43,7 @@ public final class Constants
   public static final double ROBOT_MASS = 61.5;//(115) * 0.453592; // 32lbs * kg per pound
   public static final Matter CHASSIS    = new Matter(new Translation3d(0, 0, Units.inchesToMeters(8)), ROBOT_MASS);
   public static final double LOOP_TIME  = 0.13; //s, 20ms + 110ms sprk max velocity lag
-  public static final double MAX_SPEED  = 3.5;//3.5;//Units.feetToMeters(14.63);
+  public static final double MAX_SPEED  = 3.5; //Units.feetToMeters(14.63);
   // Maximum speed of the robot in meters per second, used to limit acceleration.
 
 //  public static final class AutonConstants
@@ -137,7 +137,7 @@ public final class Constants
         public static final double thetakP =  3.3;
         public static final double thetakD = 0.0;
         public static final double driveMaxVelocity = 3.5;
-        public static final double driveMaxAcceleration = 2.0;
+        public static final double driveMaxAcceleration = 2.67;
         public static final double thetaMaxVelocity = Units.degreesToRadians(360);
         public static final double thetaMaxAcceleration = 5.0;
         public static final double driveTolerance = 0.02;
@@ -146,8 +146,23 @@ public final class Constants
         public static final double ffMaxRadius = 0.1;
       }
 
+      // public static class DriveToPoseWorkingMonday{
+      //   public static final double drivekP = 1.5;
+      //   public static final double drivekD = 0.0;
+      //   public static final double thetakP =  3.3;
+      //   public static final double thetakD = 0.0;
+      //   public static final double driveMaxVelocity = 3.5;
+      //   public static final double driveMaxAcceleration = 2.0;
+      //   public static final double thetaMaxVelocity = Units.degreesToRadians(360);
+      //   public static final double thetaMaxAcceleration = 5.0;
+      //   public static final double driveTolerance = 0.02;
+      //   public static final double thetaTolerance = Units.degreesToRadians(0.75);
+      //   public static final double ffMinRadius = 0.05;
+      //   public static final double ffMaxRadius = 0.1;
+      // }
 
-      // public static class DriveToPose{
+
+      // public static class DriveToPoseOld{
       //   public static final double drivekP = 3.0;
       //   public static final double drivekD = 0.0;
       //   public static final double thetakP =  3.3;
