@@ -60,6 +60,8 @@ import java.util.function.Supplier;
 
 import org.ironmaple.simulation.IntakeSimulation;
 import org.ironmaple.simulation.SimulatedArena;
+import org.ironmaple.simulation.gamepieces.GamePieceOnFieldSimulation;
+import org.ironmaple.simulation.gamepieces.GamePieceOnFieldSimulation.GamePieceInfo;
 import org.ironmaple.simulation.seasonspecific.reefscape2025.ReefscapeCoralAlgaeStack;
 import org.json.simple.parser.ParseException;
 import org.opencv.features2d.FlannBasedMatcher;
@@ -499,6 +501,15 @@ private void ProcessVision4920()
     //DogLog.log("Simulated Position",Simulate)
     SmartDashboard.putNumber("y",100);
     DogLog.log("FieldSimulation/Robot",swerveDrive.getMapleSimDrive().get().getSimulatedDriveTrainPose());
+    if (CintakeSimulation.getGamePiecesAmount() ==0 && (DH_In_InRightCoralZone || DH_In_InLeftCoralZone))
+    {
+      CintakeSimulation.addGamePieceToIntake();
+      
+      
+      
+     
+      
+    }
     //swerveDrive.addVisionMeasurement(getPose(), getAIntakeGamePiecesAmount());
 
     //swerveDrive.addVisionMeasurement(swerveDrive.getMapleSimDrive().get().getSimulatedDriveTrainPose(),Timer.getFPGATimestamp());
@@ -523,10 +534,12 @@ private void ProcessVision4920()
               swerveDrive.getMapleSimDrive().get(), 
               width, Extension, IntakeSimulation.IntakeSide.BACK, 1);
         CintakeSimulation.register(SimulatedArena.getInstance());
+        CintakeSimulation.addGamePieceToIntake();
   }
   public void setupSimulatedField()
   { 
       SimulatedArena.getInstance().resetFieldForAuto();
+
     
   }
   public void startCIntake()

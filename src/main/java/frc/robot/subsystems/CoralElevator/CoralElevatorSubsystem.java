@@ -46,6 +46,8 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.filter.LinearFilter;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.system.plant.DCMotor;
@@ -124,6 +126,7 @@ public class CoralElevatorSubsystem extends SubsystemBase {
   public Pose2d DH_In_RobotPose = new Pose2d();
   public boolean OverrideRedZone = false; //set from the algae commands
   public int DH_Out_ScoreSelection = 1;
+  public boolean DH_SimIn_HasCoral = false;
 
   /** Physical Robot Init START**/
   
@@ -1245,7 +1248,7 @@ public class CoralElevatorSubsystem extends SubsystemBase {
       WristSpd = 0;
     }
    // if (ElevatorSpd > 0.3 || ElevatorSpd < 0.3)
-       SimElevatorHeight = SimElevatorHeight + 0.55*ElevatorSpd;
+       SimElevatorHeight = SimElevatorHeight + 0.3*ElevatorSpd;
     if (SimElevatorHeight > 0.9) SimElevatorHeight = 0.9; 
     SimElbowAngle = SimElbowAngle + 3*ElbowSpd;        
     if (SimElbowAngle > 360) SimElbowAngle = SimElbowAngle -360;
@@ -1258,6 +1261,18 @@ public class CoralElevatorSubsystem extends SubsystemBase {
     
     SimWrist.setAngle(SimWristAngle-45);
     SmartDashboard.putData("Elevator",SimElevator);
+
+
+    if (DH_SimIn_HasCoral)
+    {
+      double z = SimStage1.getLength() + Math.sin(Units.degreesToRadians(SimElbow.getAngle()))*SimElbow.getLength();
+      double x = Math.cos(Units.degreesToRadians(SimElbow.getAngle())*SimElbow.getLength());
+      double y = Math.sin(Units.degreesToRadians(SimElbow.getAngle())*SimElbow.getLength());//-Units.inchesToMeters(6);;
+      Pose2d RobotPose = DH_In_RobotPose;
+      Pose3d CoralPose= new Pose3d(RobotPose.getX()+x,RobotPose.getY()+y,z,new Rotation3d(0,Units.degreesToRadians(90+GetWristAngleWorldCoordinates()),RobotPose.getRotation().getRadians()));
+      DogLog.log("Simulation/IntakeCoral",CoralPose);
+
+    }
   }
   
 

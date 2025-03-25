@@ -290,7 +290,10 @@ public class DataHighwaySubsystem extends SubsystemBase {
     
   }
   private void getCoralData(){
-    hasCoral = Coral_SS.DH_Out_HasCoral;
+    if (Robot.isReal())
+    {
+       hasCoral = Coral_SS.DH_Out_HasCoral;
+    }   
     scoreSelection = Coral_SS.DH_Out_ScoreSelection;
   }
 
@@ -314,7 +317,10 @@ public class DataHighwaySubsystem extends SubsystemBase {
     Coral_SS.DH_In_RedZone = inReefRedZone || inCoralStationRedZone || inCageRedZone;
     Coral_SS.DH_In_YellowZone = inReefYellowZone;
     Coral_SS.DH_In_RobotPose = CurrentPose;
-    
+    if (Robot.isSimulation())
+    {
+      Coral_SS.DH_SimIn_HasCoral = hasCoral;
+    }
   }
 
   private void SetupZonesCenter(){
@@ -474,7 +480,7 @@ public class DataHighwaySubsystem extends SubsystemBase {
       }
 
     // if (WithinZone(LeftCoralStationPose.toPose2d(),CurrentPose, 3, 0, 90) && !hasCoral){
-      hasCoral = true;
+    //  hasCoral = true;
     // }
   }
   }
