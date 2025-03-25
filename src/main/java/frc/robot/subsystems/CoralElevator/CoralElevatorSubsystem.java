@@ -226,10 +226,10 @@ public class CoralElevatorSubsystem extends SubsystemBase {
 
   private int ScoreSelection = 4; //default score level is 4
 
-  public final Trigger atElevatorMin = new Trigger(() -> !CanMoveElevatorDown());
-  public final Trigger atElevatorMax = new Trigger(() -> !CanMoveElevatorUp());
-  public final Trigger atElbowMin = new Trigger(() -> !CanMoveElbowDec());
-  public final Trigger atElbowMax = new Trigger(() -> !CanMoveElbowInc());
+  public final Trigger atElevatorMin = new Trigger(() -> getDownStop());
+  public final Trigger atElevatorMax = new Trigger(() -> getUpStop());
+  public final Trigger atElbowMin = new Trigger(() -> GetElbowAngle() <= 10);
+  public final Trigger atElbowMax = new Trigger(() -> GetElbowAngle() >= 190);
   public final Trigger atWristMin = new Trigger(() -> !CanMoveWristDec());
   public final Trigger atWristMax = new Trigger(() -> !CanMoveWristInc());
   
@@ -891,7 +891,7 @@ public class CoralElevatorSubsystem extends SubsystemBase {
 //           elevatorOutput = Math.max(elevatorOutput, elevatorMinSpeed);
 //         }
 //       //}
-        ElevatorStageMotor.set(elevatorOutput+ EleFF);
+        //////////////////UNCOMMENT: ElevatorStageMotor.set(elevatorOutput+ EleFF);
       // }
       // else
       // {
@@ -902,11 +902,13 @@ public class CoralElevatorSubsystem extends SubsystemBase {
     else
     {
       //not requested to move - so stop
-      ElevatorStageMotor.set(0 + EleFF);
+     //////////////////UNCOMMENT:// ElevatorStageMotor.set(0 + EleFF);
     } 
     // may need to add if at setpoint to stop moving.. hopefully the PID stops us.
-    ElbowMotor.set(elbowOutput); 
-    WristMotor.set(wristOutput);
+    //UNCOMMENT
+    // ElbowMotor.set(elbowOutput); 
+    // WristMotor.set(wristOutput);
+
     DogLog.log("CoralElevatorSS/Elbow/ActualElbowMotorOutput", elbowOutput);
     DogLog.log("CoralElevatorSS/Wrist/ActualWristMotorOutput", wristOutput); 
     DogLog.log("CoralElevatorSS/Elevator/ClampedElevatorPIDOutput", elevatorOutput);
@@ -1285,7 +1287,7 @@ public class CoralElevatorSubsystem extends SubsystemBase {
   // SysID nonsense
 
   // Mutable holder for unit-safe values, persisted to avoid reallocation.
-
+*/
   private final MutDistance m_distance = Meters.mutable(0);
   private final MutAngle m_rotations = Rotations.mutable(0);
   private final MutLinearVelocity m_velocity = MetersPerSecond.mutable(0);
@@ -1298,7 +1300,7 @@ public class CoralElevatorSubsystem extends SubsystemBase {
       ElevatorStageMotor::setVoltage,
    // (voltage) -> this.sysidElevatorRunVoltage(voltage.in(Volts)),
     log -> {
-      DogLog.log("SysID/Elevator/VoltageApplied", ElevatorStageMotor.getAppliedOutput() * RobotController.getBatteryVoltage());
+      DogLog.log("SysID/Elevator/VoltageApplied", ElevatorStageMotor.getAppliedOutput() * ElevatorStageMotor.getBusVoltage());
       DogLog.log("SysID/Elevator/Position", m_distance.mut_replace(getHeightMeters(),Meters).in(Meters));
       DogLog.log("SysID/Elevator/Velocity", m_velocity.mut_replace(getVelocityMetersPerSecond(),
       MetersPerSecond).in(MetersPerSecond));
@@ -1307,12 +1309,10 @@ public class CoralElevatorSubsystem extends SubsystemBase {
 
   public void sysidElevatorRunVoltage(double V)
   {
-    if (CanMoveElevatorUp() && V > 0)
-    ElevatorStageMotor.set(V / RobotController.getBatteryVoltage());
-    else if (CanMoveElevatorDown() && V < 0)
-    ElevatorStageMotor.set(V / RobotController.getBatteryVoltage());
+    if (!getUpStop() && !getDownStop())
+    ElevatorStageMotor.setVoltage(V);
     else
-    ElevatorStageMotor.set(0);
+    ElevatorStageMotor.setVoltage(0);
   }
 
   public Command sysIDElevatorAll(){
@@ -1339,7 +1339,7 @@ public class CoralElevatorSubsystem extends SubsystemBase {
       new SysIdRoutine.Mechanism(
       ElbowMotor::setVoltage,
       log -> {
-        DogLog.log("SysID/Elbow/VoltageApplied", ElbowMotor.getAppliedOutput() * RobotController.getBatteryVoltage());
+        DogLog.log("SysID/Elbow/VoltageApplied", ElbowMotor.getAppliedOutput() * ElbowMotor.getBusVoltage());
         DogLog.log("SysID/Elbow/Position", m_rotations.mut_replace(ElbowAbsoluteEncoder.getPosition(),Degrees).in(Degrees));
         //check to make sure these units make sense. Normally rev returns velocity in rpm, we've converted it to degrees, so velocity should return as degrees per min
         //for sysid, we want <units> per second for velocity
@@ -1370,6 +1370,6 @@ public class CoralElevatorSubsystem extends SubsystemBase {
       },
       this));
 
-    ******************************/
+    /******************************/
 }
 

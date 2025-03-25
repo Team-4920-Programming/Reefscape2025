@@ -416,6 +416,7 @@ public class DataHighwaySubsystem extends SubsystemBase {
     inCoralStationRedZone = WithinZone("LeftCoralStationRedZone",LeftCoralStationPose.toPose2d(),CurrentPose, 2, 0, 90) || WithinZone("RightCoralStationRedZone",RightCoralStationPose.toPose2d(),CurrentPose, 2, 0, 90);
     inReefRedZone = WithinZone("ReefRedZone_ClosestTag",ClosestReefSegment, CurrentPose, 1.1, 0, 45) || WithinZone("ReefRedZone_MainBorder",ReefPose, CurrentPose, 1.65, 0, 180) ;
     inReefYellowZone = WithinZone("ReefYellowZone",ReefPose, CurrentPose, Units.inchesToMeters(38.25)+2, 0, 180) && !inReefRedZone;
+    inCageRedZone = WithinRectZone("RedAllianceCageZone", 7.5, 10 , 0.0 ,8.0, CurrentPose);
     if(inLeftCoralZone){
       inCoralStationPickupZone = WithinZone("LeftCoralStationPickupZone",ClosestPickupSlot,CurrentPose, 0.6, 180, 15);
     }
@@ -467,6 +468,13 @@ public class DataHighwaySubsystem extends SubsystemBase {
     // }
     // return distance <= radius && (targetHeading <= RightCone && targetHeading >= LeftCone);
     return distance <= radius && Math.abs(t.getRotation().getDegrees()) <= impactedHeading;
+  }
+
+  private Boolean WithinRectZone(String name, double xmin, double xmax, double ymin, double ymax, Pose2d currentPose){
+    double x = currentPose.getX();
+    double y = currentPose.getY();
+
+    return x >= xmin && x <= xmax && y >= ymin && y <= ymax;
   }
   private void sim()
   {

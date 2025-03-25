@@ -311,6 +311,7 @@ public class RobotContainer
 
   //   } else
   //   {
+  
 
   /****************Start of Teleop Controls*****************************/
   
@@ -336,9 +337,10 @@ public class RobotContainer
   driverXbox.x().whileTrue(new CmdT_CoralIntake(CoralElevatorSS ));
   driverXbox.y().whileTrue(new CmdT_CoralOutTake(CoralElevatorSS ));
 
-  driverXbox.a().whileTrue(new CmdA_DriveToFeederPosition_Relative(drivebase));
-  driverXbox.b().whileTrue(new CmdA_DriveToReefPositionV7_Test(drivebase, 2));
-
+  // driverXbox.a().whileTrue(new CmdA_DriveToFeederPosition_Relative(drivebase));
+  // driverXbox.b().whileTrue(new CmdA_DriveToReefPositionV7_Test(drivebase, 2));
+  driverXbox.a().whileTrue(CoralElevatorSS.sysIDElevatorAll());
+  driverXbox.b().whileTrue(CoralElevatorSS.sysIDElbowAll());
   // Button 1: Abort climb
   OperatorJoystick.button(1 ).whileTrue(new CmdT_ClimberIn(ClimberSS));
   // Button 2: Setup Climb
