@@ -116,14 +116,35 @@ public final class Constants
         public static final double elevatorReduction = 12;
       }
       public static class TestElbow{
-        public static final double kp = 0.12409;
-        public static final double ki = 0.000;
-        public static final double kd = 0.052567;
+        // 45:1
+        // public static final double kp = 0.12409;
+        // public static final double ki = 0.000;
+        // public static final double kd = 0.052567;
 
-        public static final double ks = 1.3432;
+        // public static final double ks = 1.3432;
+        // public static final double kg = 0.76004;
+        // public static final double kv = 0.027346;
+        // public static final double ka = 0.0058474;
+
+        //36:1
+          public static final double kp = 0.12913;
+          public static final double ki = 0.000;
+          public static final double kd = 0.025224;
+
+        //trying 45:1 FF numbers
+                  public static final double ks = 1.3432;
         public static final double kg = 0.76004;
         public static final double kv = 0.027346;
         public static final double ka = 0.0058474;
+        public static final double offsetAngleToHorizonal = 90.699;
+
+  
+        //36:1 FF numbers
+          // public static final double ks = 0.92686;
+          // public static final double kg = 0.51665 ;
+          // public static final double kv = 0.027237;
+          // public static final double ka = 0.0049381;
+          // public static final double offsetAngleToHorizonal = 90.754;
         
         public static final double maxVelocity = 0.01;
       }
@@ -346,7 +367,7 @@ public final class Constants
     public static class CoralStation {
       public static final double wrist = 160; //degrees //-202
       public static final double elbow = 0; //degrees
-      public static final double height = 0.14; //meters
+      public static final double height = 0.11; //meters
     }
     public static class TransportCoralUp{
       public static final double wrist = 90;
@@ -386,7 +407,7 @@ public final class Constants
     public static class Level4 {
       public static final double wrist = -37; //degrees-37
       public static final double elbow =161; //degrees 180
-      public static final double height = .750; //meters
+      public static final double height = .78; //meters
     }
     public static class Level4_Far {
       public static final double wrist = -36; //degrees
@@ -457,7 +478,7 @@ public final class Constants
   public static class RobotAutomationInformation {
     public static class AutoAlignReef{
       public static final double branchOffset = Units.inchesToMeters(6.5);
-      public static final double distanceFromFace = Units.inchesToMeters(25.25);
+      public static final double distanceFromFace = Units.inchesToMeters(24.75);
     }
     public static class AutoAlignCoralFeederStation{
       public static final double distanceFromFace = Units.inchesToMeters(20);

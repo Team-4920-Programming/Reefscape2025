@@ -17,6 +17,7 @@ import frc.robot.commands.swervedrive.auto.CmdA_DriveToReefPositionV2;
 import frc.robot.commands.swervedrive.auto.CmdA_DriveToReefPositionV3_Relative;
 import frc.robot.commands.swervedrive.auto.CmdA_DriveToReefPositionV4_Test;
 import frc.robot.commands.swervedrive.auto.CmdA_DriveToReefPositionV6_ActuallyWinningWindsor;
+import frc.robot.commands.swervedrive.auto.CmdA_DriveToReefPositionV7_Test;
 import frc.robot.subsystems.CoralElevator.CoralElevatorSubsystem;
 import frc.robot.subsystems.DataHighway.DataHighwaySubsystem;
 import frc.robot.subsystems.ReefSurvey.ReefSurveySubsystem;
@@ -36,7 +37,7 @@ public class Cmd_SeqScoreLeft extends SequentialCommandGroup {
     addCommands(
       new CmdT_StopDrive(Drive_SS),
       new CmdT_MoveToLevel(Coral_SS),
-      new CmdA_DriveToReefPositionV6_ActuallyWinningWindsor(Drive_SS, 1).withTimeout(3),
+      new CmdA_DriveToReefPositionV7_Test(Drive_SS, 1).withTimeout(3),
       // new CmdT_UltrasonicCheck(Coral_SS),
       new CmdT_CoralOutTake(Coral_SS),
       new Reef_MarkOurs(Reef_SS, 0),
