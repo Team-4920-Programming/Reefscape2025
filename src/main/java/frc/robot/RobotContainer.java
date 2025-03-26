@@ -339,8 +339,9 @@ public class RobotContainer
 
   // driverXbox.a().whileTrue(new CmdA_DriveToFeederPosition_Relative(drivebase));
   // driverXbox.b().whileTrue(new CmdA_DriveToReefPositionV7_Test(drivebase, 2));
-  driverXbox.a().whileTrue(CoralElevatorSS.sysIDElevatorAll());
-  driverXbox.b().whileTrue(CoralElevatorSS.sysIDElbowAll());
+  // driverXbox.a().whileTrue(CoralElevatorSS.sysIDElevatorAll());
+  driverXbox.b().whileTrue(CoralElevatorSS.sysIDWristAll());
+
   // Button 1: Abort climb
   OperatorJoystick.button(1 ).whileTrue(new CmdT_ClimberIn(ClimberSS));
   // Button 2: Setup Climb

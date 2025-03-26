@@ -50,7 +50,14 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Twist2d;
+import edu.wpi.first.math.numbers.N7;
+import edu.wpi.first.math.spline.Spline.ControlVector;
+import edu.wpi.first.math.system.LinearSystem;
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.system.plant.LinearSystemId;
+import edu.wpi.first.math.trajectory.Trajectory;
+import edu.wpi.first.math.trajectory.TrajectoryGenerator;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
 import edu.wpi.first.math.util.Units;
@@ -64,9 +71,12 @@ import edu.wpi.first.units.measure.MutAngularVelocity;
 import edu.wpi.first.units.measure.MutDistance;
 import edu.wpi.first.units.measure.MutLinearVelocity;
 import edu.wpi.first.units.measure.MutVoltage;
+import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.units.measure.Velocity;
+import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.simulation.AnalogInputSim;
 import edu.wpi.first.wpilibj.simulation.ElevatorSim;
@@ -79,6 +89,7 @@ import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.RamseteCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
@@ -90,6 +101,7 @@ import frc.robot.Constants.CanIDs.CoralElevator;
 import frc.robot.Constants.PIDs.CoralElevator.Elevator;
 import frc.robot.Constants.PIDs.CoralElevator.LeftFlap;
 import frc.robot.Constants.PIDs.CoralElevator.RightFlap;
+import frc.robot.Constants.PIDs.CoralElevator.TestElevator;
 import frc.robot.Constants.PIDs.CoralElevator.Wrist;
 import frc.robot.Constants.RobotPositions.CoralStation;
 import frc.robot.Constants.CanIDs;
@@ -147,12 +159,33 @@ public class CoralElevatorSubsystem extends SubsystemBase {
 
   // PIDs
 
-  PIDController ElevatorPID = new PIDController(PIDs.CoralElevator.Elevator.kp, PIDs.CoralElevator.Elevator.ki, PIDs.CoralElevator.Elevator.kd);
+  private final TrapezoidProfile.Constraints m_constraints =
+      new TrapezoidProfile.Constraints(0.25, 0.25);
+  private final ProfiledPIDController m_controller =
+      new ProfiledPIDController(PIDs.CoralElevator.TestElevator.kp, 0, PIDs.CoralElevator.TestElevator.kd, m_constraints, Constants.LOOP_TIME);
+  private final ElevatorFeedforward m_feedforward = new ElevatorFeedforward(PIDs.CoralElevator.TestElevator.ks, PIDs.CoralElevator.TestElevator.kg, PIDs.CoralElevator.TestElevator.kv);
+  
+  private final TrapezoidProfile.Constraints m_elbowconstraints =
+      new TrapezoidProfile.Constraints(720, 720);
+  private final ProfiledPIDController m_elbowcontroller =
+  new ProfiledPIDController(PIDs.CoralElevator.TestElbow.kp, 0, PIDs.CoralElevator.TestElbow.kd, m_elbowconstraints, Constants.LOOP_TIME);
+private final ArmFeedforward elbowFF = new ArmFeedforward(PIDs.CoralElevator.TestElbow.ks, PIDs.CoralElevator.TestElbow.kg, PIDs.CoralElevator.TestElbow.kv);
+
+
+private final TrapezoidProfile.Constraints m_wristConstraints =
+      new TrapezoidProfile.Constraints(180, 60);
+  private final ProfiledPIDController m_wristcontroller =
+  new ProfiledPIDController(PIDs.CoralElevator.TestWrist.kp, 0, PIDs.CoralElevator.TestWrist.kd, m_wristConstraints, Constants.LOOP_TIME);
+private final ArmFeedforward wristFF = new ArmFeedforward(PIDs.CoralElevator.TestWrist.ks, PIDs.CoralElevator.TestWrist.kg, PIDs.CoralElevator.TestWrist.kv);
+
+  
+  PIDController ElevatorPID = new PIDController(PIDs.CoralElevator.TestElevator.kp, PIDs.CoralElevator.TestElevator.ki, PIDs.CoralElevator.TestElevator.kd);
+  ElevatorFeedforward EFF = new ElevatorFeedforward(PIDs.CoralElevator.TestElevator.ks,PIDs.CoralElevator.TestElevator.kg,PIDs.CoralElevator.TestElevator.kv);
+  // PIDController ElevatorPID = new PIDController(PIDs.CoralElevator.Elevator.kp, PIDs.CoralElevator.Elevator.ki, PIDs.CoralElevator.Elevator.kd);
   PIDController ElbowPID = new PIDController(PIDs.CoralElevator.Elbow.kp, PIDs.CoralElevator.Elbow.ki, PIDs.CoralElevator.Elbow.kd);
   PIDController WristPID = new PIDController(PIDs.CoralElevator.Wrist.kp, PIDs.CoralElevator.Wrist.ki, PIDs.CoralElevator.Wrist.kd);
   
   // Limit Switch
-
   DigitalInput ElevatorUpStop = new DigitalInput(DIO.CoralElevator.UpStop);
   DigitalInput ElevatorDownStop = new DigitalInput(DIO.CoralElevator.DownStop);
   DigitalInput ElevatorCoralPresence = new DigitalInput(DIO.CoralElevator.CoralPresence);
@@ -160,6 +193,8 @@ public class CoralElevatorSubsystem extends SubsystemBase {
   //DigitalInput UltrasonicTrigger = new DigitalInput(DIO.CoralElevator.UltrasonicTrigger);
 
   // Encoders
+  Encoder ElevEnc = new Encoder(0, 4, false);
+  
 
   RelativeEncoder ElevatorEncoder = ElevatorStageMotor.getEncoder();
   AbsoluteEncoder ElbowAbsoluteEncoder = ElbowMotor.getAbsoluteEncoder();
@@ -228,36 +263,39 @@ public class CoralElevatorSubsystem extends SubsystemBase {
 
   public final Trigger atElevatorMin = new Trigger(() -> getDownStop());
   public final Trigger atElevatorMax = new Trigger(() -> getUpStop());
-  public final Trigger atElbowMin = new Trigger(() -> GetElbowAngle() <= 10);
-  public final Trigger atElbowMax = new Trigger(() -> GetElbowAngle() >= 190);
-  public final Trigger atWristMin = new Trigger(() -> !CanMoveWristDec());
-  public final Trigger atWristMax = new Trigger(() -> !CanMoveWristInc());
+  public final Trigger atElbowMin = new Trigger(() -> GetElbowAngle() <= -10);
+  public final Trigger atElbowMax = new Trigger(() -> GetElbowAngle() >= 220);
+  public final Trigger atWristMin = new Trigger(() -> GetWristAngleWorldCoordinates() <= -50);
+  public final Trigger atWristMax = new Trigger(() -> GetWristAngleWorldCoordinates() >= 210);
   
   public CoralElevatorSubsystem() {
 
 
+    ElevEnc.setDistancePerPulse(Units.inchesToMeters(31.25) / (10432));
     ElevatorPID.setTolerance(0.015);
     elevatorConfig.idleMode(IdleMode.kBrake);
-    elevatorConfig.inverted(false);
+    elevatorConfig.inverted(true);
     elevatorConfig.smartCurrentLimit(80);
-    elevatorConfig.openLoopRampRate(0.1);
+    // elevatorConfig.openLoopRampRate(0.1);
     elevatorConfig.voltageCompensation(12);
     ElevatorStageMotor.configure(elevatorConfig, SparkBase.ResetMode.kResetSafeParameters, SparkBase.PersistMode.kPersistParameters);
     
     ElbowPID.setTolerance(3);
  
     elbowConfig.idleMode(IdleMode.kBrake);
-    elbowConfig.inverted(true);
+    elbowConfig.inverted(false);
     elbowConfig.absoluteEncoder.positionConversionFactor(360);
+    elbowConfig.absoluteEncoder.velocityConversionFactor(6);
     elbowConfig.absoluteEncoder.inverted(true);
     elbowConfig.smartCurrentLimit(40);
-    elbowConfig.openLoopRampRate(0.25);
+    // elbowConfig.openLoopRampRate(0.25);
     ElbowMotor.configure(elbowConfig, SparkBase.ResetMode.kNoResetSafeParameters, SparkBase.PersistMode.kPersistParameters);
 
 
     wristConfig.idleMode(IdleMode.kBrake);
     wristConfig.inverted(false);
     wristConfig.absoluteEncoder.positionConversionFactor(360);
+    wristConfig.absoluteEncoder.velocityConversionFactor(6);
     wristConfig.absoluteEncoder.inverted(false);
     wristConfig.smartCurrentLimit(20);
     WristMotor.configure(wristConfig, SparkBase.ResetMode.kNoResetSafeParameters, SparkBase.PersistMode.kPersistParameters);
@@ -285,6 +323,11 @@ public class CoralElevatorSubsystem extends SubsystemBase {
     CoralIntakeConfig.inverted(true);
     CoralIntakeMotor.configure(CoralIntakeConfig, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
     WristPID.setSetpoint(GetWristAngleWorldCoordinates());
+    
+    m_elbowcontroller.setTolerance(2);
+    m_controller.setTolerance(0.015);
+    m_wristcontroller.setTolerance(2);
+
     
 
     ScoreSelection = 4; //default to level 4
@@ -324,6 +367,8 @@ public class CoralElevatorSubsystem extends SubsystemBase {
       ElevatorGoal = height;
       SawElevatorGoal = false;
     }
+
+    m_controller.setGoal(new State(height, 0.0));
     
   }
 
@@ -446,6 +491,10 @@ public class CoralElevatorSubsystem extends SubsystemBase {
       SawElbowGoal = false;
       System.out.println("ElbowGoal Set "+ angle);
     }
+
+    m_elbowcontroller.setGoal(new State(angle, 0.0));
+
+
     
   }
   
@@ -521,6 +570,8 @@ public class CoralElevatorSubsystem extends SubsystemBase {
       WristGoal = angle;
       SawWristGoal = false;
     }
+
+    m_wristcontroller.setGoal(new State(angle, 0));
     }
     
 
@@ -579,6 +630,7 @@ public class CoralElevatorSubsystem extends SubsystemBase {
   }
 
   public double getFilteredElevatorHeight(){
+
     return filteredelevatorHeight;
   }
 
@@ -642,7 +694,11 @@ public class CoralElevatorSubsystem extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-    resetEncoderCount();
+    // resetEncoderCount();
+    double test1 = m_elbowcontroller.calculate(GetElbowAngle(), m_elbowcontroller.getGoal().position);
+    double test2 = elbowFF.calculate(Units.degreesToRadians(90.699), m_elbowcontroller.getSetpoint().velocity);
+    double test3 = m_wristcontroller.calculate(GetWristAngleWorldCoordinates(), m_wristcontroller.getGoal().position);
+    double test4 = wristFF.calculate(Units.degreesToRadians(-90 - GetElbowAngle()), m_wristcontroller.getSetpoint().velocity);
     DistanceSensor.setAutomaticMode(true);
     DistanceSensor.setEnabled(true);
     if (DistanceSensor.isRangeValid())
@@ -673,6 +729,18 @@ public class CoralElevatorSubsystem extends SubsystemBase {
       UnfreezeSetPoints();
 
     }
+
+    // double test = ElevatorPID.calculate(getElevDistance(),ElevatorGoal);
+    // ElevatorStageMotor.setVoltage(
+    //     m_controller.calculate(getElevDistance())
+    //         + m_feedforward.calculate(m_controller.getSetpoint().velocity));
+    // ElevatorStageMotor.set(test + EFF.calculate(0));
+
+    // ElbowMotor.setVoltage(test1 + test2); 
+
+    WristMotor.setVoltage(test3);
+
+    
 /****************** LOOK AT *************************
  */
     // if ((isElevatorPassingThroughRedZone() || isElevatorInRedZone()) && WristPID.getSetpoint() >= 90){
@@ -719,7 +787,27 @@ public class CoralElevatorSubsystem extends SubsystemBase {
       }
       wristOutput = WristPID.calculate(GetWristAngleWorldCoordinates());
     }
-   
+    DogLog.log("CoralElevatorSS/Elevator/EncDistance", getElevDistance());
+    DogLog.log("CoralElevatorSS/Elevator/EncVelocity", getVelocityMetersPerSecond());
+    DogLog.log("CoralElevatorSS/Elevator/EPID", m_controller.calculate(getElevDistance()));
+    DogLog.log("CoralElevatorSS/Elevator/Ectrlpgoal", m_controller.getGoal().position);
+    DogLog.log("CoralElevatorSS/Elevator/Ectrlvgoal", m_controller.getGoal().velocity);
+    DogLog.log ("CoralElevatorSS/Elbow/NewFF", test2);
+
+    DogLog.log ("CoralElevatorSS/Elbow/NewPID", test1);
+    DogLog.log ("CoralElevatorSS/Elbow/newPIDPError", m_elbowcontroller.getPositionError());
+    DogLog.log ("CoralElevatorSS/Elbow/newPIDVError", m_elbowcontroller.getVelocityError());
+
+    DogLog.log ("CoralElevatorSS/Wrist/NewFF", test4);
+
+    DogLog.log ("CoralElevatorSS/Wrist/NewPID", test3);
+    DogLog.log ("CoralElevatorSS/Wrist/newPIDPError", m_wristcontroller.getPositionError());
+    DogLog.log ("CoralElevatorSS/Wrist/newPIDVError", m_wristcontroller.getVelocityError());
+
+
+    DogLog.log("CoralElevatorSS/Elevator/EFF", m_feedforward.calculate(m_controller.getSetpoint().velocity));
+    
+    DogLog.log("CoralElevatorSS/Elevator/ThroughBoreRelative", ElevEnc.get());
     DogLog.log ("CoralElevatorSS/Elbow/FF", elbowOutputFF);
     DogLog.log("CoralElevatorSS/Elevator/ElevatorPIDOutput", elevatorPIDValue);
     DogLog.log("CoralElevatorSS/Elevator/ElevatorPIDSetpoint", ElevatorPID.getSetpoint());
@@ -891,18 +979,28 @@ public class CoralElevatorSubsystem extends SubsystemBase {
 //           elevatorOutput = Math.max(elevatorOutput, elevatorMinSpeed);
 //         }
 //       //}
-        //////////////////UNCOMMENT: ElevatorStageMotor.set(elevatorOutput+ EleFF);
+        //////////////////UNCOMMENT: 
+        // ElevatorStageMotor.set(elevatorOutput+ EleFF);
+        // double test = ElevatorPID.calculate(filteredelevatorHeight);
+        // ElevatorStageMotor.set(test + EFF.calculate(0));
+
       // }
       // else
       // {
       //   //On a overtravel don't move in requested direction
-      //   ElevatorStageMotor.set(0 + EleFF);
+      // ElevatorStageMotor.set(0 + EleFF);
+      
+      // ElevatorStageMotor.set(0 + EFF.calculate((0)));
+
       // }
     }
     else
     {
       //not requested to move - so stop
-     //////////////////UNCOMMENT:// ElevatorStageMotor.set(0 + EleFF);
+     //////////////////UNCOMMENT:// 
+    //  ElevatorStageMotor.set(0 + EleFF);
+    // ElevatorStageMotor.set(0);
+
     } 
     // may need to add if at setpoint to stop moving.. hopefully the PID stops us.
     //UNCOMMENT
@@ -1173,7 +1271,7 @@ public class CoralElevatorSubsystem extends SubsystemBase {
   }
 
   public double getHeightLaserMeters(){
-    
+    /*
     LaserCan.Measurement measurement= LaserCan.getMeasurement();
 
     double elevatorHeight = 0;
@@ -1189,12 +1287,27 @@ public class CoralElevatorSubsystem extends SubsystemBase {
       return elevatorHeight;
     else
       return getHeightMeters();
+
+      */
+    double elevatorHeight = ElevEnc.get() * Units.inchesToMeters(31.25) / (10432);
+    // double elevatorHeight = ((ElevEnc.get()/8192) / PIDs.CoralElevator.Elevator.elevatorReduction) *
+    // (2 * Math.PI * PIDs.CoralElevator.Elevator.pulleyRadius);
+     DogLog.log("CoralElevatorSS/Elevator/EncoderHeight", elevatorHeight);
+     DogLog.log("CoralElevatorSS/Elevator/EncoderDistance", ElevEnc.getDistance());
+    // elevatorHeight = ElevatorEncoder.getPosition() * 0.0104;
+    return elevatorHeight;
+
+  }
+
+  public double getElevDistance(){
+    return ElevEnc.getDistance();
   }
 
   public double getVelocityMetersPerSecond()
   {
-    return ((ElevatorEncoder.getVelocity()/ 60 )/ PIDs.CoralElevator.Elevator.elevatorReduction) *
-           (2 * Math.PI * PIDs.CoralElevator.Elevator.pulleyRadius);
+    return ElevEnc.getRate();
+    // return ((ElevatorEncoder.getVelocity()/ 60 )/ PIDs.CoralElevator.Elevator.elevatorReduction) *
+    //        (2 * Math.PI * PIDs.CoralElevator.Elevator.pulleyRadius);
   }
 
   public LinearVelocity getLinearVelocity()
@@ -1295,15 +1408,14 @@ public class CoralElevatorSubsystem extends SubsystemBase {
 
   //Elevator
   private final SysIdRoutine ElevatorSysID = new SysIdRoutine
-  (new SysIdRoutine.Config(),
+  (new SysIdRoutine.Config(null, Voltage.ofBaseUnits(7,edu.wpi.first.units.Units.Volt), null),
    new SysIdRoutine.Mechanism(
       ElevatorStageMotor::setVoltage,
    // (voltage) -> this.sysidElevatorRunVoltage(voltage.in(Volts)),
     log -> {
       DogLog.log("SysID/Elevator/VoltageApplied", ElevatorStageMotor.getAppliedOutput() * ElevatorStageMotor.getBusVoltage());
-      DogLog.log("SysID/Elevator/Position", m_distance.mut_replace(getHeightMeters(),Meters).in(Meters));
-      DogLog.log("SysID/Elevator/Velocity", m_velocity.mut_replace(getVelocityMetersPerSecond(),
-      MetersPerSecond).in(MetersPerSecond));
+      DogLog.log("SysID/Elevator/Position", m_distance.mut_replace(getElevDistance(),Meters).in(Meters));
+      DogLog.log("SysID/Elevator/Velocity", m_velocity.mut_replace(getVelocityMetersPerSecond(),MetersPerSecond).in(MetersPerSecond));
     },
     this));
 
@@ -1343,7 +1455,7 @@ public class CoralElevatorSubsystem extends SubsystemBase {
         DogLog.log("SysID/Elbow/Position", m_rotations.mut_replace(ElbowAbsoluteEncoder.getPosition(),Degrees).in(Degrees));
         //check to make sure these units make sense. Normally rev returns velocity in rpm, we've converted it to degrees, so velocity should return as degrees per min
         //for sysid, we want <units> per second for velocity
-        DogLog.log("SysID/Elbow/Velocity", m_AngularVelocity.mut_replace(ElbowAbsoluteEncoder.getVelocity(),Degrees.per(Minute)).in(DegreesPerSecond)); 
+        DogLog.log("SysID/Elbow/Velocity", m_AngularVelocity.mut_replace(ElbowAbsoluteEncoder.getVelocity(),DegreesPerSecond).in(DegreesPerSecond)); 
 
       },
       this));
@@ -1363,9 +1475,9 @@ public class CoralElevatorSubsystem extends SubsystemBase {
       new SysIdRoutine.Mechanism(
       WristMotor::setVoltage,
       log -> {
-        DogLog.log("SysID/Wrist/VoltageApplied", WristMotor.getAppliedOutput() * RobotController.getBatteryVoltage());
-        DogLog.log("SysID/Wrist/Position", m_rotations.mut_replace(WristAbsoluteEncoder.getPosition(),Degrees).in(Degrees));
-        DogLog.log("SysID/Wrist/Velocity", m_AngularVelocity.mut_replace(WristAbsoluteEncoder.getVelocity(),Degrees.per(Minute)).in(DegreesPerSecond)); 
+        DogLog.log("SysID/Wrist/VoltageApplied", WristMotor.getAppliedOutput() * WristMotor.getBusVoltage());
+        DogLog.log("SysID/Wrist/Position", m_rotations.mut_replace(GetWristAngleWorldCoordinates(),Degrees).in(Degrees));
+        DogLog.log("SysID/Wrist/Velocity", m_AngularVelocity.mut_replace(WristAbsoluteEncoder.getVelocity(),DegreesPerSecond).in(DegreesPerSecond)); 
 
       },
       this));

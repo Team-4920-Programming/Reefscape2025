@@ -83,6 +83,23 @@ public final class Constants
       public static final double maxVelocity = 0.01;
     }
     public static class CoralElevator {
+
+      public static class TestElevator{
+        public static final double kp = 45.43;//3.8441;
+        public static final double ki = 0.0;
+        public static final double kd = 8.3361;//1.1294;
+
+        public static final double ks = 0.25556;
+        public static final double kv = 7.1594;
+        public static final double ka = 0.85838;
+        public static final double kg = 0.1185;
+
+        public static double maxVelocity = Meters.of(4).per(Second).in(MetersPerSecond);
+        public static double maxAcceleration = Meters.of(8).per(Second).per(Second).in(MetersPerSecondPerSecond);
+        public static final double pulleyRadius = Units.inchesToMeters(2.05/2);
+        public static final double elevatorReduction = 12;
+      }
+      
       public static class Elevator{
         public static final double kp = 0.8;//real is 2.5
         public static final double ki = 0.0;
@@ -97,6 +114,18 @@ public final class Constants
         public static double maxAcceleration = Meters.of(8).per(Second).per(Second).in(MetersPerSecondPerSecond);
         public static final double pulleyRadius = Units.inchesToMeters(2.05/2);
         public static final double elevatorReduction = 12;
+      }
+      public static class TestElbow{
+        public static final double kp = 0.12409;
+        public static final double ki = 0.000;
+        public static final double kd = 0.052567;
+
+        public static final double ks = 1.3432;
+        public static final double kg = 0.76004;
+        public static final double kv = 0.027346;
+        public static final double ka = 0.0058474;
+        
+        public static final double maxVelocity = 0.01;
       }
       public static class Elbow{
         public static final double kp = 0.01;
@@ -117,6 +146,19 @@ public final class Constants
         public static final double ks = 0.1;
         public static final double kg = 0.1;
         public static final double kv = 0.1;
+        
+        public static final double maxVelocity = 0.01;
+      }
+
+      public static class TestWrist{
+        public static final double kp = 0.06187;
+        public static final double ki = 0.000;
+        public static final double kd = 0.00059369;
+
+        public static final double ks = 0.395;
+        public static final double kg = 0.162;
+        public static final double kv = 0.62473;
+        public static final double ka = 0.04564;
         
         public static final double maxVelocity = 0.01;
       }
@@ -344,7 +386,7 @@ public final class Constants
     public static class Level4 {
       public static final double wrist = -37; //degrees-37
       public static final double elbow =161; //degrees 180
-      public static final double height = 0.84; //meters
+      public static final double height = .750; //meters
     }
     public static class Level4_Far {
       public static final double wrist = -36; //degrees
