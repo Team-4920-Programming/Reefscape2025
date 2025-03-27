@@ -37,6 +37,7 @@ public class CmdT_MoveToLevel extends Command {
   public void initialize() {
       Coral_SS.setIsScoring(true);
       DogLog.log("Tele/MoveToLevelCmd/CommandStatus", "initialized");
+      DogLog.log("Tele/MoveToLevelCmd/Conditions/ScoreSelection", -1);
       Coral_SS.OverrideRedZone = toggleRedZoneOverride;
   }
 
@@ -113,11 +114,13 @@ public class CmdT_MoveToLevel extends Command {
   @Override
   public boolean isFinished() {
 
-    DogLog.log("Tele/MoveToLevelCmd/FinishedCondition/NotInYellowZone", !Coral_SS.DH_In_YellowZone);
+    DogLog.log("Tele/MoveToLevelCmd/FinishedCondition/InRedZoneAndNoOverride", (Coral_SS.DH_In_RedZone && !toggleRedZoneOverride));
     DogLog.log("Tele/MoveToLevelCmd/FinishedCondition/ElevatorAtSetpoint", Coral_SS.IsElevatorAtSetpoint(TargetHeight));
     DogLog.log("Tele/MoveToLevelCmd/FinishedCondition/ElbowAtSetpoint", Coral_SS.IsElbowAtSetpoint(TargetElbowAng));
     DogLog.log("Tele/MoveToLevelCmd/FinishedCondition/WristAtSetpoint", Coral_SS.IsWristAtSetpoint(TargetWristAng));
-
+    DogLog.log("Tele/MoveToLevelCmd/FinishedCondition/ElbowCloseEnough", Coral_SS.ElbowCloseEnough());
+    DogLog.log("Tele/MoveToLevelCmd/FinishedCondition/WristCloseEnough", Coral_SS.WristCloseEnough());
+    
     return (Coral_SS.IsElevatorAtSetpoint(TargetHeight) && Math.abs(Coral_SS.GetElbowAngle() - TargetElbowAng) <= 20 && Math.abs(Coral_SS.GetWristAngleWorldCoordinates() - TargetWristAng) <= 20 ) || (Coral_SS.DH_In_RedZone && !toggleRedZoneOverride);
   }
 }

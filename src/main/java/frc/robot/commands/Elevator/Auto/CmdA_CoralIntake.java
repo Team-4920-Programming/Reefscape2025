@@ -37,6 +37,7 @@ public class CmdA_CoralIntake extends Command {
   public void execute() {
     // BoltLogger.Log(BoltLogger.HighLog, getSubsystem(), getName(), "execute", "Executing", true);
     DogLog.log("Auto/CoralIntakeCmd/CommandStatus", "executing");
+
     if (Robot.isSimulation()){
                 
     }
@@ -44,6 +45,8 @@ public class CmdA_CoralIntake extends Command {
     {
       CoralElevatorSS.setIntakeSpeed(1.0);
     }
+    DogLog.log("Auto/CoralIntakeCmd/IsCoralPresent", CoralElevatorSS.isCoralPresent());
+    DogLog.log("Auto/CoralIntakeCmd/IntakeSpeed", 1.0);
   }
 
   // Called once the command ends or is interrupted.
@@ -57,6 +60,7 @@ public class CmdA_CoralIntake extends Command {
     }
     
     CoralElevatorSS.setIntakeSpeed(0.0);
+    DogLog.log("Auto/CoralIntakeCmd/IntakeSpeed", 0.0);
     // BoltLogger.Log(BoltLogger.HighLog, getSubsystem(), getName(), "Execute", "Executing", false);
   }
 

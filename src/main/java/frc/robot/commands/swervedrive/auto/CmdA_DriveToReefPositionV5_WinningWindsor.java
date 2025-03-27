@@ -29,7 +29,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants;
 import frc.robot.Constants.PIDs;
-import frc.robot.Constants.PIDs.CoralElevator.DriveToPose;
+import frc.robot.Constants.PIDs.CoralElevator.DriveToPoseOld;
 import frc.robot.Constants.RobotAutomationInformation.AutoAlignReef;
 import frc.robot.subsystems.DataHighway.DataHighwaySubsystem;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
@@ -43,17 +43,17 @@ public class CmdA_DriveToReefPositionV5_WinningWindsor extends Command {
 
   private final ProfiledPIDController driveController =
       new ProfiledPIDController(
-        DriveToPose.drivekP, 0.0, DriveToPose.drivekD, new TrapezoidProfile.Constraints(DriveToPose.driveMaxVelocity, DriveToPose.driveMaxAcceleration), Constants.LOOP_TIME);
+        DriveToPoseOld.drivekP, 0.0, DriveToPoseOld.drivekD, new TrapezoidProfile.Constraints(DriveToPoseOld.driveMaxVelocity, DriveToPoseOld.driveMaxAcceleration), Constants.LOOP_TIME);
   private final ProfiledPIDController xdriveController =
         new ProfiledPIDController(
-          DriveToPose.drivekP, 0.0, DriveToPose.drivekD, new TrapezoidProfile.Constraints(DriveToPose.driveMaxVelocity, DriveToPose.driveMaxAcceleration), Constants.LOOP_TIME);
+          DriveToPoseOld.drivekP, 0.0, DriveToPoseOld.drivekD, new TrapezoidProfile.Constraints(DriveToPoseOld.driveMaxVelocity, DriveToPoseOld.driveMaxAcceleration), Constants.LOOP_TIME);
   private final ProfiledPIDController ydriveController =
   new ProfiledPIDController(
-    DriveToPose.drivekP, 0.0, DriveToPose.drivekD, new TrapezoidProfile.Constraints(DriveToPose.driveMaxVelocity, DriveToPose.driveMaxAcceleration), Constants.LOOP_TIME);
+    DriveToPoseOld.drivekP, 0.0, DriveToPoseOld.drivekD, new TrapezoidProfile.Constraints(DriveToPoseOld.driveMaxVelocity, DriveToPoseOld.driveMaxAcceleration), Constants.LOOP_TIME);
    
         private final ProfiledPIDController thetaController =
       new ProfiledPIDController(
-        DriveToPose.thetakP, 0.0, DriveToPose.thetakD, new TrapezoidProfile.Constraints(DriveToPose.thetaMaxVelocity, DriveToPose.thetaMaxAcceleration), Constants.LOOP_TIME);
+        DriveToPoseOld.thetakP, 0.0, DriveToPoseOld.thetakD, new TrapezoidProfile.Constraints(DriveToPoseOld.thetaMaxVelocity, DriveToPoseOld.thetaMaxAcceleration), Constants.LOOP_TIME);
 
   private Translation2d lastSetpointTranslation = Translation2d.kZero;
   private Rotation2d lastSetpointRotation = Rotation2d.kZero;
@@ -118,10 +118,10 @@ public class CmdA_DriveToReefPositionV5_WinningWindsor extends Command {
     lastSetpointTranslation = currentPose.getTranslation();
     lastSetpointRotation = target.getRotation();
     lastTime = Timer.getTimestamp();
-    thetaController.setTolerance(DriveToPose.thetaTolerance);
-    driveController.setTolerance(DriveToPose.driveTolerance);
-    xdriveController.setTolerance(DriveToPose.driveTolerance);
-    ydriveController.setTolerance(DriveToPose.driveTolerance);
+    thetaController.setTolerance(DriveToPoseOld.thetaTolerance);
+    driveController.setTolerance(DriveToPoseOld.driveTolerance);
+    xdriveController.setTolerance(DriveToPoseOld.driveTolerance);
+    ydriveController.setTolerance(DriveToPoseOld.driveTolerance);
   }
 
 
@@ -138,7 +138,7 @@ public class CmdA_DriveToReefPositionV5_WinningWindsor extends Command {
     double currentDistanceY = currentPose.getTranslation().getY() - targetPose.getTranslation().getY();
 
     double ffScaler = MathUtil.clamp(
-        (currentDistance - DriveToPose.ffMinRadius) / (DriveToPose.ffMaxRadius - DriveToPose.ffMinRadius),
+        (currentDistance - DriveToPoseOld.ffMinRadius) / (DriveToPoseOld.ffMaxRadius - DriveToPoseOld.ffMinRadius),
         0.0,
         1.0);
 
