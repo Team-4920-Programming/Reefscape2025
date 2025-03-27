@@ -54,6 +54,7 @@ public class CmdT_CoralIntake extends Command {
     DogLog.log("Tele/CoralIntakeCmd/CommandWasInterrupted", interrupted);
 
     CoralElevatorSS.setIntakeSpeed(0.0);
+
     // BoltLogger.Log(BoltLogger.HighLog, getSubsystem(), getName(), "Execute", "Executing", false);
   }
 

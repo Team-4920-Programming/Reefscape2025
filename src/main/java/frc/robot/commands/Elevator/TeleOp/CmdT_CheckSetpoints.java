@@ -21,19 +21,16 @@ public class CmdT_CheckSetpoints extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    boolean b = CoralSS.isElbowAtGoal() && CoralSS.isWristAtGoal() && CoralSS.isElevatorAtGoal();
-    if (!b){
+    if (!CoralSS.DH_Out_MechAtGoal)
       CoralSS.OverrideRedZone = true;
-    }
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    boolean b = CoralSS.isElbowAtGoal() && CoralSS.isWristAtGoal() && CoralSS.isElevatorAtGoal();
-    if (b){
-      CoralSS.OverrideRedZone = false;
-    }
+
+  //   if (CoralSS.DH_Out_MechAtGoal)
+  //     CoralSS.OverrideRedZone = false;
   }
 
   // Called once the command ends or is interrupted.
@@ -46,6 +43,6 @@ public class CmdT_CheckSetpoints extends Command {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return CoralSS.isElbowAtGoal() && CoralSS.isWristAtGoal() && CoralSS.isElevatorAtGoal() && CoralSS.OverrideRedZone == false;
+    return CoralSS.DH_Out_MechAtGoal ;//&& CoralSS.OverrideRedZone == false;
   }
 }

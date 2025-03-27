@@ -41,6 +41,7 @@ public class DataHighwaySubsystem extends SubsystemBase {
   AddressableLED m_led = new AddressableLED(0);
   AddressableLEDBuffer m_ledBuffer;
   private boolean hasCoral = false;
+  private boolean MechAtGoal = false;
   private double ReefDistance = 0;
   private int ReefSegment = 0;
   private int scoreSelection = 0;
@@ -136,11 +137,13 @@ public class DataHighwaySubsystem extends SubsystemBase {
     DogLog.log("DataHighwaySS/Checks/InCageRedZone", inCageRedZone);
     DogLog.log("DataHighwaySS/Checks/InCoralStationRedZone", inCoralStationRedZone);
     DogLog.log("DataHighwaySS/Checks/InReefYellowZone", inReefYellowZone);
-
     DogLog.log("DataHighwaySS/Zones/LeftCoralPose",LeftCoralStationPose);
     DogLog.log("DataHighwaySS/Zones/RightCoralPose", RightCoralStationPose);
     DogLog.log("DataHighwaySS/Zones/CenterOfReefPose", ReefPose);
     DogLog.log("DataHighwaySS/MatchTime", Timer.getMatchTime());
+    DogLog.log("DataHighwaySS/FPGATime", Timer.getFPGATimestamp());
+    DogLog.log("DataHighwaySS/BatteryVoltage", RobotController.getBatteryVoltage());
+
 
     
     if (inReefRedZone || inCageRedZone || inCoralStationRedZone){
@@ -287,10 +290,15 @@ public class DataHighwaySubsystem extends SubsystemBase {
     Drive_SS.DH_In_ReefPose = ReefPose;
     Drive_SS.DH_In_ClosestPickupSlot = getClosestPickupSlot();
     Drive_SS.DH_In_ScoreSelection = scoreSelection;
+    Drive_SS.DH_In_MechAtGoal = MechAtGoal;
     
   }
   private void getCoralData(){
-    hasCoral = Coral_SS.DH_Out_HasCoral;
+    if (Robot.isReal())
+    {
+       hasCoral = Coral_SS.DH_Out_HasCoral;
+       MechAtGoal = Coral_SS.DH_Out_MechAtGoal;
+    }   
     scoreSelection = Coral_SS.DH_Out_ScoreSelection;
   }
 
@@ -314,7 +322,10 @@ public class DataHighwaySubsystem extends SubsystemBase {
     Coral_SS.DH_In_RedZone = inReefRedZone || inCoralStationRedZone || inCageRedZone;
     Coral_SS.DH_In_YellowZone = inReefYellowZone;
     Coral_SS.DH_In_RobotPose = CurrentPose;
-    
+    if (Robot.isSimulation())
+    {
+      Coral_SS.DH_SimIn_HasCoral = hasCoral;
+    }
   }
 
   private void SetupZonesCenter(){
@@ -409,6 +420,7 @@ public class DataHighwaySubsystem extends SubsystemBase {
     inCoralStationRedZone = WithinZone("LeftCoralStationRedZone",LeftCoralStationPose.toPose2d(),CurrentPose, 2, 0, 90) || WithinZone("RightCoralStationRedZone",RightCoralStationPose.toPose2d(),CurrentPose, 2, 0, 90);
     inReefRedZone = WithinZone("ReefRedZone_ClosestTag",ClosestReefSegment, CurrentPose, 1.1, 0, 45) || WithinZone("ReefRedZone_MainBorder",ReefPose, CurrentPose, 1.65, 0, 180) ;
     inReefYellowZone = WithinZone("ReefYellowZone",ReefPose, CurrentPose, Units.inchesToMeters(38.25)+2, 0, 180) && !inReefRedZone;
+    inCageRedZone = WithinRectZone("RedAllianceCageZone", 7.5, 10 , 0.0 ,8.0, CurrentPose);
     if(inLeftCoralZone){
       inCoralStationPickupZone = WithinZone("LeftCoralStationPickupZone",ClosestPickupSlot,CurrentPose, 0.6, 180, 15);
     }
@@ -461,6 +473,13 @@ public class DataHighwaySubsystem extends SubsystemBase {
     // return distance <= radius && (targetHeading <= RightCone && targetHeading >= LeftCone);
     return distance <= radius && Math.abs(t.getRotation().getDegrees()) <= impactedHeading;
   }
+
+  private Boolean WithinRectZone(String name, double xmin, double xmax, double ymin, double ymax, Pose2d currentPose){
+    double x = currentPose.getX();
+    double y = currentPose.getY();
+
+    return x >= xmin && x <= xmax && y >= ymin && y <= ymax;
+  }
   private void sim()
   {
     if (Drive_SS.getCIntakeGamePiecesAmount()>0)
@@ -474,7 +493,7 @@ public class DataHighwaySubsystem extends SubsystemBase {
       }
 
     // if (WithinZone(LeftCoralStationPose.toPose2d(),CurrentPose, 3, 0, 90) && !hasCoral){
-      hasCoral = true;
+    //  hasCoral = true;
     // }
   }
   }

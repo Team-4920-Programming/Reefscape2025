@@ -11,12 +11,14 @@ import frc.robot.Constants.RobotPositions;
 import frc.robot.Constants.RobotPositions.Level2;
 import frc.robot.Constants.RobotPositions.Level3;
 import frc.robot.Constants.RobotPositions.Level4;
+import frc.robot.Constants.RobotPositions.SafePosition;
+import frc.robot.Constants.RobotPositions.TransportCoralDown;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
-public class CmdA_Level4 extends Command {
+public class CmdA_SafePosition extends Command {
   /** Creates a new CmdT_Level1. */
   CoralElevatorSubsystem m_ElevatorSubsystem;
-  public CmdA_Level4(CoralElevatorSubsystem elevatorSS) {
+  public CmdA_SafePosition(CoralElevatorSubsystem elevatorSS) {
     // Use addRequirements() here to declare subsystem dependencies.
     m_ElevatorSubsystem = elevatorSS;
     addRequirements(m_ElevatorSubsystem);
@@ -36,13 +38,13 @@ public class CmdA_Level4 extends Command {
   public void execute() {
     DogLog.log("Auto/Level4Cmd/CommandStatus", "executing");
 
-        m_ElevatorSubsystem.setArmPosition(Level4.height, Level4.elbow, Level4.wrist);
+          m_ElevatorSubsystem.setArmPosition(TransportCoralDown.height, SafePosition.elbow, SafePosition.wrist);
       }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    // m_ElevatorSubsystem.OverrideRedZone = false;
+    m_ElevatorSubsystem.OverrideRedZone = false;
     DogLog.log("Auto/Level4Cmd/CommandStatus", "finished");
     DogLog.log("Auto/Level4Cmd/CommandWasInterrupted", interrupted);
 
@@ -51,6 +53,6 @@ public class CmdA_Level4 extends Command {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return m_ElevatorSubsystem.IsElbowAtSetpoint(Level4.elbow) && m_ElevatorSubsystem.IsElevatorAtSetpoint(Level4.height) && m_ElevatorSubsystem.IsWristAtSetpoint(Level4.wrist) ;
+    return  m_ElevatorSubsystem.GetWristAngleWorldCoordinates() <= 85 && m_ElevatorSubsystem.GetElbowAngle() >= SafePosition.elbow;
   }
 }

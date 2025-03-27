@@ -90,7 +90,8 @@ public class Robot extends TimedRobot
     disabledTimer.reset();
     disabledTimer.start();
 
-    m_robotContainer.SetElevatorCoast();
+    if(DriverStation.isTest())
+      m_robotContainer.SetElevatorCoast();
   }
 
   @Override

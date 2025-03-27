@@ -60,6 +60,8 @@ import java.util.function.Supplier;
 
 import org.ironmaple.simulation.IntakeSimulation;
 import org.ironmaple.simulation.SimulatedArena;
+import org.ironmaple.simulation.gamepieces.GamePieceOnFieldSimulation;
+import org.ironmaple.simulation.gamepieces.GamePieceOnFieldSimulation.GamePieceInfo;
 import org.ironmaple.simulation.seasonspecific.reefscape2025.ReefscapeCoralAlgaeStack;
 import org.json.simple.parser.ParseException;
 import org.opencv.features2d.FlannBasedMatcher;
@@ -110,6 +112,7 @@ public class SwerveSubsystem extends SubsystemBase
   public boolean DH_InStationZone = false;
   public boolean DH_In_InLeftCoralZone = false;
   public boolean DH_In_InRightCoralZone = false;
+  public boolean DH_In_MechAtGoal = false;
   public Pose2d DH_In_ClosestReefSegment;
   public Pose2d DH_In_ReefPose;
   public Pose2d DH_In_ClosestPickupSlot;
@@ -282,6 +285,7 @@ public class SwerveSubsystem extends SubsystemBase
 
     DogLog.log("SwerveSS/RobotOdo",swerveDrive.getPose());
     DogLog.log("SwerveSS/RoboSpeed", swerveDrive.getRobotVelocity());
+    DogLog.log("SwerveSS/FieldVelocity", swerveDrive.getFieldVelocity());
     DogLog.log("SwerveSS/isRedAlliance", isRedAlliance());
     DogLog.log("SwerveSS/isAutoAim", isAutoAim());
     // DogLog.log("SwerveSS/Reefposition",getReefSegment());
@@ -499,6 +503,15 @@ private void ProcessVision4920()
     //DogLog.log("Simulated Position",Simulate)
     SmartDashboard.putNumber("y",100);
     DogLog.log("FieldSimulation/Robot",swerveDrive.getMapleSimDrive().get().getSimulatedDriveTrainPose());
+    if (CintakeSimulation.getGamePiecesAmount() ==0 && (DH_In_InRightCoralZone || DH_In_InLeftCoralZone))
+    {
+      CintakeSimulation.addGamePieceToIntake();
+      
+      
+      
+     
+      
+    }
     //swerveDrive.addVisionMeasurement(getPose(), getAIntakeGamePiecesAmount());
 
     //swerveDrive.addVisionMeasurement(swerveDrive.getMapleSimDrive().get().getSimulatedDriveTrainPose(),Timer.getFPGATimestamp());
@@ -523,10 +536,12 @@ private void ProcessVision4920()
               swerveDrive.getMapleSimDrive().get(), 
               width, Extension, IntakeSimulation.IntakeSide.BACK, 1);
         CintakeSimulation.register(SimulatedArena.getInstance());
+        CintakeSimulation.addGamePieceToIntake();
   }
   public void setupSimulatedField()
   { 
       SimulatedArena.getInstance().resetFieldForAuto();
+
     
   }
   public void startCIntake()
@@ -911,7 +926,9 @@ private void ProcessVision4920()
       if (DH_In_InRedZone)
       {
         if (speed.vxMetersPerSecond> 1)  speed.vxMetersPerSecond =1;
-        if (speed.vyMetersPerSecond >1)  speed.vyMetersPerSecond =1;
+        if (speed.vyMetersPerSecond> 1)  speed.vyMetersPerSecond =1;
+        if (speed.vxMetersPerSecond< -1)  speed.vxMetersPerSecond =-1;
+        if (speed.vyMetersPerSecond< -1)  speed.vyMetersPerSecond =-1;
          
 
       }

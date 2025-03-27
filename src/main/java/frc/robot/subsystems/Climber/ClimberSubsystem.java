@@ -75,7 +75,7 @@ public class ClimberSubsystem extends SubsystemBase {
     ClimberMotorConfig = new SparkMaxConfig();
     ClimberPivot = new SparkMax(CanIDs.Climber.Pivot, MotorType.kBrushless);
     ClimberPivotConfig = new SparkMaxConfig();
-    cagePresenceSensor = new DigitalInput(DIO.Climber.CagePresence);
+    // cagePresenceSensor = new DigitalInput(DIO.Climber.CagePresence);
     climberAngleEncoder = climberMotor.getAbsoluteEncoder();
     
   
@@ -109,9 +109,9 @@ public class ClimberSubsystem extends SubsystemBase {
     {
       // //System.out.println("Climber Out");
       // //System.out.println("ClimberAnagle" + climberAngle);
-      if((climberAngle <160 || climberAngle> 300) && !ClimberIdle)
+      if((climberAngle <200 || climberAngle> 300) && !ClimberIdle)
       {
-        ClimberPivot.set(0.1);
+        ClimberPivot.set(0.15);
         // //System.out.println("Climber Spd 0.1");
       }
       else
@@ -187,7 +187,7 @@ public class ClimberSubsystem extends SubsystemBase {
 
   private void ReadSensorValues() {
     climberAngle = climberAngleEncoder.getPosition();
-    cagePresent = cagePresenceSensor.get();
+    // cagePresent = cagePresenceSensor.get();
   }
 
   public double GetClimberEncoder(){

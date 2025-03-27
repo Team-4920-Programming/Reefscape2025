@@ -43,7 +43,7 @@ public final class Constants
   public static final double ROBOT_MASS = 61.5;//(115) * 0.453592; // 32lbs * kg per pound
   public static final Matter CHASSIS    = new Matter(new Translation3d(0, 0, Units.inchesToMeters(8)), ROBOT_MASS);
   public static final double LOOP_TIME  = 0.13; //s, 20ms + 110ms sprk max velocity lag
-  public static final double MAX_SPEED  = 3.5;//3.5;//Units.feetToMeters(14.63);
+  public static final double MAX_SPEED  = 3.5; //Units.feetToMeters(14.63);
   // Maximum speed of the robot in meters per second, used to limit acceleration.
 
 //  public static final class AutonConstants
@@ -83,10 +83,27 @@ public final class Constants
       public static final double maxVelocity = 0.01;
     }
     public static class CoralElevator {
-      public static class Elevator{
-        public static final double kp = 2.5;
+
+      public static class TestElevator{
+        public static final double kp = 45.43;//3.8441;
         public static final double ki = 0.0;
-        public static final double kd = 0.01;
+        public static final double kd = 8.3361;//1.1294;
+
+        public static final double ks = 0.25556;
+        public static final double kv = 7.1594;
+        public static final double ka = 0.85838;
+        public static final double kg = 0.1185;
+
+        public static double maxVelocity = Meters.of(4).per(Second).in(MetersPerSecond);
+        public static double maxAcceleration = Meters.of(8).per(Second).per(Second).in(MetersPerSecondPerSecond);
+        public static final double pulleyRadius = Units.inchesToMeters(2.05/2);
+        public static final double elevatorReduction = 12;
+      }
+      
+      public static class Elevator{
+        public static final double kp = 0.8;//real is 2.5
+        public static final double ki = 0.0;
+        public static final double kd = 0.00;
 
         public static final double ks = 0.6016;
         public static final double kv = 11.991;
@@ -97,6 +114,39 @@ public final class Constants
         public static double maxAcceleration = Meters.of(8).per(Second).per(Second).in(MetersPerSecondPerSecond);
         public static final double pulleyRadius = Units.inchesToMeters(2.05/2);
         public static final double elevatorReduction = 12;
+      }
+      public static class TestElbow{
+        // 45:1
+        // public static final double kp = 0.12409;
+        // public static final double ki = 0.000;
+        // public static final double kd = 0.052567;
+
+        // public static final double ks = 1.3432;
+        // public static final double kg = 0.76004;
+        // public static final double kv = 0.027346;
+        // public static final double ka = 0.0058474;
+
+        //36:1
+          public static final double kp = 0.12913;
+          public static final double ki = 0.000;
+          public static final double kd = 0.025224;
+
+        //trying 45:1 FF numbers
+                  public static final double ks = 1.3432;
+        public static final double kg = 0.76004;
+        public static final double kv = 0.027346;
+        public static final double ka = 0.0058474;
+        public static final double offsetAngleToHorizonal = 90.699;
+
+  
+        //36:1 FF numbers
+          // public static final double ks = 0.92686;
+          // public static final double kg = 0.51665 ;
+          // public static final double kv = 0.027237;
+          // public static final double ka = 0.0049381;
+          // public static final double offsetAngleToHorizonal = 90.754;
+        
+        public static final double maxVelocity = 0.01;
       }
       public static class Elbow{
         public static final double kp = 0.01;
@@ -120,6 +170,19 @@ public final class Constants
         
         public static final double maxVelocity = 0.01;
       }
+
+      public static class TestWrist{
+        public static final double kp = 0.06187;
+        public static final double ki = 0.000;
+        public static final double kd = 0.00059369;
+
+        public static final double ks = 0.395;
+        public static final double kg = 0.162;
+        public static final double kv = 0.62473;
+        public static final double ka = 0.04564;
+        
+        public static final double maxVelocity = 0.01;
+      }
       public static class RightFlap{
         public static final double kp = 0.01;
         public static final double ki = 0;
@@ -132,19 +195,50 @@ public final class Constants
       }
 
       public static class DriveToPose{
-        public static final double drivekP = 3.0;
+        public static final double drivekP = 1.5;//1.5
         public static final double drivekD = 0.0;
-        public static final double thetakP =  3.3;
+        public static final double thetakP =  3.5;
         public static final double thetakD = 0.0;
         public static final double driveMaxVelocity = 3.5;
-        public static final double driveMaxAcceleration = 2.0;
+        public static final double driveMaxAcceleration = 2.67;
         public static final double thetaMaxVelocity = Units.degreesToRadians(360);
         public static final double thetaMaxAcceleration = 5.0;
         public static final double driveTolerance = 0.02;
-        public static final double thetaTolerance = Units.degreesToRadians(0.75);
+        public static final double thetaTolerance = Units.degreesToRadians(1.0);
         public static final double ffMinRadius = 0.05;
         public static final double ffMaxRadius = 0.1;
       }
+
+      // public static class DriveToPoseWorkingMonday{
+      //   public static final double drivekP = 1.5;
+      //   public static final double drivekD = 0.0;
+      //   public static final double thetakP =  3.3;
+      //   public static final double thetakD = 0.0;
+      //   public static final double driveMaxVelocity = 3.5;
+      //   public static final double driveMaxAcceleration = 2.0;
+      //   public static final double thetaMaxVelocity = Units.degreesToRadians(360);
+      //   public static final double thetaMaxAcceleration = 5.0;
+      //   public static final double driveTolerance = 0.02;
+      //   public static final double thetaTolerance = Units.degreesToRadians(0.75);
+      //   public static final double ffMinRadius = 0.05;
+      //   public static final double ffMaxRadius = 0.1;
+      // }
+
+
+      // public static class DriveToPoseOld{
+      //   public static final double drivekP = 3.0;
+      //   public static final double drivekD = 0.0;
+      //   public static final double thetakP =  3.3;
+      //   public static final double thetakD = 0.0;
+      //   public static final double driveMaxVelocity = 3.5;
+      //   public static final double driveMaxAcceleration = 2.0;
+      //   public static final double thetaMaxVelocity = Units.degreesToRadians(360);
+      //   public static final double thetaMaxAcceleration = 5.0;
+      //   public static final double driveTolerance = 0.02;
+      //   public static final double thetaTolerance = Units.degreesToRadians(0.75);
+      //   public static final double ffMinRadius = 0.05;
+      //   public static final double ffMaxRadius = 0.1;
+      // }
       
     }
     public static class AlgaeIntake {
@@ -266,23 +360,23 @@ public final class Constants
   }
   public static class RobotPositions{
     public static class SafePosition {
-      public static final double wrist = 90;
-      public static final double elbow = 16;
+      public static final double wrist = 85;
+      public static final double elbow = 15;
       
     }
     public static class CoralStation {
       public static final double wrist = 160; //degrees //-202
       public static final double elbow = 0; //degrees
-      public static final double height = 0.14; //meters
+      public static final double height = 0.11; //meters
     }
     public static class TransportCoralUp{
-      public static final double wrist = 90;
-      public static final double elbow = 0;
+      public static final double wrist = 85;
+      public static final double elbow = 10;
       public static final double height = Level4.height;
     }
     public static class TransportCoralDown{
-      public static final double wrist = 90;
-      public static final double elbow = 0;
+      public static final double wrist = 85;
+      public static final double elbow = 10;
       public static final double height = CoralStation.height;
     }
     public static class JustScored{
@@ -303,17 +397,17 @@ public final class Constants
     public static class Level2 {
       public static final double wrist = -10; //degrees
       public static final double elbow = 15; //degrees
-      public static final double height = 0.286; //meters
+      public static final double height = 0.374; //meters
     }
     public static class Level3 {
       public static final double wrist = -10; //degrees -35
       public static final double elbow = 15; //degrees 170
-      public static final double height = 0.635; //meters 0.12
+      public static final double height = 0.80; //meters 0.12
     }
     public static class Level4 {
-      public static final double wrist = -37; //degrees-37
+      public static final double wrist = -38; //degrees-37
       public static final double elbow =161; //degrees 180
-      public static final double height = 0.84; //meters
+      public static final double height = .80; //meters
     }
     public static class Level4_Far {
       public static final double wrist = -36; //degrees
@@ -384,10 +478,10 @@ public final class Constants
   public static class RobotAutomationInformation {
     public static class AutoAlignReef{
       public static final double branchOffset = Units.inchesToMeters(6.5);
-      public static final double distanceFromFace = Units.inchesToMeters(25.25);
+      public static final double distanceFromFace = Units.inchesToMeters(24.75);
     }
     public static class AutoAlignCoralFeederStation{
-      public static final double distanceFromFace = Units.inchesToMeters(20);
+      public static final double distanceFromFace = Units.inchesToMeters(26);
     }
   }
 

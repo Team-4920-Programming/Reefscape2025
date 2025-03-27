@@ -50,7 +50,7 @@ public class CmdA_CoralOutTake extends Command {
   public void end(boolean interrupted) {
     DogLog.log("Auto/CoralOutTakeCmd/CommandStatus", "finished");
     DogLog.log("Auto/CoralOutTakeCmd/CommandWasInterrupted", interrupted);
-
+    CoralElevatorSS.OverrideRedZone = false;
     CoralElevatorSS.setIntakeSpeed(0.0);
     // BoltLogger.Log(BoltLogger.HighLog, getSubsystem(), getName(), "Execute", "Executing", false);
   }
