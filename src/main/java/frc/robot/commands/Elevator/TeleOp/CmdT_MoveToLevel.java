@@ -20,13 +20,15 @@ import frc.robot.commands.Elevator.TeleOp.CmdT_Level4;
 public class CmdT_MoveToLevel extends Command {
   /** Creates a new CmdT_MoveToLevel. */
     CoralElevatorSubsystem Coral_SS;
+    boolean toggleRedZoneOverride = false;
   int ScoreLevel =0;
   double TargetHeight = 0;
   double TargetElbowAng = 0;
   double TargetWristAng = 0;
-  public CmdT_MoveToLevel(CoralElevatorSubsystem CoralSS) {
+  public CmdT_MoveToLevel(CoralElevatorSubsystem CoralSS, boolean b) {
     // Use addRequirements() here to declare subsystem dependencies.
     Coral_SS  = CoralSS;
+    toggleRedZoneOverride = b;
     addRequirements(CoralSS);
   }
 
@@ -35,6 +37,7 @@ public class CmdT_MoveToLevel extends Command {
   public void initialize() {
       Coral_SS.setIsScoring(true);
       DogLog.log("Tele/MoveToLevelCmd/CommandStatus", "initialized");
+      Coral_SS.OverrideRedZone = toggleRedZoneOverride;
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -43,7 +46,7 @@ public class CmdT_MoveToLevel extends Command {
 
     DogLog.log("Tele/MoveToLevelCmd/CommandStatus", "executing");    
     //System.out.println("Moving to Level");
-    if (!Coral_SS.DH_In_RedZone)
+    if (!Coral_SS.DH_In_RedZone || Coral_SS.OverrideRedZone)
     {
       //System.out.println("Moving to Level (In yellow)");
       if (Coral_SS.GetScoreSelection() ==1)
@@ -102,7 +105,7 @@ public class CmdT_MoveToLevel extends Command {
     
     DogLog.log("Tele/MoveToLevelCmd/CommandWasInterrupted", interrupted);
     DogLog.log("Tele/MoveToLevelCmd/CommandStatus", "finished");
-    // Coral_SS.OverrideRedZone = true;
+    // Coral_SS.OverrideRedZone = false;
     //System.out.println("Move to Level End");
   }
 
@@ -115,6 +118,6 @@ public class CmdT_MoveToLevel extends Command {
     DogLog.log("Tele/MoveToLevelCmd/FinishedCondition/ElbowAtSetpoint", Coral_SS.IsElbowAtSetpoint(TargetElbowAng));
     DogLog.log("Tele/MoveToLevelCmd/FinishedCondition/WristAtSetpoint", Coral_SS.IsWristAtSetpoint(TargetWristAng));
 
-    return (Coral_SS.IsElevatorAtSetpoint(TargetHeight) && Math.abs(Coral_SS.GetElbowAngle() - TargetElbowAng) <= 20 && Math.abs(Coral_SS.GetWristAngleWorldCoordinates() - TargetWristAng) <= 20 ) || Coral_SS.DH_In_RedZone;
+    return (Coral_SS.IsElevatorAtSetpoint(TargetHeight) && Math.abs(Coral_SS.GetElbowAngle() - TargetElbowAng) <= 20 && Math.abs(Coral_SS.GetWristAngleWorldCoordinates() - TargetWristAng) <= 20 ) || (Coral_SS.DH_In_RedZone && !toggleRedZoneOverride);
   }
 }

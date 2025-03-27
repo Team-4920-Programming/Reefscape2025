@@ -49,7 +49,6 @@ public class CmdT_Def_Elevator extends Command {
           Coral_SS.setJustScored(false);
       }
       if (HasCoral && !InRedZone){
-        
         if (!pablo)
           if (Coral_SS.GetWristAngleWorldCoordinates() <= 95){
           Coral_SS.setArmPosition(TransportCoralUp.height, TransportCoralUp.elbow, TransportCoralUp.wrist);

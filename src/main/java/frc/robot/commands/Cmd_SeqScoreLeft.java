@@ -5,12 +5,14 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.commands.Elevator.TeleOp.*;
 import frc.robot.commands.ReefSurvey.Reef_MarkOurs;
 import frc.robot.commands.swervedrive.TeleOp.CmdT_DriveToPoseRelativeBackAwayFromReef;
 import frc.robot.commands.swervedrive.TeleOp.CmdT_DriveToReefPosition;
 import frc.robot.commands.swervedrive.TeleOp.CmdT_DriveToReefPositionV2;
+import frc.robot.commands.swervedrive.TeleOp.CmdT_DriveToReefPositionV8_Windsor;
 import frc.robot.commands.swervedrive.TeleOp.CmdT_EnableAutoAim;
 import frc.robot.commands.swervedrive.TeleOp.CmdT_StopDrive;
 import frc.robot.commands.swervedrive.auto.CmdA_DriveToReefPositionV2;
@@ -36,8 +38,9 @@ public class Cmd_SeqScoreLeft extends SequentialCommandGroup {
     //addRequirements(Drive_SS, Coral_SS);
     addCommands(
       new CmdT_StopDrive(Drive_SS),
-      new CmdT_MoveToLevel(Coral_SS),
-      new CmdA_DriveToReefPositionV7_Test(Drive_SS, 1).withTimeout(3),
+      new ParallelCommandGroup(
+      new CmdT_MoveToLevel(Coral_SS, true),
+      new CmdT_DriveToReefPositionV8_Windsor(Drive_SS, 1)).andThen(new CmdT_CheckSetpoints(Coral_SS)),
       // new CmdT_UltrasonicCheck(Coral_SS),
       new CmdT_CoralOutTake(Coral_SS),
       new Reef_MarkOurs(Reef_SS, 0),

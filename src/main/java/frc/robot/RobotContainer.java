@@ -47,6 +47,7 @@ import java.io.File;
 import frc.robot.commands.Elevator.Auto.CmdA_CoralIntake;
 import frc.robot.commands.Elevator.Auto.CmdA_CoralOutTake;
 import frc.robot.commands.Elevator.Auto.CmdA_Level4;
+import frc.robot.commands.Elevator.Auto.CmdA_SafePosition;
 import frc.robot.commands.Elevator.Auto.CmdA_Station;
 import frc.robot.commands.Elevator.TeleOp.*;
 import frc.robot.commands.ReefSurvey.AddToReefTest;
@@ -173,6 +174,7 @@ public class RobotContainer
     NamedCommands.registerCommand("test", Commands.print("I EXIST"));
     NamedCommands.registerCommand("CmdA_RobotStartConfig", new CmdA_BridgeOut (ClimberSS));
     NamedCommands.registerCommand("CmdA_Level4", new CmdA_Level4 (CoralElevatorSS));
+    NamedCommands.registerCommand("CmdA_SafePosition", new CmdA_SafePosition (CoralElevatorSS));
     NamedCommands.registerCommand("CmdA_Station", new CmdA_Station (CoralElevatorSS));
     NamedCommands.registerCommand("CmdA_CoralOutTake", new CmdA_CoralOutTake (CoralElevatorSS));
     NamedCommands.registerCommand("CmdA_CoralIntake", new CmdA_CoralIntake (CoralElevatorSS));
@@ -181,9 +183,9 @@ public class RobotContainer
     NamedCommands.registerCommand("CmdA_DriveToFeederRelative", new CmdA_DriveToFeederPosition_Relative(drivebase));
     NamedCommands.registerCommand("CmdA_DriveToReefPositionRTest", new CmdA_DriveToReefPositionV6_ActuallyWinningWindsor(drivebase, 2));
     NamedCommands.registerCommand("CmdA_DriveToReefPositionLTest", new CmdA_DriveToReefPositionV6_ActuallyWinningWindsor(drivebase, 1));
-    NamedCommands.registerCommand("CmdA_BackupFromReef", new CmdT_DriveToPoseRelativeBackAwayFromReef(drivebase, 3.0, -1.0, 0, 0));
-    NamedCommands.registerCommand("CmdA_DRTest2", new CmdA_DriveToReefPositionV7_Test(drivebase, 2));
-    NamedCommands.registerCommand("CmdA_DLTest2", new CmdA_DriveToReefPositionV7_Test(drivebase, 1));
+    NamedCommands.registerCommand("CmdA_BackupFromReef", new CmdT_DriveToPoseRelativeBackAwayFromReef(drivebase, 3.0, -12.0, 0, 0));
+    NamedCommands.registerCommand("CmdA_DRTest2", new CmdT_DriveToReefPositionV8_Windsor(drivebase, 2));
+    NamedCommands.registerCommand("CmdA_DLTest2", new CmdT_DriveToReefPositionV8_Windsor(drivebase, 1));
 
 
     DogLog.setOptions(new DogLogOptions().withNtPublish(true));
@@ -337,11 +339,7 @@ public class RobotContainer
   driverXbox.x().whileTrue(new CmdT_CoralIntake(CoralElevatorSS ));
   driverXbox.y().whileTrue(new CmdT_CoralOutTake(CoralElevatorSS ));
 
-  // driverXbox.a().whileTrue(new CmdA_DriveToFeederPosition_Relative(drivebase));
-  // driverXbox.b().whileTrue(new CmdA_DriveToReefPositionV7_Test(drivebase, 2));
-  // driverXbox.a().whileTrue(CoralElevatorSS.sysIDElevatorAll());
-  driverXbox.b().whileTrue(CoralElevatorSS.sysIDElbowAll());
-
+  driverXbox.a().whileTrue(new CmdA_DriveToFeederPosition_Relative(drivebase));
   // Button 1: Abort climb
   OperatorJoystick.button(1 ).whileTrue(new CmdT_ClimberIn(ClimberSS));
   // Button 2: Setup Climb

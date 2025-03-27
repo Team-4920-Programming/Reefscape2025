@@ -112,6 +112,7 @@ public class SwerveSubsystem extends SubsystemBase
   public boolean DH_InStationZone = false;
   public boolean DH_In_InLeftCoralZone = false;
   public boolean DH_In_InRightCoralZone = false;
+  public boolean DH_In_MechAtGoal = false;
   public Pose2d DH_In_ClosestReefSegment;
   public Pose2d DH_In_ReefPose;
   public Pose2d DH_In_ClosestPickupSlot;
@@ -925,7 +926,9 @@ private void ProcessVision4920()
       if (DH_In_InRedZone)
       {
         if (speed.vxMetersPerSecond> 1)  speed.vxMetersPerSecond =1;
-        if (speed.vyMetersPerSecond >1)  speed.vyMetersPerSecond =1;
+        if (speed.vyMetersPerSecond> 1)  speed.vyMetersPerSecond =1;
+        if (speed.vxMetersPerSecond< -1)  speed.vxMetersPerSecond =-1;
+        if (speed.vyMetersPerSecond< -1)  speed.vyMetersPerSecond =-1;
          
 
       }

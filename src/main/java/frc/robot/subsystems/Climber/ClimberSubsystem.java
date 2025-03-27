@@ -109,9 +109,9 @@ public class ClimberSubsystem extends SubsystemBase {
     {
       // //System.out.println("Climber Out");
       // //System.out.println("ClimberAnagle" + climberAngle);
-      if((climberAngle <160 || climberAngle> 300) && !ClimberIdle)
+      if((climberAngle <200 || climberAngle> 300) && !ClimberIdle)
       {
-        ClimberPivot.set(0.1);
+        ClimberPivot.set(0.15);
         // //System.out.println("Climber Spd 0.1");
       }
       else

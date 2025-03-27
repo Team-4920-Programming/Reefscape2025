@@ -52,6 +52,9 @@ public class CmdA_CoralIntake extends Command {
     DogLog.log("Auto/CoralIntakeCmd/CommandStatus", "finished");
     DogLog.log("Auto/CoralIntakeCmd/CommandWasInterrupted", interrupted);
 
+    if (CoralElevatorSS.DH_In_CoralZone && CoralElevatorSS.isCoralPresent()){
+      // CoralElevatorSS.SetWristAngle(85);
+    }
     
     CoralElevatorSS.setIntakeSpeed(0.0);
     // BoltLogger.Log(BoltLogger.HighLog, getSubsystem(), getName(), "Execute", "Executing", false);

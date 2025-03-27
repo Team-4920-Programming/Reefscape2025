@@ -142,6 +142,7 @@ public class CoralElevatorSubsystem extends SubsystemBase {
   public boolean OverrideRedZone = false; //set from the algae commands
   public int DH_Out_ScoreSelection = 1;
   public boolean DH_SimIn_HasCoral = false;
+  public boolean DH_Out_MechAtGoal = false;
 
   /** Physical Robot Init START**/
   
@@ -235,8 +236,8 @@ private final ArmFeedforward wristFF = new ArmFeedforward(PIDs.CoralElevator.Tes
 
 //Mike's new logic for Setpoints - March 22
   double ElevatorGoal = 0.0;
-  double WristGoal = 0.0;
-  double ElbowGoal = 0.0;
+  double WristGoal = SafePosition.wrist;
+  double ElbowGoal = SafePosition.elbow;
   boolean SawElbowGoal = false;
   boolean SawWristGoal = false;
   boolean SawElevatorGoal = false;
@@ -330,9 +331,9 @@ private final ArmFeedforward wristFF = new ArmFeedforward(PIDs.CoralElevator.Tes
     WristPID.setSetpoint(GetWristAngleWorldCoordinates());
     m_wristcontroller.setGoal(new State(GetWristAngleWorldCoordinates(), 0));
     
-    m_elbowcontroller.setTolerance(2);
+    m_elbowcontroller.setTolerance(3);
     m_controller.setTolerance(0.015);
-    m_wristcontroller.setTolerance(2);
+    m_wristcontroller.setTolerance(3);
 
     
 
@@ -374,7 +375,7 @@ private final ArmFeedforward wristFF = new ArmFeedforward(PIDs.CoralElevator.Tes
       SawElevatorGoal = false;
     }
 
-    m_controller.setGoal(new State(height, 0.0));
+    // m_controller.setGoal(new State(height, 0.0));
     
   }
 
@@ -385,16 +386,18 @@ private final ArmFeedforward wristFF = new ArmFeedforward(PIDs.CoralElevator.Tes
     // boolean b4 = ElevatorStageMotor.get() > 0 && getFilteredElevatorHeight() >= RobotLimits.Elevator.maxHeight;
     // boolean b5 = ElevatorStageMotor.get() < 0 && getFilteredElevatorHeight() <= RobotLimits.Elevator.minHeight;
     // return b1 || b2 || b3 || b4 || b5;
-    return m_controller.atGoal();
+    return isElevatorAtGoal();
   }
   public boolean IsWristAtSetpoint(double target){
     // return Math.abs(GetWristAngleWorldCoordinates() - target) <= WristPID.getErrorTolerance();
-    return Math.abs(GetWristAngleWorldCoordinates() - target) <= m_wristcontroller.getPositionError();
+    // return Math.abs(GetWristAngleWorldCoordinates() - target) <= m_wristcontroller.getPositionError();
+    return isWristAtGoal();
 
   }
   public boolean IsElbowAtSetpoint(double target){
     // return Math.abs(GetElbowAngle() - target) <= ElbowPID.getErrorTolerance();
-    return Math.abs(GetElbowAngle() - target) <= m_elbowcontroller.getPositionError();
+    // return Math.abs(GetElbowAngle() - target) <= m_elbowcontroller.getPositionError();
+    return isElbowAtGoal();
 
   }
   public BooleanSupplier test(){
@@ -565,27 +568,27 @@ private final ArmFeedforward wristFF = new ArmFeedforward(PIDs.CoralElevator.Tes
 
   public void SetWristAngle(double angle)
   { 
-    if (!SetpointsFrozen || (SetpointsFrozen && OverrideRedZone)){
-      if (tmpWristSetpointHolder == 999){
-        //WristPID.setSetpoint(angle);
-        m_wristcontroller.setGoal(new State(angle,0));
-      }
-      else{
+    // if (!SetpointsFrozen || (SetpointsFrozen && OverrideRedZone)){
+    //   if (tmpWristSetpointHolder == 999){
+    //     //WristPID.setSetpoint(angle);
+    //     // m_wristcontroller.setGoal(new State(angle,0)); 
+    //   }
+    //   else{
 
-        WristPID.setSetpoint(tmpWristSetpointHolder);
-        m_wristcontroller.setGoal(new State(tmpWristSetpointHolder,0));
-      }
-      tmpWristSetpointHolder = 999; 
-    }
-    else{
-      tmpWristSetpointHolder = angle;
-    }
+    //     // WristPID.setSetpoint(tmpWristSetpointHolder);
+    //     // m_wristcontroller.setGoal(new State(angle,0));
+    //   }
+    //   tmpWristSetpointHolder = 999; 
+    // }
+    // else{
+    //   tmpWristSetpointHolder = angle;
+    // }
     if (angle != WristGoal){
       WristGoal = angle;
       SawWristGoal = false;
     }
 
-    m_wristcontroller.setGoal(new State(angle, 0));
+    // m_wristcontroller.setGoal(new State(angle, 0));
     }
     
 
@@ -674,13 +677,13 @@ private final ArmFeedforward wristFF = new ArmFeedforward(PIDs.CoralElevator.Tes
   public boolean getJustScored(){
     return justScored;
   }
-  public boolean isElevatorAtGoal()
+  public boolean  isElevatorAtGoal()
   {
     double curElevPos = getFilteredElevatorHeight();
     // double curElevTol = ElevatorPID.getErrorTolerance();
     double curElevTol = m_controller.getPositionTolerance();
 
-    boolean atGoal = (Math.abs(curElevPos - ElevatorGoal) < curElevTol);
+    boolean atGoal = (Math.abs(curElevPos - ElevatorGoal) <= curElevTol);
     if (atGoal)
       {
         SawElevatorGoal = true;
@@ -693,7 +696,7 @@ private final ArmFeedforward wristFF = new ArmFeedforward(PIDs.CoralElevator.Tes
     // double curElbowTol = ElbowPID.getErrorTolerance();
     double curElbowTol = m_elbowcontroller.getPositionError();
 
-    boolean atGoal =  (Math.abs(curElbowPos - ElbowGoal) < curElbowTol);
+    boolean atGoal =  (Math.abs(curElbowPos - ElbowGoal) <= curElbowTol);
     if (atGoal)
       {
         SawElbowGoal = true;
@@ -706,7 +709,7 @@ private final ArmFeedforward wristFF = new ArmFeedforward(PIDs.CoralElevator.Tes
     // double curWristTol = WristPID.getErrorTolerance();
     double curWristTol = m_wristcontroller.getPositionTolerance();
 
-    boolean atGoal =   (Math.abs(curWristPos - WristGoal) < curWristTol);
+    boolean atGoal =   (Math.abs(curWristPos - WristGoal) <= curWristTol);
     if (atGoal)
       {
         SawWristGoal = true;
@@ -817,8 +820,11 @@ private final ArmFeedforward wristFF = new ArmFeedforward(PIDs.CoralElevator.Tes
     DogLog.log("CoralElevatorSS/Elevator/EPID", m_controller.calculate(getElevDistance()));
     DogLog.log("CoralElevatorSS/Elevator/Ectrlpgoal", m_controller.getGoal().position);
     DogLog.log("CoralElevatorSS/Elevator/Ectrlvgoal", m_controller.getGoal().velocity);
+    DogLog.log ("CoralElevatorSS/Elevator/elevatorFFOutputNew", elevatorFFOutputNew);
+    DogLog.log ("CoralElevatorSS/Elevator/elevatorPIDOutputNew", elevatorPIDOutputNew);
+    DogLog.log("CoralElevatorSS/Elevator/newPIDSetpoint", m_controller.getGoal().position);
     DogLog.log ("CoralElevatorSS/Elbow/elbowFFOutputNew", elbowFFOutputNew);
-
+    DogLog.log("CoralElevatorSS/MechAtGoal", DH_Out_MechAtGoal);
     DogLog.log ("CoralElevatorSS/Elbow/elbowPIDOutputNew", elbowPIDOutputNew);
     DogLog.log ("CoralElevatorSS/Elbow/newPIDPError", m_elbowcontroller.getPositionError());
     DogLog.log ("CoralElevatorSS/Elbow/newPIDVError", m_elbowcontroller.getVelocityError());
@@ -887,8 +893,6 @@ private final ArmFeedforward wristFF = new ArmFeedforward(PIDs.CoralElevator.Tes
     DogLog.log("CoralElevatorSS/Check/tmpElbow", tmpElbowSetpointHolder);
     DogLog.log("CoralElevatorSS/Check/tmpElevator", tmpElevatorSetpointHolder);
     DogLog.log("CoralElevatorSS/Check/tmpWrist", tmpWristSetpointHolder);
-    DogLog.log("CoralElevatorSS/Check/tmpMotionElbow", tmpMotionProfileElbowHolder);
-    DogLog.log("CoralElevatorSS/Check/tmpMotionWrist", tmpMotionProfileWristHolder);
 
     double  EmotorSpd =0;
     boolean atSet = true;
@@ -907,7 +911,7 @@ private final ArmFeedforward wristFF = new ArmFeedforward(PIDs.CoralElevator.Tes
     boolean MoveElevator = false;
     if (SetpointsFrozen)
     {
-      MoveElevator = true;
+      MoveElevator = false;
     }
     if (!SetpointsFrozen)
     {
@@ -938,12 +942,18 @@ private final ArmFeedforward wristFF = new ArmFeedforward(PIDs.CoralElevator.Tes
         // ElbowPID.setSetpoint(RobotPositions.SafePosition.elbow);
         m_wristcontroller.setGoal(new State(SafePosition.wrist, 0));
         m_elbowcontroller.setGoal(new State(SafePosition.elbow, 0));
-        //MoveElevator = false;
+        MoveElevator = false;
+        if (GetWristAngleWorldCoordinates() <= SafePosition.wrist + (m_wristcontroller.getPositionTolerance() * 2) && GetElbowAngle() >= SafePosition.elbow - (m_elbowcontroller.getPositionTolerance() * 2) && GetElbowAngle() <= 185){
+          MoveElevator = true;
+        }
         // boolean WristCloseEnough = Math.abs(WristPID.getError()) < 3* WristPID.getErrorTolerance();
         // boolean ArmCloseEnought = (Math.abs(ElbowPID.getError()) < 4* ElbowPID.getErrorTolerance());
-        boolean WristCloseEnough = Math.abs(m_wristcontroller.getPositionError()) < 2* m_wristcontroller.getPositionTolerance();
-        boolean ArmCloseEnought = (Math.abs(m_elbowcontroller.getPositionError()) < 2* m_wristcontroller.getPositionTolerance());
-
+        boolean WristCloseEnough = Math.abs(m_wristcontroller.getPositionError()) < 3* m_wristcontroller.getPositionTolerance();
+        boolean ArmCloseEnought = (Math.abs(m_elbowcontroller.getPositionError()) < 4* m_elbowcontroller.getPositionTolerance());
+        if (WristGoal <= SafePosition.wrist && ElbowGoal >= SafePosition.elbow && ElbowGoal <= 195 && GetWristAngleWorldCoordinates() <= SafePosition.wrist + m_wristcontroller.getPositionTolerance() && GetElbowAngle() >= SafePosition.elbow - m_elbowcontroller.getPositionTolerance() && GetElbowAngle() <= 185){
+          m_wristcontroller.setGoal(new State(WristGoal, 0));
+          m_elbowcontroller.setGoal(new State(ElbowGoal, 0));
+        }
         if (WristCloseEnough && ArmCloseEnought && m_wristcontroller.getGoal().position == RobotPositions.SafePosition.wrist && m_elbowcontroller.getGoal().position == RobotPositions.SafePosition.elbow){
         // if (WristCloseEnough && ArmCloseEnought && WristPID.getSetpoint() == RobotPositions.SafePosition.wrist && ElbowPID.getSetpoint() == RobotPositions.SafePosition.elbow){
           // ElevatorPID.setSetpoint(ElevatorGoal);
@@ -1041,7 +1051,7 @@ private final ArmFeedforward wristFF = new ArmFeedforward(PIDs.CoralElevator.Tes
      //////////////////UNCOMMENT:// 
     //  ElevatorStageMotor.set(0 + EleFF);
     // ElevatorStageMotor.set(0);
-    ElevatorStageMotor.setVoltage(elevatorPIDOutputNew + elevatorFFOutputNew);
+    ElevatorStageMotor.setVoltage(0 + elevatorFFOutputNew);
 
 
     } 
@@ -1190,6 +1200,7 @@ private final ArmFeedforward wristFF = new ArmFeedforward(PIDs.CoralElevator.Tes
 
     DH_Out_HasCoral = isCoralPresent();
     DH_Out_ScoreSelection = GetScoreSelection();
+    DH_Out_MechAtGoal = isElevatorAtGoal() && isElbowAtGoal() && isWristAtGoal();
 
 
   }

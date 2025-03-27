@@ -195,16 +195,16 @@ public final class Constants
       }
 
       public static class DriveToPose{
-        public static final double drivekP = 1.5;
+        public static final double drivekP = 1.5;//1.5
         public static final double drivekD = 0.0;
-        public static final double thetakP =  3.3;
+        public static final double thetakP =  3.5;
         public static final double thetakD = 0.0;
         public static final double driveMaxVelocity = 3.5;
         public static final double driveMaxAcceleration = 2.67;
         public static final double thetaMaxVelocity = Units.degreesToRadians(360);
         public static final double thetaMaxAcceleration = 5.0;
         public static final double driveTolerance = 0.02;
-        public static final double thetaTolerance = Units.degreesToRadians(0.75);
+        public static final double thetaTolerance = Units.degreesToRadians(1.0);
         public static final double ffMinRadius = 0.05;
         public static final double ffMaxRadius = 0.1;
       }
@@ -360,8 +360,8 @@ public final class Constants
   }
   public static class RobotPositions{
     public static class SafePosition {
-      public static final double wrist = 90;
-      public static final double elbow = 16;
+      public static final double wrist = 85;
+      public static final double elbow = 15;
       
     }
     public static class CoralStation {
@@ -370,13 +370,13 @@ public final class Constants
       public static final double height = 0.11; //meters
     }
     public static class TransportCoralUp{
-      public static final double wrist = 90;
-      public static final double elbow = 0;
+      public static final double wrist = 85;
+      public static final double elbow = 10;
       public static final double height = Level4.height;
     }
     public static class TransportCoralDown{
-      public static final double wrist = 90;
-      public static final double elbow = 0;
+      public static final double wrist = 85;
+      public static final double elbow = 10;
       public static final double height = CoralStation.height;
     }
     public static class JustScored{
@@ -397,17 +397,17 @@ public final class Constants
     public static class Level2 {
       public static final double wrist = -10; //degrees
       public static final double elbow = 15; //degrees
-      public static final double height = 0.286; //meters
+      public static final double height = 0.374; //meters
     }
     public static class Level3 {
       public static final double wrist = -10; //degrees -35
       public static final double elbow = 15; //degrees 170
-      public static final double height = 0.635; //meters 0.12
+      public static final double height = 0.80; //meters 0.12
     }
     public static class Level4 {
-      public static final double wrist = -37; //degrees-37
+      public static final double wrist = -38; //degrees-37
       public static final double elbow =161; //degrees 180
-      public static final double height = .78; //meters
+      public static final double height = .80; //meters
     }
     public static class Level4_Far {
       public static final double wrist = -36; //degrees
@@ -481,7 +481,7 @@ public final class Constants
       public static final double distanceFromFace = Units.inchesToMeters(24.75);
     }
     public static class AutoAlignCoralFeederStation{
-      public static final double distanceFromFace = Units.inchesToMeters(20);
+      public static final double distanceFromFace = Units.inchesToMeters(26);
     }
   }
 
