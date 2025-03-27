@@ -1034,8 +1034,9 @@ private final ArmFeedforward wristFF = new ArmFeedforward(PIDs.CoralElevator.Tes
   }
 
   private void Log(){
-
-    DogLog.log("CoralElevatorSS/CurrentCommand", this.getCurrentCommand().toString());
+    if (this.getCurrentCommand() != null){
+      DogLog.log("CoralElevatorSS/CurrentCommand", this.getCurrentCommand().toString());
+    }
     
     //Mechanism Specific Data
     

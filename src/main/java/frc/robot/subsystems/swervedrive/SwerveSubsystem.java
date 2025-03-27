@@ -280,8 +280,9 @@ public class SwerveSubsystem extends SubsystemBase
     //4920 Vision
     swerveDrive.updateOdometry();
     ProcessVision4920();
-
+    if (this.getCurrentCommand() != null){
     DogLog.log("SwerveSS/CurrentCommand", this.getCurrentCommand().toString());
+    }
     DogLog.log("SwerveSS/RobotOdo",swerveDrive.getPose());
     DogLog.log("SwerveSS/RoboSpeed", swerveDrive.getRobotVelocity());
     DogLog.log("SwerveSS/FieldVelocity", swerveDrive.getFieldVelocity());
