@@ -194,7 +194,7 @@ public final class Constants
         public static final double kd = 0;
       }
 
-      public static class DriveToPose{
+      public static class DriveToPoseTele{
         public static final double drivekP = 1.5;//1.5
         public static final double drivekD = 0.0;
         public static final double thetakP =  3.5;
@@ -209,36 +209,35 @@ public final class Constants
         public static final double ffMaxRadius = 0.1;
       }
 
-      // public static class DriveToPoseWorkingMonday{
-      //   public static final double drivekP = 1.5;
-      //   public static final double drivekD = 0.0;
-      //   public static final double thetakP =  3.3;
-      //   public static final double thetakD = 0.0;
-      //   public static final double driveMaxVelocity = 3.5;
-      //   public static final double driveMaxAcceleration = 2.0;
-      //   public static final double thetaMaxVelocity = Units.degreesToRadians(360);
-      //   public static final double thetaMaxAcceleration = 5.0;
-      //   public static final double driveTolerance = 0.02;
-      //   public static final double thetaTolerance = Units.degreesToRadians(0.75);
-      //   public static final double ffMinRadius = 0.05;
-      //   public static final double ffMaxRadius = 0.1;
-      // }
+      public static class DriveToPoseAuto{
+        public static final double drivekP = 1.5;//1.5
+        public static final double drivekD = 0.0;
+        public static final double thetakP =  3.5;
+        public static final double thetakD = 0.0;
+        public static final double driveMaxVelocity = 3.5;
+        public static final double driveMaxAcceleration = 2.67;
+        public static final double thetaMaxVelocity = Units.degreesToRadians(360);
+        public static final double thetaMaxAcceleration = 5.0;
+        public static final double driveTolerance = 0.02;
+        public static final double thetaTolerance = Units.degreesToRadians(1.0);
+        public static final double ffMinRadius = 0.05;
+        public static final double ffMaxRadius = 0.1;
+      }
 
-
-      // public static class DriveToPoseOld{
-      //   public static final double drivekP = 3.0;
-      //   public static final double drivekD = 0.0;
-      //   public static final double thetakP =  3.3;
-      //   public static final double thetakD = 0.0;
-      //   public static final double driveMaxVelocity = 3.5;
-      //   public static final double driveMaxAcceleration = 2.0;
-      //   public static final double thetaMaxVelocity = Units.degreesToRadians(360);
-      //   public static final double thetaMaxAcceleration = 5.0;
-      //   public static final double driveTolerance = 0.02;
-      //   public static final double thetaTolerance = Units.degreesToRadians(0.75);
-      //   public static final double ffMinRadius = 0.05;
-      //   public static final double ffMaxRadius = 0.1;
-      // }
+      public static class DriveToPoseOld{
+        public static final double drivekP = 1.5;
+        public static final double drivekD = 0.0;
+        public static final double thetakP =  3.3;
+        public static final double thetakD = 0.0;
+        public static final double driveMaxVelocity = 3.5;
+        public static final double driveMaxAcceleration = 2.0;
+        public static final double thetaMaxVelocity = Units.degreesToRadians(360);
+        public static final double thetaMaxAcceleration = 5.0;
+        public static final double driveTolerance = 0.02;
+        public static final double thetaTolerance = Units.degreesToRadians(0.75);
+        public static final double ffMinRadius = 0.05;
+        public static final double ffMaxRadius = 0.1;
+      }
       
     }
     public static class AlgaeIntake {
@@ -423,6 +422,11 @@ public final class Constants
       public static final double wrist = 0 ; //degrees
       public static final double elbow =45; //degrees
       public static final double height = 0.3; //meters
+    }
+    public static class Climb{
+      public static final double wrist = 0; //degrees
+      public static final double elbow = 15; //degrees
+      public static final double height = 0.11; //meters
     }
   }
   public static class RobotLimits {

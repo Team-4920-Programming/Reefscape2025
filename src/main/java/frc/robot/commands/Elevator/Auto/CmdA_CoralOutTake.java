@@ -42,6 +42,7 @@ public class CmdA_CoralOutTake extends Command {
     }
   
       CoralElevatorSS.setIntakeSpeed(-0.5);
+      DogLog.log("Auto/CoralOutTakeCmd/IntakeSpeed", -0.5);
    
   }
 
@@ -52,17 +53,21 @@ public class CmdA_CoralOutTake extends Command {
     DogLog.log("Auto/CoralOutTakeCmd/CommandWasInterrupted", interrupted);
     CoralElevatorSS.OverrideRedZone = false;
     CoralElevatorSS.setIntakeSpeed(0.0);
+    DogLog.log("Auto/CoralOutTakeCmd/IntakeSpeed", 0.0);
     // BoltLogger.Log(BoltLogger.HighLog, getSubsystem(), getName(), "Execute", "Executing", false);
   }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
+    DogLog.log("Auto/CoralOutTakeCmd/TimerValue", PresentTimer.get());
     if (!CoralElevatorSS.isCoralPresent() && !PresentTimer.isRunning())
         PresentTimer.start();
+        DogLog.log("Auto/CoralOutTakeCmd/TimerStatus","Timer Started");
     if (CoralElevatorSS.isCoralPresent())
     {
         PresentTimer.stop();
+        DogLog.log("Auto/CoralOutTakeCmd/TimerStatus","Timer Stopped");
         PresentTimer.reset();
     }
     return (PresentTimer.hasElapsed(.1));

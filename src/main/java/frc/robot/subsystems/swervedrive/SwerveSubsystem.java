@@ -77,7 +77,6 @@ import swervelib.telemetry.SwerveDriveTelemetry;
 import swervelib.telemetry.SwerveDriveTelemetry.TelemetryVerbosity;
 import edu.wpi.first.math.Matrix;
 import frc.robot.Vision4920;
-import frc.robot.Constants.PIDs.CoralElevator.DriveToPose;
 
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Inches;
@@ -282,7 +281,7 @@ public class SwerveSubsystem extends SubsystemBase
     swerveDrive.updateOdometry();
     ProcessVision4920();
 
-
+    DogLog.log("SwerveSS/CurrentCommand", this.getCurrentCommand().toString());
     DogLog.log("SwerveSS/RobotOdo",swerveDrive.getPose());
     DogLog.log("SwerveSS/RoboSpeed", swerveDrive.getRobotVelocity());
     DogLog.log("SwerveSS/FieldVelocity", swerveDrive.getFieldVelocity());

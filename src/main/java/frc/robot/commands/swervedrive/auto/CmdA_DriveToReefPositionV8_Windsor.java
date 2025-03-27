@@ -16,6 +16,7 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -29,24 +30,24 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants;
 import frc.robot.Constants.PIDs;
-import frc.robot.Constants.PIDs.CoralElevator.DriveToPoseOld;
+import frc.robot.Constants.PIDs.CoralElevator.DriveToPoseAuto;
 import frc.robot.Constants.RobotAutomationInformation.AutoAlignReef;
 import frc.robot.subsystems.DataHighway.DataHighwaySubsystem;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
-public class CmdA_DriveToReefPositionV4_Test extends Command {
+public class CmdA_DriveToReefPositionV8_Windsor extends Command {
 
   private final SwerveSubsystem DriveSS;
   private Pose2d target;
 
   private final ProfiledPIDController driveController =
       new ProfiledPIDController(
-        DriveToPoseOld.drivekP, 0.0, DriveToPoseOld.drivekD, new TrapezoidProfile.Constraints(DriveToPoseOld.driveMaxVelocity, DriveToPoseOld.driveMaxAcceleration), Constants.LOOP_TIME);
+        DriveToPoseAuto.drivekP, 0.0, DriveToPoseAuto.drivekD, new TrapezoidProfile.Constraints(DriveToPoseAuto.driveMaxVelocity, DriveToPoseAuto.driveMaxAcceleration), Constants.LOOP_TIME);
   private final ProfiledPIDController thetaController =
       new ProfiledPIDController(
-        DriveToPoseOld.thetakP, 0.0, DriveToPoseOld.thetakD, new TrapezoidProfile.Constraints(DriveToPoseOld.thetaMaxVelocity, DriveToPoseOld.thetaMaxAcceleration), Constants.LOOP_TIME);
+        DriveToPoseAuto.thetakP, 0.0, DriveToPoseAuto.thetakD, new TrapezoidProfile.Constraints(DriveToPoseAuto.thetaMaxVelocity, DriveToPoseAuto.thetaMaxAcceleration), Constants.LOOP_TIME);
 
   private Translation2d lastSetpointTranslation = Translation2d.kZero;
   private Rotation2d lastSetpointRotation = Rotation2d.kZero;
@@ -55,7 +56,7 @@ public class CmdA_DriveToReefPositionV4_Test extends Command {
   private double thetaFromTarget = 0.0;
   private int pos;
   
-  public CmdA_DriveToReefPositionV4_Test(SwerveSubsystem DriveSubsystem, int position) {
+  public CmdA_DriveToReefPositionV8_Windsor(SwerveSubsystem DriveSubsystem, int position) {
     DriveSS = DriveSubsystem;
     pos = position;
   }
@@ -89,31 +90,40 @@ public class CmdA_DriveToReefPositionV4_Test extends Command {
     lastSetpointTranslation = currentPose.getTranslation();
     lastSetpointRotation = target.getRotation();
     lastTime = Timer.getTimestamp();
-    thetaController.setTolerance(DriveToPoseOld.thetaTolerance);
-    driveController.setTolerance(DriveToPoseOld.driveTolerance);
+    thetaController.setTolerance(DriveToPoseAuto.thetaTolerance);
+    driveController.setTolerance(DriveToPoseAuto.driveTolerance);
+
+    DogLog.log("Auto/DriveToReefV8/Init/currentPose", currentPose);
+    DogLog.log("Auto/DriveToReefV8/Init/targetPose", target);
+    DogLog.log("Auto/DriveToReefV8/Init/drivePIDTolerance", driveController.getPositionTolerance());
+    DogLog.log("Auto/DriveToReefV8/Init/thetaPIDTolerance", thetaController.getPositionTolerance());
+    DogLog.log("Auto/DriveToReefV8/Init/drivePIDError", driveController.getPositionError());
+    DogLog.log("Auto/DriveToReefV8/Init/thetaPIDError", thetaController.getPositionError());
+    DogLog.log("Auto/DriveToReefV8/Status", "Initialized");
+
   }
-
-
-
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
     
     Pose2d currentPose = DriveSS.getPose();
     Pose2d targetPose = target;
+    if (target.getX() == 0 && target.getY() == 0)
+   {
+    targetPose = GetTargetPose(DriveSS.GetClosestReefSegment());
+    target = targetPose;
+    }
 
     double currentDistance = currentPose.getTranslation().getDistance(targetPose.getTranslation());
     
     double ffScaler = MathUtil.clamp(
-        (currentDistance - DriveToPoseOld.ffMinRadius) / (DriveToPoseOld.ffMaxRadius - DriveToPoseOld.ffMinRadius),
+        (currentDistance - DriveToPoseAuto.ffMinRadius) / (DriveToPoseAuto.ffMaxRadius - DriveToPoseAuto.ffMinRadius),
         0.0,
         1.0);
 
-    DogLog.log("Auto/Test/Exec/currentPose", currentPose);
-    DogLog.log("Auto/Test/Exec/targetPose", targetPose);
-    DogLog.log("Auto/Test/Exec/currentDistance", currentDistance);
-    
-    DogLog.log("Auto/Test/Check/ffScaler", ffScaler);
+    DogLog.log("Auto/DriveToReefV8/Exec/currentPose", currentPose);
+    DogLog.log("Auto/DriveToReefV8/Exec/targetPose", targetPose);
+    DogLog.log("Auto/DriveToReefV8/Exec/ffScaler", ffScaler);
         
     distanceFromTarget = currentDistance;
 
@@ -136,8 +146,8 @@ public class CmdA_DriveToReefPositionV4_Test extends Command {
             .transformBy(new Transform2d(driveController.getSetpoint().position, 0.0, Rotation2d.kZero))
             .getTranslation();
 
-    DogLog.log("Auto/Test/Check/driveVelocityScalar", driveVelocityScalar);
-    DogLog.log("Auto/Test/Check/lastSetpointTranslation", lastSetpointTranslation);
+    DogLog.log("Auto/DriveToReefV8/Exec/driveVelocityScalar", driveVelocityScalar);
+    DogLog.log("Auto/DriveToReefV8/Exec/lastSetpointTranslation", lastSetpointTranslation);
 
     // Calculate theta speed
     double thetaVelocity = thetaController.calculate( currentPose.getRotation().getRadians(),
@@ -171,29 +181,103 @@ public class CmdA_DriveToReefPositionV4_Test extends Command {
     // //         thetaVelocity, omegaFF.getAsDouble() * 4.0 / Units.inchesToMeters(Math.hypot(13.25, 13.25)), thetaS);
 
     // Command speeds
-    DogLog.log("Auto/Test/Check/distanceFromTarget", distanceFromTarget);
-    DogLog.log("Auto/Test/Check/thetaFromTarget", Units.radiansToDegrees(thetaFromTarget));
-    DogLog.log("Auto/Test/Check/driveVelocityX", driveVelocity.getX());
-    DogLog.log("Auto/Test/Check/driveVelocityY", driveVelocity.getY());
-    DogLog.log("Auto/Test/Check/thetaVelocity", thetaVelocity);
-    DogLog.log("Auto/Test/Check/currentPose.getRotation()",currentPose.getRotation());
-    DogLog.log("Auto/Test/Check/FINISHED", false);
-    DriveSS.drive(
-        ChassisSpeeds.fromFieldRelativeSpeeds(
-            driveVelocity.getX(), driveVelocity.getY(), thetaVelocity, currentPose.getRotation()));
+
+    // double driveXVel = driveVelocity.getX();
+    // double driveYVel = driveVelocity.getY();
+    double driveXVel = 999;
+    double driveYVel = 999;
+    // if (Math.abs(currentPose.getX() - target.getX()) <=  DriveToPoseAuto.driveTolerance) 
+    //    driveXVel = 0.0;
+    // if (Math.abs(currentPose.getY() - target.getY()) <=  DriveToPoseAuto.driveTolerance)
+    //    driveYVel = 0.0;
+  Translation2d PositionErrorRobotRel = new Translation2d(driveController.getPositionError()*Math.cos(thetaController.getPositionError()),driveController.getPositionError()*Math.sin(thetaController.getPositionError()));
+
+//Math.abs(currentPose.getY() - target.getY()) >=   DriveToPoseAuto.driveTolerance ||
+if (( Math.abs(PositionErrorRobotRel.getY()) >=   DriveToPoseAuto.driveTolerance * 3 || Math.abs(thetaController.getPositionError()) >= thetaController.getPositionTolerance()*3) && currentDistance <= 0.9 ){
+  DriveSS.DH_Out_DriveToPose = true;
+  // driveYVel = 0.0;
+  driveXVel = 0.0;
+  }
+  Translation2d FieldToRobotVel = driveVelocity.rotateBy(new Rotation2d(-1*DriveSS.getPose().getRotation().getRadians()));
+  
+  DogLog.log("Auto/DriveToReefV8/Exec/RawFieldDriveVelX", driveVelocity.getX());
+  DogLog.log("Auto/DriveToReefV8/Exec/RawFieldDriveVelY", driveVelocity.getY());
+  DogLog.log("Auto/DriveToReefV8/Exec/RawRobotVelY", FieldToRobotVel.getY());
+  DogLog.log("Auto/DriveToReefV8/Exec/RawRobotVelX", FieldToRobotVel.getX());
+  DogLog.log("Auto/DriveToReefV8/Exec/RotatedErrorX", PositionErrorRobotRel.getX());
+  DogLog.log("Auto/DriveToReefV8/Exec/RotatedErrorY", PositionErrorRobotRel.getY());
+
+  if (driveXVel != 0){
+      driveXVel = FieldToRobotVel.getX();
+  }
+  if (driveYVel != 0){
+      driveYVel = FieldToRobotVel.getY();
+  }
+
+  if (!DriveSS.DH_In_MechAtGoal){
+      
+    // driveYVel *=0.25;
+    driveXVel  *=0.75;
+  
+  }
+  
+  if (!DriveSS.DH_In_MechAtGoal && currentDistance <= 1.5  ){
+      
+    // driveYVel *=0.25;
+    driveXVel *= 0.5;
+  }
+    if (thetaVelocity < 0){
+      thetaVelocity = Math.min(thetaVelocity, -0.15);
+    }
+    if (thetaVelocity > 0){
+      thetaVelocity = Math.max(thetaVelocity, 0.15);
+    }
+    if (driveXVel < 0){
+      driveXVel = Math.min(driveXVel, -0.2);
+    }
+    if (driveXVel > 0){
+      driveXVel = Math.max(driveXVel, 0.8);
+    }
+
+    if (driveYVel < 0){
+      driveYVel = Math.min(driveYVel, -0.15);
+    }
+    if (driveYVel > 0){
+      driveYVel = Math.max(driveYVel, 0.15);
+    }
+
+    DogLog.log("Auto/DriveToReefV8/Exec/FieldRelDistanceFromTarget", distanceFromTarget);
+    DogLog.log("Auto/DriveToReefV8/Exec/FieldRelDistanceFromTargetX", Math.abs(currentPose.getX() - target.getX()));
+    DogLog.log("Auto/DriveToReefV8/Exec/FieldRelDistanceFromTargetY", Math.abs(currentPose.getY() - target.getY()));
+    DogLog.log("Auto/DriveToReefV8/Exec/ThetaFromTarget", Units.radiansToDegrees(thetaFromTarget));
+
+
+    DogLog.log("Auto/DriveToReefV8/Exec/RobotRelSuppliedDriveVelocityX", driveXVel);
+    DogLog.log("Auto/DriveToReefV8/Exec/RobotRelSuppliedDriveVelocityY", driveYVel);
+    DogLog.log("Auto/DriveToReefV8/Exec/RobotRelSuppliedThetaVelocity", thetaVelocity);
+    DogLog.log("Auto/DriveToReefV8/Status", "Executing");
+    DogLog.log("Auto/DriveToReefV8/Check/DrivePIDAtGoal", driveController.atGoal());
+    DogLog.log("Auto/DriveToReefV8/Check/ThetaPIDAtGoal", thetaController.atGoal());
+
+    // DriveSS.drive(
+    //     ChassisSpeeds.fromRobotRelativeSpeeds(
+    //       -driveXVel, -driveYVel, thetaVelocity, currentPose.getRotation()));
+    DriveSS.drive(new Translation2d(driveXVel, driveYVel),thetaVelocity, false);
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    DogLog.log("Auto/Test/Check/FINISHED", true);
+    DriveSS.DH_Out_DriveToPose = false;
+    DogLog.log("Auto/DriveToReefV8/Status", "Finished");
+    DogLog.log("Auto/DriveToReefV8/Interrupted", interrupted);
     DriveSS.drive(new ChassisSpeeds(0,0,0));
   
     
   }
 
   public boolean atGoal() {
-    return driveController.atGoal() && thetaController.atGoal();
+    return  driveController.atGoal() && thetaController.atGoal();
   }
 
   // Returns true when the command should end.
@@ -216,7 +300,6 @@ public class CmdA_DriveToReefPositionV4_Test extends Command {
     }
     Pose2d targetAprilTagPose = DriveSS.GetClosestReefSegment();
     target = targetAprilTagPose.plus(offset);
-    // target = target.rotateAround(target.getTranslation(), new Rotation2d(Units.degreesToRadians(180)));
     return target;
   }
    

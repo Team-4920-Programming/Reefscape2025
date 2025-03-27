@@ -100,6 +100,7 @@ public class ClimberSubsystem extends SubsystemBase {
   public void periodic() {
     ReadSensorValues();
     double rightFlapOutput = RightFlapPID.calculate(GetRightFlap());
+    DogLog.log("ClimberSS/CurrentCommand", this.getCurrentCommand().toString());
     DogLog.log("ClimberSS/RampAngle", GetRightFlap());
     DogLog.log("ClimberSS/ClimberAngleEncoder", climberAngleEncoder.getPosition());
       rightFlapOutput = -MathUtil.clamp(rightFlapOutput, -.1, .1);

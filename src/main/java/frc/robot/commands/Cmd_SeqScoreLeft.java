@@ -41,11 +41,11 @@ public class Cmd_SeqScoreLeft extends SequentialCommandGroup {
       new ParallelCommandGroup(
       new CmdT_MoveToLevel(Coral_SS, true),
       new CmdT_DriveToReefPositionV8_Windsor(Drive_SS, 1)).andThen(new CmdT_CheckSetpoints(Coral_SS)),
-      // new CmdT_UltrasonicCheck(Coral_SS),
       new CmdT_CoralOutTake(Coral_SS),
       new Reef_MarkOurs(Reef_SS, 0),
       new CmdT_DriveToReefPosition(Drive_SS, 4),
       new CmdT_Station(Coral_SS),
-      new CmdT_EnableAutoAim(Drive_SS));
+      new CmdT_EnableAutoAim(Drive_SS),
+      new CmdT_IsScoring(Coral_SS, false));
   }
 }
