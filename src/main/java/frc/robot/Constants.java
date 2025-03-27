@@ -21,6 +21,7 @@ import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.util.Units;
+import frc.robot.TrajectoryPlanner4920.MechState;
 import swervelib.math.Matter;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Matrix;
@@ -343,17 +344,26 @@ public final class Constants
       public static final double elbow = 16;
       
     }
+    public static class SafeTransition {
+      public static final MechState name = MechState.SafeTransition;
+      public static final double wrist = 90; //degrees //-202
+      public static final double elbow = 0; //degrees
+      public static final double height = CoralStation.height; //meters
+    }
     public static class CoralStation {
+      public static final MechState name = MechState.CoralStation;
       public static final double wrist = 160; //degrees //-202
       public static final double elbow = 0; //degrees
       public static final double height = 0.14; //meters
     }
     public static class TransportCoralUp{
+      public static final MechState name = MechState.TransportHigh;
       public static final double wrist = 90;
       public static final double elbow = 0;
       public static final double height = Level4.height;
     }
     public static class TransportCoralDown{
+      public static final MechState name = MechState.TransportLow;
       public static final double wrist = 90;
       public static final double elbow = 0;
       public static final double height = CoralStation.height;
@@ -369,21 +379,25 @@ public final class Constants
       public static final double height = 0.12; //meters
     }
     public static class Level1 {
+      public static final MechState name = MechState.Level1;
       public static final double wrist = 30; //degrees
       public static final double elbow = 0; //degrees
       public static final double height = 0.05; //meters
     }
     public static class Level2 {
+      public static final MechState name = MechState.Level2;
       public static final double wrist = -10; //degrees
       public static final double elbow = 15; //degrees
       public static final double height = 0.286; //meters
     }
     public static class Level3 {
+      public static final MechState name = MechState.Level3;
       public static final double wrist = -10; //degrees -35
       public static final double elbow = 15; //degrees 170
       public static final double height = 0.635; //meters 0.12
     }
     public static class Level4 {
+      public static final MechState name = MechState.Level4;
       public static final double wrist = -37; //degrees-37
       public static final double elbow =161; //degrees 180
       public static final double height = .750; //meters
@@ -394,14 +408,22 @@ public final class Constants
       public static final double height = 0.55; //meters
     }
     public static class AlgaeL3{
+      public static final MechState name = MechState.AlgaeHigh;
       public static final double wrist = 0 ; //degrees
       public static final double elbow =45; //degrees
       public static final double height = 0.625; //meters
     }
     public static class AlgaeL2{
+      public static final MechState name = MechState.AlgaeLow;
       public static final double wrist = 0 ; //degrees
       public static final double elbow =45; //degrees
       public static final double height = 0.3; //meters
+    }
+    public static class StartingConfig{
+      public static final MechState name = MechState.StartingConfig;
+      public static final double wrist = 90 ; //degrees
+      public static final double elbow =0.0; //degrees
+      public static final double height = 0.0; //meters
     }
   }
   public static class RobotLimits {

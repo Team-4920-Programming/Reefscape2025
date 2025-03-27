@@ -3,7 +3,6 @@
 // the WPILib BSD license file in the root directory of this project.
 
 package frc.robot.subsystems.CoralElevator;
-
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.DegreesPerSecond;
 import static edu.wpi.first.units.Units.Meters;
@@ -14,9 +13,14 @@ import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
 
-
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.PriorityQueue;
 import java.util.concurrent.ThreadPoolExecutor.AbortPolicy;
 import java.util.function.BooleanSupplier;
+import java.util.function.DoubleSupplier;
+import java.util.prefs.NodeChangeEvent;
 
 import javax.lang.model.util.ElementScanner14;
 
@@ -103,7 +107,19 @@ import frc.robot.Constants.PIDs.CoralElevator.LeftFlap;
 import frc.robot.Constants.PIDs.CoralElevator.RightFlap;
 import frc.robot.Constants.PIDs.CoralElevator.TestElevator;
 import frc.robot.Constants.PIDs.CoralElevator.Wrist;
+import frc.robot.Constants.RobotPositions.AlgaeL2;
+import frc.robot.Constants.RobotPositions.AlgaeL3;
 import frc.robot.Constants.RobotPositions.CoralStation;
+import frc.robot.Constants.RobotPositions.Level1;
+import frc.robot.Constants.RobotPositions.Level2;
+import frc.robot.Constants.RobotPositions.Level3;
+import frc.robot.Constants.RobotPositions.Level4;
+import frc.robot.Constants.RobotPositions.SafeTransition;
+import frc.robot.Constants.RobotPositions.StartingConfig;
+import frc.robot.Constants.RobotPositions.TransportCoralDown;
+import frc.robot.Constants.RobotPositions.TransportCoralUp;
+import frc.robot.TrajectoryPlanner4920.MechState;
+import frc.robot.TrajectoryPlanner4920.Node;
 import frc.robot.Constants.CanIDs;
 import frc.robot.Constants.DIO;
 import frc.robot.Constants.PIDs;
@@ -118,6 +134,8 @@ import dev.doglog.DogLog;
 import au.grapplerobotics.ConfigurationFailedException;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Ultrasonic;
+
+import frc.robot.TrajectoryPlanner4920;
 
 public class CoralElevatorSubsystem extends SubsystemBase {
 
@@ -1483,5 +1501,94 @@ private final ArmFeedforward wristFF = new ArmFeedforward(PIDs.CoralElevator.Tes
       this));
 
     /******************************/
+
+    private DoubleSupplier getWristWorldSupplier(){
+      DoubleSupplier d = () -> GetWristAngleWorldCoordinates();
+      return d;
+    }
+    private DoubleSupplier getElbowAngleSupplier(){
+      DoubleSupplier d = () -> GetElbowAngle();
+      return d;
+    }
+    private DoubleSupplier getElevatorHeightSupplier(){
+      DoubleSupplier d = () -> getFilteredElevatorHeight();
+      return d;
+    }
+
+    private List<Node> CommandQueue = new ArrayList<>();
+    private MechState currentState = MechState.StartingConfig;
+    private MechState targetState;
+    private HashMap<MechState,Node> ConfigList = new HashMap<>();
+    private void PopulateConfigList(){ 
+        ConfigList.put(MechState.StartingConfig,new Node(StartingConfig.name, StartingConfig.wrist,StartingConfig.elbow,StartingConfig.height));
+        ConfigList.put(MechState.AlgaeHigh,new Node(AlgaeL3.name, AlgaeL3.wrist,AlgaeL3.elbow,AlgaeL3.height));
+        ConfigList.put(MechState.AlgaeLow,new Node(AlgaeL2.name, AlgaeL2.wrist,AlgaeL2.elbow,AlgaeL2.height));
+        ConfigList.put(MechState.CoralStation,new Node(CoralStation.name, CoralStation.wrist,CoralStation.elbow,CoralStation.height));
+        ConfigList.put(MechState.Level1,new Node(Level1.name, Level1.wrist,Level1.elbow,Level1.height));
+        ConfigList.put(MechState.Level2,new Node(Level2.name, Level2.wrist,Level2.elbow,Level2.height));
+        ConfigList.put(MechState.Level3,new Node(Level3.name, Level3.wrist,Level3.elbow,Level3.height));
+        ConfigList.put(MechState.Level4,new Node(Level4.name, Level4.wrist,Level4.elbow,Level4.height));
+        ConfigList.put(MechState.SafeTransition,new Node(SafeTransition.name, SafeTransition.wrist,SafeTransition.elbow,SafeTransition.height));
+        ConfigList.put(MechState.TransportLow,new Node(TransportCoralDown.name, TransportCoralDown.wrist,TransportCoralDown.elbow,TransportCoralDown.height));
+        ConfigList.put(MechState.TransportHigh,new Node(TransportCoralUp.name, TransportCoralUp.wrist,TransportCoralUp.elbow,TransportCoralUp.height));
+        ConfigList.put(MechState.Holding,new Node(MechState.Holding, getWristWorldSupplier(), getElbowAngleSupplier(), getElevatorHeightSupplier()));
+
+      }
+
+    private void setArmPosition(MechState target){
+      if (!CommandQueue.isEmpty()){
+        CommandQueue.clear();
+      }
+      if (!MechAtGoal()){
+      currentState = TrajectoryPlanner4920.getClosestNode(ConfigList, new Node(null, GetWristAngleWorldCoordinates(), GetElbowAngle(), getFilteredElevatorHeight()));
+      }
+      if (currentState.equals(MechState.CoralStation) ^ target.equals(MechState.CoralStation)){
+        CommandQueue.add(ConfigList.get(target));
+        targetState = MechState.SafeTransition;
+      }
+      else{
+        targetState = target;
+      }
+      m_controller.setGoal(new State(ConfigList.get(targetState).getElevatorGoal(), 0));
+      m_elbowcontroller.setGoal(new State(ConfigList.get(targetState).getElbowGoal(), 0));
+      m_wristcontroller.setGoal(new State(ConfigList.get(targetState).getWristGoal(), 0));
+        
+    }
+
+    private boolean MechAtGoal(){
+      return m_controller.atGoal() && m_elbowcontroller.atGoal() && m_wristcontroller.atGoal();
+    }
+
+    private void MoveMech(){
+      if (!DH_In_RedZone || (DH_In_RedZone && OverrideRedZone)){
+        if (MechAtGoal() && currentState != MechState.StartingConfig && currentState != MechState.Holding){
+          if (!CommandQueue.isEmpty()){
+            currentState = targetState;
+            Node n = CommandQueue.remove(0);
+            targetState = n.getName();
+            m_controller.setGoal(new State(n.getElevatorGoal(), 0));
+            m_elbowcontroller.setGoal(new State(n.getElbowGoal(), 0));
+            m_wristcontroller.setGoal(new State(n.getWristGoal(), 0));
+          }
+          else{
+            currentState = targetState;
+          }
+        }
+        else{
+          if (currentState != targetState){
+          m_controller.setGoal(new State(ConfigList.get(targetState).getElevatorGoal(), 0));
+          m_elbowcontroller.setGoal(new State(ConfigList.get(targetState).getElbowGoal(), 0));
+          m_wristcontroller.setGoal(new State(ConfigList.get(targetState).getWristGoal(), 0));
+          }
+        }
+      }
+    else{
+      m_controller.setGoal(new State(ConfigList.get(MechState.Holding).getElevatorGoal(), 0));
+      m_elbowcontroller.setGoal(new State(ConfigList.get(MechState.Holding).getElbowGoal(), 0));
+      m_wristcontroller.setGoal(new State(ConfigList.get(MechState.Holding).getWristGoal(), 0));
+      currentState = MechState.Holding;
+      
+    }
+  }
 }
 
