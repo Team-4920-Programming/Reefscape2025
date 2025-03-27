@@ -41,7 +41,7 @@
 
 # Log file
 *.log
-
+!../**/frc/robot/logs/*.log;
 # BlueJ files
 *.ctxt
 
