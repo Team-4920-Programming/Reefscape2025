@@ -57,7 +57,7 @@ public class CmdT_Def_Elevator extends Command {
             Coral_SS.setJustScored(false);
         }
         if (HasCoral && !InRedZone){
-          if (!pablo)
+          if (!pablo){
             if (Coral_SS.GetWristAngleWorldCoordinates() <= 95){
               DogLog.log("Tele/DefaultElevatorCmd/State",2);
             Coral_SS.setArmPosition(TransportCoralUp.height, TransportCoralUp.elbow, TransportCoralUp.wrist);
@@ -66,6 +66,7 @@ public class CmdT_Def_Elevator extends Command {
               DogLog.log("Tele/DefaultElevatorCmd/State",3);
               Coral_SS.setArmPosition(TransportCoralDown.height, TransportCoralDown.elbow, TransportCoralDown.wrist);
             }
+          }
           else{
             DogLog.log("Tele/DefaultElevatorCmd/State",4);
             Coral_SS.setArmPosition(TransportCoralDown.height, TransportCoralDown.elbow, TransportCoralDown.wrist);

@@ -4,6 +4,7 @@
 
 package frc.robot.commands.Elevator.TeleOp;
 
+import dev.doglog.DogLog;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.CoralElevator.CoralElevatorSubsystem;
 
@@ -13,6 +14,7 @@ public class CmdT_TogglePabloOverride extends Command {
   CoralElevatorSubsystem CoralSS;
   public CmdT_TogglePabloOverride(CoralElevatorSubsystem css) {
     CoralSS = css;
+    // addRequirements(CoralSS);
     // Use addRequirements() here to declare subsystem dependencies.
   }
 
@@ -23,7 +25,10 @@ public class CmdT_TogglePabloOverride extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    CoralSS.setPabloOverride(!CoralSS.getPableOverride());
+    boolean b = CoralSS.getPableOverride();
+    DogLog.log("CoralElevatorSS/why", b);
+
+      CoralSS.setPabloOverride(!b);
   }
 
   // Called once the command ends or is interrupted.
