@@ -171,14 +171,14 @@ public class CoralElevatorSubsystem extends SubsystemBase {
   private final ElevatorFeedforward m_feedforward = new ElevatorFeedforward(PIDs.CoralElevator.TestElevator.ks, PIDs.CoralElevator.TestElevator.kg, PIDs.CoralElevator.TestElevator.kv);
   
   private final TrapezoidProfile.Constraints m_elbowconstraints =
-      new TrapezoidProfile.Constraints(180, 60);
+      new TrapezoidProfile.Constraints(240, 70);
   private final ProfiledPIDController m_elbowcontroller =
   new ProfiledPIDController(PIDs.CoralElevator.TestElbow.kp, 0, PIDs.CoralElevator.TestElbow.kd, m_elbowconstraints, Constants.LOOP_TIME);
 private final ArmFeedforward elbowFF = new ArmFeedforward(PIDs.CoralElevator.TestElbow.ks, PIDs.CoralElevator.TestElbow.kg, PIDs.CoralElevator.TestElbow.kv);
 
 
 private final TrapezoidProfile.Constraints m_wristConstraints =
-      new TrapezoidProfile.Constraints(180, 60);
+      new TrapezoidProfile.Constraints(360, 100);
   private final ProfiledPIDController m_wristcontroller =
   new ProfiledPIDController(PIDs.CoralElevator.TestWrist.kp, 0, PIDs.CoralElevator.TestWrist.kd, m_wristConstraints, Constants.LOOP_TIME);
 private final ArmFeedforward wristFF = new ArmFeedforward(PIDs.CoralElevator.TestWrist.ks, PIDs.CoralElevator.TestWrist.kg, PIDs.CoralElevator.TestWrist.kv);
@@ -864,7 +864,7 @@ private final ArmFeedforward wristFF = new ArmFeedforward(PIDs.CoralElevator.Tes
         m_controller.setGoal(new State(ElevatorGoal, 0));
         // ElevatorPID.setSetpoint(ElevatorGoal);
       }
-      if (isElevatorAtGoal() || (SawElevatorGoal && Math.abs(m_controller.getPositionError()) < 3* m_controller.getPositionTolerance()))
+      if (isElevatorAtGoal() || (SawElevatorGoal && Math.abs(m_controller.getPositionError()) < 3* m_controller.getPositionTolerance()) || (getFilteredElevatorHeight() <= 0.325 && ElevatorGoal < getFilteredElevatorHeight() && !isCoralPresent()))
       {
       // if (isElevatorAtGoal() || (SawElevatorGoal && Math.abs(ElevatorPID.getError()) < 3* ElevatorPID.getErrorTolerance()))
       // {

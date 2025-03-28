@@ -425,8 +425,8 @@ public final class Constants
     }
     public static class Climb{
       public static final double wrist = 0; //degrees
-      public static final double elbow = 15; //degrees
-      public static final double height = 0.11; //meters
+      public static final double elbow = 60; //degrees
+      public static final double height = 0.21; //meters
     }
   }
   public static class RobotLimits {

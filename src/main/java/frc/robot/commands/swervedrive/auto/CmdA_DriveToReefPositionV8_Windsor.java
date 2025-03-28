@@ -55,6 +55,8 @@ public class CmdA_DriveToReefPositionV8_Windsor extends Command {
   private double distanceFromTarget = 0.0;
   private double thetaFromTarget = 0.0;
   private int pos;
+  private double ErrorValidationX = 2.0;
+  private double ErrorValidationY = 2.0;
   
   public CmdA_DriveToReefPositionV8_Windsor(SwerveSubsystem DriveSubsystem, int position) {
     DriveSS = DriveSubsystem;
@@ -205,6 +207,15 @@ if (( Math.abs(PositionErrorRobotRel.getY()) >=   DriveToPoseAuto.driveTolerance
   DogLog.log("Auto/DriveToReefV8/Exec/RawRobotVelX", FieldToRobotVel.getX());
   DogLog.log("Auto/DriveToReefV8/Exec/RotatedErrorX", PositionErrorRobotRel.getX());
   DogLog.log("Auto/DriveToReefV8/Exec/RotatedErrorY", PositionErrorRobotRel.getY());
+  ErrorValidationX = PositionErrorRobotRel.getX();
+  ErrorValidationY = PositionErrorRobotRel.getY();
+  // if (Math.abs(PositionErrorRobotRel.getX()) <= DriveToPoseAuto.driveTolerance){
+  //   driveXVel = 0;
+
+  // }
+  // if (Math.abs(PositionErrorRobotRel.getY()) <= DriveToPoseAuto.driveTolerance){
+  //   driveYVel = 0;
+  // }
 
   if (driveXVel != 0){
       driveXVel = FieldToRobotVel.getX();
@@ -277,6 +288,7 @@ if (( Math.abs(PositionErrorRobotRel.getY()) >=   DriveToPoseAuto.driveTolerance
 
   public boolean atGoal() {
     return  driveController.atGoal() && thetaController.atGoal();
+    // return Math.abs(ErrorValidationX) <= DriveToPoseAuto.driveTolerance && Math.abs(ErrorValidationY) <= DriveToPoseAuto.driveTolerance && thetaController.atGoal();
   }
 
   // Returns true when the command should end.
