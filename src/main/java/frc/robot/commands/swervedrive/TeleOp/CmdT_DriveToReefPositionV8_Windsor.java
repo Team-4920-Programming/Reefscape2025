@@ -99,7 +99,7 @@ public class CmdT_DriveToReefPositionV8_Windsor extends Command {
     DogLog.log("Tele/DriveToReefV8/Init/thetaPIDTolerance", thetaController.getPositionTolerance());
     DogLog.log("Tele/DriveToReefV8/Init/drivePIDError", driveController.getPositionError());
     DogLog.log("Tele/DriveToReefV8/Init/thetaPIDError", thetaController.getPositionError());
-    DogLog.log("Auto/DriveToReefV8/Status", "Initialized");
+    DogLog.log("Tele/DriveToReefV8/Status", "Initialized");
   }
 
 
@@ -209,19 +209,19 @@ if (( Math.abs(PositionErrorRobotRel.getY()) >=   DriveToPoseTele.driveTolerance
   if (driveYVel != 0){
       driveYVel = FieldToRobotVel.getY();
   }
-
   if (!DriveSS.DH_In_MechAtGoal){
-      
-    // driveYVel *=0.25;
-    driveXVel  *=0.75;
+
+
+    if (currentDistance <= 1.5){
+      // driveXVel *= 0.5;
+      driveXVel  *=0.75;
+    }
+    else{
+      // driveXVel  *=0.75;
+    }
   
   }
   
-  if (!DriveSS.DH_In_MechAtGoal && currentDistance <= 1.5  ){
-      
-    // driveYVel *=0.25;
-    driveXVel *= 0.5;
-  }
     if (thetaVelocity < 0){
       thetaVelocity = Math.min(thetaVelocity, -0.15);
     }
@@ -251,7 +251,7 @@ if (( Math.abs(PositionErrorRobotRel.getY()) >=   DriveToPoseTele.driveTolerance
     DogLog.log("Tele/DriveToReefV8/Exec/RobotRelSuppliedDriveVelocityX", driveXVel);
     DogLog.log("Tele/DriveToReefV8/Exec/RobotRelSuppliedDriveVelocityY", driveYVel);
     DogLog.log("Tele/DriveToReefV8/Exec/RobotRelSuppliedThetaVelocity", thetaVelocity);
-    DogLog.log("Auto/DriveToReefV8/Status", "Executing");
+    DogLog.log("Tele/DriveToReefV8/Status", "Executing");
     DogLog.log("Tele/DriveToReefV8/Check/DrivePIDAtGoal", driveController.atGoal());
     DogLog.log("Tele/DriveToReefV8/Check/ThetaPIDAtGoal", thetaController.atGoal());
     

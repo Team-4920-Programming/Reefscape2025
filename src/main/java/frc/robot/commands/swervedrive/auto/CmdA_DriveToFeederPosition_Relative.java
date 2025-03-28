@@ -33,13 +33,13 @@ public class CmdA_DriveToFeederPosition_Relative extends Command {
   Pose2d ReefPose;
   Pose2d targetPose;
   Pose2d startingPose;
-  double minSpeed = 0.25;
+  double minSpeed = 1.0;
   boolean inter;
   Twist2d RobotDelta;
   double xytolerance = 0.05;
   double thetaTolerance = Units.degreesToRadians(5);
-  double px = 2;
-  double py = 2;
+  double px = 4.5;
+  double py = 4.5;
   double pt = 5;
   public CmdA_DriveToFeederPosition_Relative(SwerveSubsystem DriveSubsystem) {
     // Use addRequirements() here to declare subsystem dependencies.
@@ -98,8 +98,8 @@ public class CmdA_DriveToFeederPosition_Relative extends Command {
       YVel = RawYVel;
       RotVel = RawRotVel;
 
-    XVel = MathUtil.clamp(XVel, -3, 3);
-    YVel = MathUtil.clamp(YVel, -3,3);
+    XVel = MathUtil.clamp(XVel, -3.5, 3.5);
+    YVel = MathUtil.clamp(YVel, -3.5,3.5);
     RotVel = MathUtil.clamp(RotVel, -3, 3);
 
     DogLog.log("Auto/DriveToFeederRelative/Exec/ClampedXPIDOutput", XVel);

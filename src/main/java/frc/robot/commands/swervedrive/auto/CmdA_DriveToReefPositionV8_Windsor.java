@@ -214,16 +214,15 @@ if (( Math.abs(PositionErrorRobotRel.getY()) >=   DriveToPoseAuto.driveTolerance
   }
 
   if (!DriveSS.DH_In_MechAtGoal){
-      
-    // driveYVel *=0.25;
-    driveXVel  *=0.75;
+
+
+    if (currentDistance <= 1.5){
+      driveXVel *= 0.75;
+    }
+    else{
+      // driveXVel  *=0.75;
+    }
   
-  }
-  
-  if (!DriveSS.DH_In_MechAtGoal && currentDistance <= 1.5  ){
-      
-    // driveYVel *=0.25;
-    driveXVel *= 0.5;
   }
     if (thetaVelocity < 0){
       thetaVelocity = Math.min(thetaVelocity, -0.15);

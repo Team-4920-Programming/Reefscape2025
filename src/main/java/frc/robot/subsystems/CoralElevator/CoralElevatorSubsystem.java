@@ -178,7 +178,7 @@ private final ArmFeedforward elbowFF = new ArmFeedforward(PIDs.CoralElevator.Tes
 
 
 private final TrapezoidProfile.Constraints m_wristConstraints =
-      new TrapezoidProfile.Constraints(180, 60);
+      new TrapezoidProfile.Constraints(360, 120);
   private final ProfiledPIDController m_wristcontroller =
   new ProfiledPIDController(PIDs.CoralElevator.TestWrist.kp, 0, PIDs.CoralElevator.TestWrist.kd, m_wristConstraints, Constants.LOOP_TIME);
 private final ArmFeedforward wristFF = new ArmFeedforward(PIDs.CoralElevator.TestWrist.ks, PIDs.CoralElevator.TestWrist.kg, PIDs.CoralElevator.TestWrist.kv);
