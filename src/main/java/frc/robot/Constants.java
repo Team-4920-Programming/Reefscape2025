@@ -482,10 +482,10 @@ public final class Constants
   public static class RobotAutomationInformation {
     public static class AutoAlignReef{
       public static final double branchOffset = Units.inchesToMeters(6.5);
-      public static final double distanceFromFace = Units.inchesToMeters(24.75);
+      public static final double distanceFromFace = Units.inchesToMeters(25.75);
     }
     public static class AutoAlignCoralFeederStation{
-      public static final double distanceFromFace = Units.inchesToMeters(26);
+      public static final double distanceFromFace = Units.inchesToMeters(20);
     }
   }
 

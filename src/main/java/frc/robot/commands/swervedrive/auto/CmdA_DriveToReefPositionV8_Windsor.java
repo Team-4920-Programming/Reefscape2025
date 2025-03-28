@@ -108,11 +108,10 @@ public class CmdA_DriveToReefPositionV8_Windsor extends Command {
     
     Pose2d currentPose = DriveSS.getPose();
     Pose2d targetPose = target;
-    if (target.getX() == 0 && target.getY() == 0)
-   {
+
     targetPose = GetTargetPose(DriveSS.GetClosestReefSegment());
     target = targetPose;
-    }
+
 
     double currentDistance = currentPose.getTranslation().getDistance(targetPose.getTranslation());
     

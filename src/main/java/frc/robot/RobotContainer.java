@@ -361,7 +361,7 @@ public class RobotContainer
   // Button 9: L1
   // OperatorJoystick.button(9).onTrue(new CmdT_Level1(CoralElevatorSS));
   // Button 9: Pablo Override
-  OperatorJoystick.button(9).debounce(1).toggleOnTrue(new CmdT_TogglePabloOverride(CoralElevatorSS));
+  OperatorJoystick.button(9).onTrue(new CmdT_TogglePabloOverride(CoralElevatorSS));
 
   // Button 11: High Algae
   OperatorJoystick.button(12).whileTrue(new Cmd_SeqRemoveLowAlgea(CoralElevatorSS, drivebase));
