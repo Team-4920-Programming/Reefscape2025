@@ -43,7 +43,7 @@ public class CmdT_CoralOutTake extends Command {
       int i = CoralElevatorSS.GetScoreSelection();
 
       if (i == 1){
-        speed = 0.35;
+        speed = 0.25;
       }
       else{
         speed = 0.75;
@@ -80,6 +80,12 @@ public class CmdT_CoralOutTake extends Command {
         PresentTimer.stop();
         PresentTimer.reset();
     }
-    return (PresentTimer.hasElapsed(.25));
+    if (!(CoralElevatorSS.GetScoreSelection() == 1))
+    {
+      return (PresentTimer.hasElapsed(.25));
+    }
+    else{
+      return (PresentTimer.hasElapsed(.5));
+    }
   }
 }

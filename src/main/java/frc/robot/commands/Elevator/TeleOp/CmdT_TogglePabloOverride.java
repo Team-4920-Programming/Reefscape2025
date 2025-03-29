@@ -14,7 +14,7 @@ public class CmdT_TogglePabloOverride extends Command {
   CoralElevatorSubsystem CoralSS;
   public CmdT_TogglePabloOverride(CoralElevatorSubsystem css) {
     CoralSS = css;
-    // addRequirements(CoralSS);
+    addRequirements(CoralSS);
     // Use addRequirements() here to declare subsystem dependencies.
   }
 
@@ -26,8 +26,6 @@ public class CmdT_TogglePabloOverride extends Command {
   @Override
   public void execute() {
     boolean b = CoralSS.getPableOverride();
-    DogLog.log("CoralElevatorSS/why", b);
-
       CoralSS.setPabloOverride(!b);
   }
 

@@ -188,6 +188,8 @@ public class CmdT_DriveToReefPositionV8_Windsor extends Command {
     // if (Math.abs(currentPose.getY() - target.getY()) <=  DriveToPoseTele.driveTolerance)
     //    driveYVel = 0.0;
     Translation2d PositionErrorRobotRel = new Translation2d(driveController.getPositionError()*Math.cos(thetaController.getPositionError()),driveController.getPositionError()*Math.sin(thetaController.getPositionError()));
+    Translation2d test23  = new Translation2d(Math.abs(currentPose.getX() - target.getX()), Math.abs(currentPose.getY() - target.getY())).rotateBy(new Rotation2d(-1*targetPose.getRotation().getRadians()));
+    Translation2d test32  = new Translation2d(Math.abs(currentPose.getX() - target.getX()), Math.abs(currentPose.getY() - target.getY())).rotateBy(new Rotation2d(targetPose.getRotation().getRadians()));
 
 //Math.abs(currentPose.getY() - target.getY()) >=   DriveToPoseTele.driveTolerance ||
 if (( Math.abs(PositionErrorRobotRel.getY()) >=   DriveToPoseTele.driveTolerance * 3 || Math.abs(thetaController.getPositionError()) >= thetaController.getPositionTolerance()*3) && currentDistance <= 0.9 ){
@@ -256,6 +258,12 @@ if (( Math.abs(PositionErrorRobotRel.getY()) >=   DriveToPoseTele.driveTolerance
     DogLog.log("Tele/DriveToReefV8/Status", "Executing");
     DogLog.log("Tele/DriveToReefV8/Check/DrivePIDAtGoal", driveController.atGoal());
     DogLog.log("Tele/DriveToReefV8/Check/ThetaPIDAtGoal", thetaController.atGoal());
+
+
+    DogLog.log("Tele/DriveToReefV8/Check/test23x", test23.getX());
+    DogLog.log("Tele/DriveToReefV8/Check/test23y", test23.getY());
+    DogLog.log("Tele/DriveToReefV8/Check/test32x", test32.getX());
+    DogLog.log("Tele/DriveToReefV8/Check/test32y", test32.getY());
     
 
 
