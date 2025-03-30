@@ -55,6 +55,7 @@ public class CmdT_DriveToReefPositionV8_Windsor extends Command {
   private double distanceFromTarget = 0.0;
   private double thetaFromTarget = 0.0;
   private int pos;
+  Pose2d targetAprilTagPose;
   
   public CmdT_DriveToReefPositionV8_Windsor(SwerveSubsystem DriveSubsystem, int position) {
     DriveSS = DriveSubsystem;
@@ -188,9 +189,15 @@ public class CmdT_DriveToReefPositionV8_Windsor extends Command {
     // if (Math.abs(currentPose.getY() - target.getY()) <=  DriveToPoseTele.driveTolerance)
     //    driveYVel = 0.0;
     Translation2d PositionErrorRobotRel = new Translation2d(driveController.getPositionError()*Math.cos(thetaController.getPositionError()),driveController.getPositionError()*Math.sin(thetaController.getPositionError()));
-    Translation2d test23  = new Translation2d(Math.abs(currentPose.getX() - target.getX()), Math.abs(currentPose.getY() - target.getY())).rotateBy(new Rotation2d(-1*targetPose.getRotation().getRadians()));
-    Translation2d test32  = new Translation2d(Math.abs(currentPose.getX() - target.getX()), Math.abs(currentPose.getY() - target.getY())).rotateBy(new Rotation2d(targetPose.getRotation().getRadians()));
+    Pose2d test;
+      test = targetAprilTagPose.rotateAround(targetAprilTagPose.getTranslation(), targetAprilTagPose.getRotation());
+// target.getTranslation()
+// .minus(currentPose.getTranslation())
+// .getAngle()
+// .unaryMinus()
 
+    Translation2d test23  = new Translation2d(Math.abs(currentPose.getX()- target.getX()), Math.abs(currentPose.getY() - target.getY())).rotateBy(target.getRotation().unaryMinus());
+    Translation2d test32  = new Translation2d(Math.abs(currentPose.getX() - target.getX()), Math.abs(currentPose.getY() - target.getY())).rotateBy(new Rotation2d(-1*test.getRotation().getRadians()));
 //Math.abs(currentPose.getY() - target.getY()) >=   DriveToPoseTele.driveTolerance ||
 if (( Math.abs(PositionErrorRobotRel.getY()) >=   DriveToPoseTele.driveTolerance * 3 || Math.abs(thetaController.getPositionError()) >= thetaController.getPositionTolerance()*3) && currentDistance <= 0.9 ){
   DriveSS.DH_Out_DriveToPose = true;
@@ -306,7 +313,7 @@ if (( Math.abs(PositionErrorRobotRel.getY()) >=   DriveToPoseTele.driveTolerance
       offset = new Transform2d(distanceFromFace, -branchoffset, new Rotation2d(Units.degreesToRadians(180)));
 
     }
-    Pose2d targetAprilTagPose = DriveSS.GetClosestReefSegment();
+    targetAprilTagPose = DriveSS.GetClosestReefSegment();
     target = targetAprilTagPose.plus(offset);
     // target = target.rotateAround(target.getTranslation(), new Rotation2d(Units.degreesToRadians(180)));
     return target;

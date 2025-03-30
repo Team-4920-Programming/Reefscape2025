@@ -111,6 +111,7 @@ public class CmdA_DriveToReefPositionV8_Windsor extends Command {
     Pose2d currentPose = DriveSS.getPose();
     Pose2d targetPose = target;
 
+    
     targetPose = GetTargetPose(DriveSS.GetClosestReefSegment());
     target = targetPose;
 
