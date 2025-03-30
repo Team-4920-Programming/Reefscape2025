@@ -392,6 +392,10 @@ private final ArmFeedforward wristFF = new ArmFeedforward(PIDs.CoralElevator.Tes
     
   }
 
+  public double GetWristGoal(){
+    return WristGoal;
+  }
+
   public boolean IsElevatorAtSetpoint(double target){
     // boolean b1 = Math.abs(getFilteredElevatorHeight() - target) <= ElevatorPID.getErrorTolerance();
     // boolean b2 = ElevatorPID.getSetpoint() > getFilteredElevatorHeight() && getUpStop();

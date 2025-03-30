@@ -195,6 +195,16 @@ public class CmdA_DriveToReefPositionV8_Windsor extends Command {
   Translation2d PositionErrorRobotRel = new Translation2d(driveController.getPositionError()*Math.cos(thetaController.getPositionError()),driveController.getPositionError()*Math.sin(thetaController.getPositionError()));
   Translation2d test23  = new Translation2d(Math.abs(currentPose.getX() - target.getX()), Math.abs(currentPose.getY() - target.getY())).rotateBy(new Rotation2d(-1*DriveSS.getPose().getRotation().getRadians()));
 
+    if (targetPose.getRotation().getDegrees() == -60 || targetPose.getRotation().getDegrees() == 120){
+      DogLog.log("Auto/DriveToReefV8/Check/test23x", test23.getY());
+      DogLog.log("Auto/DriveToReefV8/Check/test23y", test23.getX());    
+    }
+    else{
+      DogLog.log("Auto/DriveToReefV8/Check/test23x", test23.getX());
+      DogLog.log("Auto/DriveToReefV8/Check/test23y", test23.getY());
+    
+    }
+
   //Math.abs(currentPose.getY() - target.getY()) >=   DriveToPoseAuto.driveTolerance ||
 if (( Math.abs(PositionErrorRobotRel.getY()) >=   DriveToPoseAuto.driveTolerance * 3 || Math.abs(thetaController.getPositionError()) >= thetaController.getPositionTolerance()*3) && currentDistance <= 0.9 ){
   DriveSS.DH_Out_DriveToPose = true;

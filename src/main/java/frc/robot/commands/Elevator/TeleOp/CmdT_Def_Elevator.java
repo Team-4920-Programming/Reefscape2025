@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants.RobotPositions.CoralStation;
 import frc.robot.Constants.RobotPositions.JustScored;
 import frc.robot.Constants.RobotPositions.Level4;
+import frc.robot.Constants.RobotPositions.Level4TransportUp;
 import frc.robot.Constants.RobotPositions.TransportCoralDown;
 import frc.robot.Constants.RobotPositions.TransportCoralUp;
 import frc.robot.subsystems.CoralElevator.CoralElevatorSubsystem;
@@ -58,9 +59,14 @@ public class CmdT_Def_Elevator extends Command {
         }
         if (HasCoral && !InRedZone){
           if (!pablo){
-            if (Coral_SS.GetWristAngleWorldCoordinates() <= 95){
+            if (Coral_SS.GetWristGoal() <= 95){
               DogLog.log("Tele/DefaultElevatorCmd/State",2);
-            Coral_SS.setArmPosition(TransportCoralUp.height, TransportCoralUp.elbow, TransportCoralUp.wrist);
+              if (Coral_SS.GetScoreSelection() == 4){
+                Coral_SS.setArmPosition(Level4TransportUp.height, Level4TransportUp.elbow, Level4TransportUp.wrist);
+              }
+              else{
+                Coral_SS.setArmPosition(TransportCoralUp.height, TransportCoralUp.elbow, TransportCoralUp.wrist);
+              }
             }
             else{
               DogLog.log("Tele/DefaultElevatorCmd/State",3);

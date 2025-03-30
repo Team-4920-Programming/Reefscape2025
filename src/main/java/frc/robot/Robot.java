@@ -82,7 +82,9 @@ public class Robot extends TimedRobot
   @Override
   public void disabledInit()
   {
-    m_robotContainer.DisableLimelight();
+    if (!DriverStation.isTest()){
+      m_robotContainer.DisableLimelight();
+    }
 
     m_robotContainer.ResetSetup();
 

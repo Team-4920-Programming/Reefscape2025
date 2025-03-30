@@ -373,6 +373,11 @@ public final class Constants
       public static final double elbow = 10;
       public static final double height = Level4.height;
     }
+    public static class Level4TransportUp{
+      public static final double wrist = 85;
+      public static final double elbow = 180;
+      public static final double height = CoralStation.height;
+    }
     public static class TransportCoralDown{
       public static final double wrist = 85;
       public static final double elbow = 10;
