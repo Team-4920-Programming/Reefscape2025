@@ -58,12 +58,12 @@ public class ReefSurveySubsystem extends SubsystemBase {
 
     for (int i = 0; i < llresults.targets_Detector.length; i++){
         LimelightTarget_Detector a = llresults.targets_Detector[i];
-        // DogLog.log("i = ", i);
-        // DogLog.log(a.className +" " + i + " classid", a.classID);
-        // DogLog.log(a.className +" " + i + " tx", a.tx);
-        // DogLog.log(a.className +" " + i + " ty", a.ty);
-        // DogLog.log(a.className +" " + i + " ta", a.ta);
-        // DogLog.log(a.className +" " + i + " confidence", a.confidence);
+         DogLog.log("reefSurvey/i = ", i);
+         DogLog.log("reefsurvey/" + a.className +" " + i + " classid", a.classID);
+         DogLog.log("reefsurvey/"+a.className +" " + i + " tx", a.tx);
+         DogLog.log("reefsurvey/"+a.className +" " + i + " ty", a.ty);
+         DogLog.log("reefsurvey/"+a.className +" " + i + " ta", a.ta);
+         DogLog.log("reefsurvey/"+a.className +" " + i + " confidence", a.confidence);
     }
     String reefdata = "000000000000000000000000000000000000"; //36 positions
         //Eric uses segment 1 to 6, and postion 1 to 12 in that segement (L2 Left to L4 Right).
