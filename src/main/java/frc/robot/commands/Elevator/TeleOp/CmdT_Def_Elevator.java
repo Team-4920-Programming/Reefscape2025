@@ -61,11 +61,25 @@ public class CmdT_Def_Elevator extends Command {
           if (!pablo){
             if (Coral_SS.GetWristGoal() <= 95){
               DogLog.log("Tele/DefaultElevatorCmd/State",2);
-              if (Coral_SS.GetScoreSelection() == 4){
-                Coral_SS.setArmPosition(Level4TransportUp.height, Level4TransportUp.elbow, Level4TransportUp.wrist);
-              }
-              else{
-                Coral_SS.setArmPosition(TransportCoralUp.height, TransportCoralUp.elbow, TransportCoralUp.wrist);
+              switch(Coral_SS.GetScoreSelection()){
+                case(0):
+                  Coral_SS.setArmPosition(Level4TransportUp.height, Level4TransportUp.elbow, Level4TransportUp.wrist);
+                  break;
+                case(1):
+                  Coral_SS.setArmPosition(TransportCoralDown.height, TransportCoralDown.elbow, TransportCoralDown.wrist);
+                  break;
+                case(2):
+                  Coral_SS.setArmPosition(TransportCoralDown.height, TransportCoralDown.elbow, TransportCoralDown.wrist);
+                  break;
+                case(3):
+                  Coral_SS.setArmPosition(TransportCoralUp.height, TransportCoralUp.elbow, TransportCoralUp.wrist);
+                  break;
+                case(4):
+                  Coral_SS.setArmPosition(Level4TransportUp.height, Level4TransportUp.elbow, Level4TransportUp.wrist);
+                  break;
+                default:
+                  Coral_SS.setArmPosition(Level4TransportUp.height, Level4TransportUp.elbow, Level4TransportUp.wrist);
+                  break;
               }
             }
             else{

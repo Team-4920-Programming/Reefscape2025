@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.robot.commands.swervedrive.TeleOp;
+package frc.robot.commands.swervedrive.auto;
 
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
@@ -31,13 +31,14 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants;
 import frc.robot.Constants.PIDs;
 import frc.robot.Constants.PIDs.CoralElevator.DriveToPoseTele;
+import frc.robot.Constants.RobotAutomationInformation.AutoAlignCoralFeederStation;
 import frc.robot.Constants.RobotAutomationInformation.AutoAlignReef;
 import frc.robot.subsystems.DataHighway.DataHighwaySubsystem;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
-public class CmdT_DriveToReefPositionV8_Windsor extends Command {
+public class CmdA_DriveToFeederPositionV3_Prov extends Command {
 
   private final SwerveSubsystem DriveSS;
   private Pose2d target;
@@ -54,12 +55,10 @@ public class CmdT_DriveToReefPositionV8_Windsor extends Command {
   private double lastTime = 0.0;
   private double distanceFromTarget = 0.0;
   private double thetaFromTarget = 0.0;
-  private int pos;
   Pose2d targetAprilTagPose;
   
-  public CmdT_DriveToReefPositionV8_Windsor(SwerveSubsystem DriveSubsystem, int position) {
+  public CmdA_DriveToFeederPositionV3_Prov(SwerveSubsystem DriveSubsystem) {
     DriveSS = DriveSubsystem;
-    pos = position;
   }
 
   // Called when the command is initially scheduled.
@@ -68,7 +67,7 @@ public class CmdT_DriveToReefPositionV8_Windsor extends Command {
     thetaController.enableContinuousInput(-Math.PI, Math.PI);
     
 
-    target = GetTargetPose(DriveSS.GetClosestReefSegment());
+    target = GetTargetPose(DriveSS.GetClosestPickupSlot());
     Pose2d currentPose = DriveSS.getPose();
     ChassisSpeeds fieldVelocity = DriveSS.getFieldVelocity();
     Translation2d linearFieldVelocity =
@@ -91,8 +90,8 @@ public class CmdT_DriveToReefPositionV8_Windsor extends Command {
     lastSetpointTranslation = currentPose.getTranslation();
     lastSetpointRotation = target.getRotation();
     lastTime = Timer.getTimestamp();
-    thetaController.setTolerance(DriveToPoseTele.thetaTolerance);
-    driveController.setTolerance(DriveToPoseTele.driveTolerance);
+    thetaController.setTolerance(Units.degreesToRadians(5));
+    driveController.setTolerance(0.05);
 
     DogLog.log("Tele/DriveToReefV8/Init/currentPose", currentPose);
     DogLog.log("Tele/DriveToReefV8/Init/targetPose", target);
@@ -241,20 +240,20 @@ public class CmdT_DriveToReefPositionV8_Windsor extends Command {
   }
   if (driveXVel < 0.0){
     DogLog.log("Auto/DriveToReefV8/Check/B", -1);
-    driveXVel = Math.min(driveXVel, -0.2);
+    driveXVel = Math.min(driveXVel, -0.15);
   }
   if (driveXVel > 0.0){
     DogLog.log("Auto/DriveToReefV8/Check/B", 1);
-    driveXVel = Math.max(driveXVel, 0.2);
+    driveXVel = Math.max(driveXVel, 0.15);
   }
 
   if (driveYVel < 0.0){
     DogLog.log("Auto/DriveToReefV8/Check/C", -1);
-    driveYVel = Math.min(driveYVel, -0.2);
+    driveYVel = Math.min(driveYVel, -0.15);
   }
   if (driveYVel > 0.0){
     DogLog.log("Auto/DriveToReefV8/Check/C", 1);
-    driveYVel = Math.max(driveYVel, 0.2);
+    driveYVel = Math.max(driveYVel, 0.15);
   }
 
 
@@ -300,17 +299,11 @@ public class CmdT_DriveToReefPositionV8_Windsor extends Command {
   }
 
   public Pose2d GetTargetPose(Pose2d targetPose){
-    double branchoffset = AutoAlignReef.branchOffset;
-    double distanceFromFace = AutoAlignReef.distanceFromFace;
-    Transform2d offset;
-    if (pos == 2){
-      offset = new Transform2d(distanceFromFace, branchoffset, new Rotation2d(Units.degreesToRadians(180)));
-    }
-      else{
-      offset = new Transform2d(distanceFromFace, -branchoffset, new Rotation2d(Units.degreesToRadians(180)));
 
-    }
-    targetAprilTagPose = DriveSS.GetClosestReefSegment();
+    double distanceFromFace = AutoAlignCoralFeederStation.distanceFromFace;
+    Transform2d offset;
+    offset = new Transform2d(distanceFromFace, 0, new Rotation2d(Units.degreesToRadians(0)));
+    targetAprilTagPose = DriveSS.GetClosestPickupSlot();
     target = targetAprilTagPose.plus(offset);
     // target = target.rotateAround(target.getTranslation(), new Rotation2d(Units.degreesToRadians(180)));
     return target;

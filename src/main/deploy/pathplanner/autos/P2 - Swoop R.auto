@@ -1,0 +1,113 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "P2 - Swoop Middle R - 1"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "CmdA_Level4"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "CmdA_DRTest2"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "CmdA_CoralOutTake"
+          }
+        },
+        {
+          "type": "deadline",
+          "data": {
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "CmdA_CoralIntake"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "CmdA_Station"
+                }
+              },
+              {
+                "type": "sequential",
+                "data": {
+                  "commands": [
+                    {
+                      "type": "path",
+                      "data": {
+                        "pathName": "P2 - Swoop Middle R - 2"
+                      }
+                    },
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "CmdA_DriveToFeederRelative"
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "P2 - Swoop Middle R - 3"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "CmdA_Level4"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "CmdA_DLTest2"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "CmdA_CoralOutTake"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": null,
+  "choreoAuto": false
+}

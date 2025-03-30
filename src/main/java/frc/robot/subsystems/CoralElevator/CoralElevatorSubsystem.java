@@ -711,7 +711,7 @@ private final ArmFeedforward wristFF = new ArmFeedforward(PIDs.CoralElevator.Tes
   {
     double curElbowPos = GetElbowAngle();
     // double curElbowTol = ElbowPID.getErrorTolerance();
-    double curElbowTol = m_elbowcontroller.getPositionError();
+    double curElbowTol = m_elbowcontroller.getPositionTolerance();
 
     boolean atGoal =  (Math.abs(curElbowPos - ElbowGoal) <= curElbowTol);
     if (atGoal)
@@ -877,6 +877,7 @@ private final ArmFeedforward wristFF = new ArmFeedforward(PIDs.CoralElevator.Tes
         DogLog.log("CoralElevatorSS/Debug/ElevatorState", 3);
         m_wristcontroller.setGoal(new State(WristGoal, 0));
         m_elbowcontroller.setGoal(new State(ElbowGoal, 0));
+        m_controller.setGoal(new State(ElevatorGoal, 0));
         MoveElevator = true;
       }
       else
@@ -888,6 +889,7 @@ private final ArmFeedforward wristFF = new ArmFeedforward(PIDs.CoralElevator.Tes
         m_elbowcontroller.setGoal(new State(SafePosition.elbow, 0));
         MoveElevator = false;
         if (GetWristAngleWorldCoordinates() <= SafePosition.wrist + (m_wristcontroller.getPositionTolerance() * 2) && GetElbowAngle() >= SafePosition.elbow - (m_elbowcontroller.getPositionTolerance() * 2) && GetElbowAngle() <= 185){
+          m_controller.setGoal(new State(ElevatorGoal, 0));
           MoveElevator = true;
           DogLog.log("CoralElevatorSS/Debug/ElevatorState", 4.1);
         }
