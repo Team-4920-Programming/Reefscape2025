@@ -215,7 +215,7 @@ public final class Constants
         public static final double thetakP = 4.0;
         public static final double thetakD = 0.0;
         public static final double driveMaxVelocity = 4.0;
-        public static final double driveMaxAcceleration = 2.0;
+        public static final double driveMaxAcceleration = 2.6;
         public static final double thetaMaxVelocity = Units.degreesToRadians(360);
         public static final double thetaMaxAcceleration = Units.degreesToRadians(360);
         public static final double driveTolerance = 0.02;

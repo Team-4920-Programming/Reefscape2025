@@ -5,12 +5,6 @@
     "data": {
       "commands": [
         {
-          "type": "named",
-          "data": {
-            "name": "CmdA_Level4Transport"
-          }
-        },
-        {
           "type": "parallel",
           "data": {
             "commands": [
@@ -21,9 +15,22 @@
                 }
               },
               {
-                "type": "named",
+                "type": "sequential",
                 "data": {
-                  "name": "CmdA_Level4"
+                  "commands": [
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "CmdA_Level4Transport"
+                      }
+                    },
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "CmdA_Level4"
+                      }
+                    }
+                  ]
                 }
               },
               {

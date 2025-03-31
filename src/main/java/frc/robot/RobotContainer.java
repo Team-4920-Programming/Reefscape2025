@@ -64,6 +64,7 @@ import frc.robot.commands.swervedrive.auto.CmdA_DriveToReefPositionV5_WinningWin
 import frc.robot.commands.swervedrive.auto.CmdA_DriveToReefPositionV6_ActuallyWinningWindsor;
 import frc.robot.commands.swervedrive.auto.CmdA_DriveToReefPositionV7_Test;
 import frc.robot.commands.swervedrive.auto.CmdA_DriveToReefPositionV8_Windsor;
+import frc.robot.commands.swervedrive.auto.CmdA_DriveToReefPositionV9_PreProvincials;
 import frc.robot.commands.swervedrive.TeleOp.*;
 import swervelib.SwerveDriveTest;
 import frc.robot.commands.Climber.Auto.CmdA_BridgeOut;
@@ -189,8 +190,8 @@ public class RobotContainer
     NamedCommands.registerCommand("CmdA_DriveToReefPositionRTest", new CmdA_DriveToReefPositionV6_ActuallyWinningWindsor(drivebase, 2));
     NamedCommands.registerCommand("CmdA_DriveToReefPositionLTest", new CmdA_DriveToReefPositionV6_ActuallyWinningWindsor(drivebase, 1));
     NamedCommands.registerCommand("CmdA_BackupFromReef", new CmdA_DriveToPoseRelativeBackAwayFromReef(drivebase, 3.0, -12.0, 0, 0));
-    NamedCommands.registerCommand("CmdA_DRTest2", new CmdA_DriveToReefPositionV8_Windsor(drivebase, 2));
-    NamedCommands.registerCommand("CmdA_DLTest2", new CmdA_DriveToReefPositionV8_Windsor(drivebase, 1));
+    NamedCommands.registerCommand("CmdA_DRTest2", new CmdA_DriveToReefPositionV9_PreProvincials(drivebase, 2));
+    NamedCommands.registerCommand("CmdA_DLTest2", new CmdA_DriveToReefPositionV9_PreProvincials(drivebase, 1));
 
 
     DogLog.setOptions(new DogLogOptions().withNtPublish(true));
@@ -344,7 +345,7 @@ public class RobotContainer
   driverXbox.y().whileTrue(new CmdT_CoralOutTake(CoralElevatorSS ));
 
   driverXbox.a().whileTrue(new CmdA_DriveToFeederPositionV3_Prov(drivebase));
-  // driverXbox.b().whileTrue(new CmdA_DriveToReefPositionV8_Windsor(drivebase,2));
+  driverXbox.b().whileTrue(new CmdA_DriveToReefPositionV9_PreProvincials(drivebase,2));
 
   // Button 1: Abort climb
   OperatorJoystick.button(1 ).whileTrue(new CmdT_ClimberIn(ClimberSS, CoralElevatorSS));

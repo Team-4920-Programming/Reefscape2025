@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.commands.Elevator.TeleOp.*;
 import frc.robot.commands.ReefSurvey.Reef_MarkOurs;
+import frc.robot.commands.swervedrive.TeleOp.CmdTDriveToReefPositionV9_PreProvincials;
 import frc.robot.commands.swervedrive.TeleOp.CmdT_DriveToPoseRelativeBackAwayFromReef;
 import frc.robot.commands.swervedrive.TeleOp.CmdT_DriveToReefPosition;
 import frc.robot.commands.swervedrive.TeleOp.CmdT_DriveToReefPositionV2;
@@ -40,7 +41,7 @@ public class Cmd_SeqScoreLeft extends SequentialCommandGroup {
       new CmdT_StopDrive(Drive_SS),
       new ParallelCommandGroup(
       new CmdT_MoveToLevel(Coral_SS, true),
-      new CmdT_DriveToReefPositionV8_Windsor(Drive_SS, 1)).andThen(new CmdT_CheckSetpoints(Coral_SS)),
+      new CmdTDriveToReefPositionV9_PreProvincials(Drive_SS, 1)).andThen(new CmdT_CheckSetpoints(Coral_SS)),
       new CmdT_CoralOutTake(Coral_SS),
       new Reef_MarkOurs(Reef_SS, 0),
       new CmdT_DriveToReefPosition(Drive_SS, 4),
