@@ -188,11 +188,11 @@ public class CmdA_DriveToReefPositionV9_PreProvincials extends Command {
     }
     if (driveXVel < 0.0){
       DogLog.log("Auto/DriveToReefV9/Check/B", -1);
-      driveXVel = Math.min(driveXVel, -0.15);
+      driveXVel = Math.min(driveXVel, -0.5);
     }
     if (driveXVel > 0.0){
       DogLog.log("Auto/DriveToReefV9/Check/B", 1);
-      driveXVel = Math.max(driveXVel, 0.15);
+      driveXVel = Math.max(driveXVel, 0.5);
     }
 
     if (driveYVel < 0.0){
