@@ -301,6 +301,9 @@ public class DataHighwaySubsystem extends SubsystemBase {
   private void setSurveyData(){
     Survey_SS.DH_In_ScoreSelection = scoreSelection;
     Survey_SS.DH_In_ReefSegment = ReefSegment;
+    Survey_SS.DH_In_DistancefromFeef = ReefDistance;
+    Survey_SS.DH_In_RobotPose = CurrentPose;
+    Survey_SS.DH_In_isAutoAlign = isAutoAimEnabled;
   }
   public Pose2d getClosestReefSegment(){
     return ClosestReefSegment;
