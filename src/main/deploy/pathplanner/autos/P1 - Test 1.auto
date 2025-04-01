@@ -15,22 +15,9 @@
                 }
               },
               {
-                "type": "sequential",
+                "type": "named",
                 "data": {
-                  "commands": [
-                    {
-                      "type": "named",
-                      "data": {
-                        "name": "CmdA_Level4Transport"
-                      }
-                    },
-                    {
-                      "type": "named",
-                      "data": {
-                        "name": "CmdA_Level4"
-                      }
-                    }
-                  ]
+                  "name": "CmdA_Level4"
                 }
               },
               {
@@ -40,6 +27,12 @@
                 }
               }
             ]
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "CmdA_CheckSetpoints"
           }
         },
         {
@@ -90,19 +83,18 @@
                 }
               },
               {
-                "type": "sequential",
+                "type": "named",
                 "data": {
-                  "commands": [
-                    {
-                      "type": "named",
-                      "data": {
-                        "name": "CmdA_Level4"
-                      }
-                    }
-                  ]
+                  "name": "CmdA_Level4"
                 }
               }
             ]
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "CmdA_CheckSetpoints"
           }
         },
         {
@@ -147,19 +139,18 @@
                 }
               },
               {
-                "type": "sequential",
+                "type": "named",
                 "data": {
-                  "commands": [
-                    {
-                      "type": "named",
-                      "data": {
-                        "name": "CmdA_Level4"
-                      }
-                    }
-                  ]
+                  "name": "CmdA_Level4"
                 }
               }
             ]
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "CmdA_CheckSetpoints"
           }
         },
         {

@@ -552,7 +552,7 @@ private void ProcessVision4920()
         CintakeSimulation.stopIntake();
   }
   public boolean isRobotStopped(){
-    return Math.abs(getFieldVelocity().vxMetersPerSecond) <= 0.2 && Math.abs(getFieldVelocity().vyMetersPerSecond) <= 0.2 && Math.abs(getFieldVelocity().omegaRadiansPerSecond) <= 0.1;
+    return Math.abs(getFieldVelocity().vxMetersPerSecond) <= 0.1 && Math.abs(getFieldVelocity().vyMetersPerSecond) <= 0.1 && Math.abs(getFieldVelocity().omegaRadiansPerSecond) <= 0.1;
   }
   public void getGamePieceFromCIntake(){
     CintakeSimulation.obtainGamePieceFromIntake();

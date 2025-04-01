@@ -48,7 +48,7 @@ public class CmdA_DriveToReefPositionV9_PreProvincials extends Command {
         DriveToPoseAuto.thetakP, 0.0, DriveToPoseAuto.thetakD, new TrapezoidProfile.Constraints(DriveToPoseAuto.thetaMaxVelocity, DriveToPoseAuto.thetaMaxAcceleration), Constants.LOOP_TIME);
   private final ProfiledPIDController xdriveController =
       new ProfiledPIDController(
-        5.0, 0.0, 0.0, new TrapezoidProfile.Constraints(DriveToPoseAuto.driveMaxVelocity, DriveToPoseAuto.driveMaxAcceleration), Constants.LOOP_TIME);
+        6.0, 0.0, 0.0, new TrapezoidProfile.Constraints(DriveToPoseAuto.driveMaxVelocity, DriveToPoseAuto.driveMaxAcceleration), Constants.LOOP_TIME);
 
   private final ProfiledPIDController ydriveController =
       new ProfiledPIDController(
@@ -180,28 +180,28 @@ public class CmdA_DriveToReefPositionV9_PreProvincials extends Command {
   
     if (thetaVelocity < 0.0){
       DogLog.log("Auto/DriveToReefV9/Check/A", -1);
-      thetaVelocity = Math.min(thetaVelocity, -0.15);
+      thetaVelocity = Math.min(thetaVelocity, -0.25);
     }
     if (thetaVelocity > 0.0){
       DogLog.log("Auto/DriveToReefV9/Check/A", 1);
-      thetaVelocity = Math.max(thetaVelocity, 0.15);
+      thetaVelocity = Math.max(thetaVelocity, 0.25);
     }
     if (driveXVel < 0.0){
       DogLog.log("Auto/DriveToReefV9/Check/B", -1);
-      driveXVel = Math.min(driveXVel, -0.5);
+      driveXVel = Math.min(driveXVel, -0.25);
     }
     if (driveXVel > 0.0){
       DogLog.log("Auto/DriveToReefV9/Check/B", 1);
-      driveXVel = Math.max(driveXVel, 0.5);
+      driveXVel = Math.max(driveXVel, 0.25);
     }
 
     if (driveYVel < 0.0){
       DogLog.log("Auto/DriveToReefV9/Check/C", -1);
-      driveYVel = Math.min(driveYVel, -0.15);
+      driveYVel = Math.min(driveYVel, -0.25);
     }
     if (driveYVel > 0.0){
       DogLog.log("Auto/DriveToReefV9/Check/C", 1);
-      driveYVel = Math.max(driveYVel, 0.15);
+      driveYVel = Math.max(driveYVel, 0.25);  
     }
 
     DogLog.log("Auto/DriveToReefV9/Exec/FieldRelDistanceFromTargetX", Math.abs(currentPose.getX() - target.getX()));
@@ -233,7 +233,7 @@ public class CmdA_DriveToReefPositionV9_PreProvincials extends Command {
   }
 
   public boolean atGoal() {
-    return  xdriveController.atSetpoint() && ydriveController.atSetpoint() && thetaController.atGoal();
+    return  xdriveController.atSetpoint() && ydriveController.atSetpoint() && thetaController.atGoal() && DriveSS.isRobotStopped();
   }
 
   // Returns true when the command should end.

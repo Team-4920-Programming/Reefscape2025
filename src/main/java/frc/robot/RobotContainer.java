@@ -44,6 +44,7 @@ import frc.robot.subsystems.ReefSurvey.ReefSurveySubsystem;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 import java.io.File;
 
+import frc.robot.commands.Elevator.Auto.CmdA_CheckSetpoints;
 import frc.robot.commands.Elevator.Auto.CmdA_CoralIntake;
 import frc.robot.commands.Elevator.Auto.CmdA_CoralOutTake;
 import frc.robot.commands.Elevator.Auto.CmdA_Level4;
@@ -192,6 +193,7 @@ public class RobotContainer
     NamedCommands.registerCommand("CmdA_BackupFromReef", new CmdA_DriveToPoseRelativeBackAwayFromReef(drivebase, 3.0, -12.0, 0, 0));
     NamedCommands.registerCommand("CmdA_DRTest2", new CmdA_DriveToReefPositionV9_PreProvincials(drivebase, 2));
     NamedCommands.registerCommand("CmdA_DLTest2", new CmdA_DriveToReefPositionV9_PreProvincials(drivebase, 1));
+    NamedCommands.registerCommand("CmdA_CheckSetpoints", new CmdA_CheckSetpoints(CoralElevatorSS));
 
 
     DogLog.setOptions(new DogLogOptions().withNtPublish(true));

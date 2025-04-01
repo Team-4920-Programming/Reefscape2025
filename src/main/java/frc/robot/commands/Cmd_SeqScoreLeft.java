@@ -9,7 +9,6 @@ import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.commands.Elevator.TeleOp.*;
 import frc.robot.commands.ReefSurvey.Reef_MarkOurs;
-import frc.robot.commands.swervedrive.TeleOp.CmdTDriveToReefPositionV9_PreProvincials;
 import frc.robot.commands.swervedrive.TeleOp.CmdT_DriveToPoseRelativeBackAwayFromReef;
 import frc.robot.commands.swervedrive.TeleOp.CmdT_DriveToReefPosition;
 import frc.robot.commands.swervedrive.TeleOp.CmdT_DriveToReefPositionV2;
@@ -21,6 +20,7 @@ import frc.robot.commands.swervedrive.auto.CmdA_DriveToReefPositionV3_Relative;
 import frc.robot.commands.swervedrive.auto.CmdA_DriveToReefPositionV4_Test;
 import frc.robot.commands.swervedrive.auto.CmdA_DriveToReefPositionV6_ActuallyWinningWindsor;
 import frc.robot.commands.swervedrive.auto.CmdA_DriveToReefPositionV7_Test;
+import frc.robot.commands.swervedrive.auto.CmdA_DriveToReefPositionV9_PreProvincials;
 import frc.robot.subsystems.CoralElevator.CoralElevatorSubsystem;
 import frc.robot.subsystems.DataHighway.DataHighwaySubsystem;
 import frc.robot.subsystems.ReefSurvey.ReefSurveySubsystem;
@@ -41,7 +41,7 @@ public class Cmd_SeqScoreLeft extends SequentialCommandGroup {
       new CmdT_StopDrive(Drive_SS),
       new ParallelCommandGroup(
       new CmdT_MoveToLevel(Coral_SS, true),
-      new CmdTDriveToReefPositionV9_PreProvincials(Drive_SS, 1)).andThen(new CmdT_CheckSetpoints(Coral_SS)),
+      new CmdA_DriveToReefPositionV9_PreProvincials(Drive_SS, 1)).andThen(new CmdT_CheckSetpoints(Coral_SS)),
       new CmdT_CoralOutTake(Coral_SS),
       new Reef_MarkOurs(Reef_SS, 0),
       new CmdT_DriveToReefPosition(Drive_SS, 4),
