@@ -70,6 +70,7 @@ public class DataHighwaySubsystem extends SubsystemBase {
   private Pose2d ClosestReefSegment = new Pose2d();
   private Pose2d ClosestPickupSlot = new Pose2d();
   private boolean isMatchSetupCompleted = false;
+  private Integer ScoringPosition = 0;
   List<Pose2d> reefPoses = new ArrayList();
   List<Pose2d> feederStationPoses = new ArrayList<>();
   public DataHighwaySubsystem(SwerveSubsystem DriveSS, CoralElevatorSubsystem CoralSS, ReefSurveySubsystem SurveySS) {
@@ -300,11 +301,17 @@ public class DataHighwaySubsystem extends SubsystemBase {
        MechAtGoal = Coral_SS.DH_Out_MechAtGoal;
     }   
     scoreSelection = Coral_SS.DH_Out_ScoreSelection;
+    ScoringPosition = Coral_SS.getScoringPos();
   }
 
   private void setSurveyData(){
     Survey_SS.DH_In_ScoreSelection = scoreSelection;
     Survey_SS.DH_In_ReefSegment = ReefSegment;
+    Survey_SS.DH_In_DistanceFromReef = ReefDistance;
+    Survey_SS.DH_In_AutoAim = isAutoAimEnabled;
+    Survey_SS.DH_In_CurrentPose = CurrentPose;
+    Survey_SS.DH_In_ReefPose = ReefPose;
+    Survey_SS.DH_In_ScoringPos = ScoringPosition;
   }
   public Pose2d getClosestReefSegment(){
     return ClosestReefSegment;
@@ -322,6 +329,7 @@ public class DataHighwaySubsystem extends SubsystemBase {
     Coral_SS.DH_In_RedZone = inReefRedZone || inCoralStationRedZone || inCageRedZone;
     Coral_SS.DH_In_YellowZone = inReefYellowZone;
     Coral_SS.DH_In_RobotPose = CurrentPose;
+    
     if (Robot.isSimulation())
     {
       Coral_SS.DH_SimIn_HasCoral = hasCoral;

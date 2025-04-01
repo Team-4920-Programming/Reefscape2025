@@ -16,6 +16,8 @@ public class CmdT_IsScoring extends Command {
     // Use addRequirements() here to declare subsystem dependencies.
     css = CoralSS;
     isScoring = s;
+    if (!s)
+      css.setScoringPos(0);
   }
 
   // Called when the command is initially scheduled.

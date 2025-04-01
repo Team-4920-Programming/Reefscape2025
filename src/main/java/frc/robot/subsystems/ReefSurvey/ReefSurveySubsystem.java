@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import dev.doglog.DogLog;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.LimelightHelpers;
@@ -22,6 +23,11 @@ public class ReefSurveySubsystem extends SubsystemBase {
   private int scorethreshold = 1;
   public int DH_In_ReefSegment = 0;
   public int DH_In_ScoreSelection = 0;
+  public double DH_In_DistanceFromReef =0;
+  public Pose2d DH_In_CurrentPose = new Pose2d();
+  public Pose2d DH_In_ReefPose = new Pose2d();
+  public boolean DH_In_AutoAim = false;
+  public int DH_In_ScoringPos = 0;
   /** Creates a new ReefSurvey. */
   public ReefSurveySubsystem() {
 
@@ -53,17 +59,86 @@ public class ReefSurveySubsystem extends SubsystemBase {
     DogLog.log("Limelight target count", LimelightHelpers.getTargetCount("limelight"));
     LimelightResults llresults;
     llresults = LimelightHelpers.getLatestResults("limelight");
+    //Double DistanceFromReef = DH_In_ReefPose.getX()-DH_In_CurrentPose.getX();
+    Double DistanceFromReef = DH_In_ReefPose.minus(DH_In_CurrentPose).getTranslation().getNorm();
+    DogLog.log("reefsurvey/ReefPose", DH_In_ReefPose);
 
-    DogLog.log("Limelight target detector size", llresults.targets_Detector.length);
+    if (DistanceFromReef >1.5 && DistanceFromReef < 2.2)
+    {
+      if (DH_In_ScoringPos == 1)
+        {
+          //Scoring Left Branch
+          //Mark Right Branch
 
+        }
+    }
+    
+    DogLog.log("reefsurvey/Limelight target detector size", llresults.targets_Detector.length);
+    DogLog.log("reefsurvey/distancefromReef", DistanceFromReef);
+    DogLog.log("reefsurvey/ScoringPos", DH_In_ScoringPos);
+    DogLog.log("reefsurvey/RobotAngle",DH_In_CurrentPose.getRotation().getDegrees() );
     for (int i = 0; i < llresults.targets_Detector.length; i++){
         LimelightTarget_Detector a = llresults.targets_Detector[i];
-         DogLog.log("reefSurvey/i = ", i);
-         DogLog.log("reefsurvey/" + a.className +" " + i + " classid", a.classID);
-         DogLog.log("reefsurvey/"+a.className +" " + i + " tx", a.tx);
-         DogLog.log("reefsurvey/"+a.className +" " + i + " ty", a.ty);
-         DogLog.log("reefsurvey/"+a.className +" " + i + " ta", a.ta);
-         DogLog.log("reefsurvey/"+a.className +" " + i + " confidence", a.confidence);
+         DogLog.log("reefsurvey/i = ", i);
+         DogLog.log("reefsurvey/" + a.className +" " + i + "/classid", a.classID);
+         DogLog.log("reefsurvey/"+a.className +" " + i + "/tx", a.tx);
+         DogLog.log("reefsurvey/"+a.className +" " + i + "/ty", a.ty);
+         DogLog.log("reefsurvey/"+a.className +" " + i + "/ta", a.ta);
+         DogLog.log("reefsurvey/"+a.className +" " + i + "/confidence", a.confidence);
+    if (DistanceFromReef >1.5 && DistanceFromReef < 2.2)
+    {
+      if (DH_In_ScoringPos == 1)
+        {
+          System.out.println("Scoring Left Looking found a coral" +a.tx +a.ty);
+          //Scoring Left Branch
+          //Mark Right Branch
+          if (a.tx > -10 && a.tx < 5)
+            {
+              //Right Branch targets
+              if (a.ty >-10 && a.ty < 10)
+              { 
+                Integer pos = (DH_In_ReefSegment)*2+1;
+                ScoreReef(2, pos);
+                System.out.println("Scoring Reef Leve 2"+ pos );
+              }
+                if (a.ty <-10)
+                {
+                  Integer pos = (DH_In_ReefSegment)*2+1;
+                  ScoreReef(1, pos);
+                  System.out.println("Scoring Reef Leve 1"+ pos );
+                }
+            }
+                
+            } 
+        
+        if (DH_In_ScoringPos == 2)
+        {
+          //Scoring Right Branch
+          //Mark Right Branch
+          System.out.println("Scoring Right Looking found a coral" +a.tx +a.ty);
+          
+          if (a.tx > -10 && a.tx < 5)
+            {
+              //Right Branch targets
+              if (a.ty >-10 && a.ty < 10)
+              {
+                Integer seg = (DH_In_ReefSegment+1)*2;
+                if (seg>11) seg =0;
+                ScoreReef(2, seg);
+                System.out.println("Scoring Reef Leve 2"+ seg );
+              }
+               
+                if (a.ty <-10)
+                {
+                  Integer seg = (DH_In_ReefSegment+1)*2;
+                  if (seg>11) seg =0;
+                  ScoreReef(1, seg);
+                  System.out.println("Scoring Reef Leve 1"+ seg );
+                }
+                
+            } 
+        }
+    }     
     }
     String reefdata = "000000000000000000000000000000000000"; //36 positions
         //Eric uses segment 1 to 6, and postion 1 to 12 in that segement (L2 Left to L4 Right).

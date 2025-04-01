@@ -224,7 +224,7 @@ private final ArmFeedforward wristFF = new ArmFeedforward(PIDs.CoralElevator.Tes
   boolean PabloOverride = false;
   boolean justScored = false;
   boolean isScoring = false;
-
+  int ScoringPos = 0;
   //NEW PID VALUES
   double elevatorPIDOutputNew;
   double elevatorFFOutputNew;
@@ -687,7 +687,13 @@ private final ArmFeedforward wristFF = new ArmFeedforward(PIDs.CoralElevator.Tes
   public boolean getIsScoring(){
     return isScoring;
   }
-
+  public void setScoringPos(int b){
+    System.out.println("Scoring Postion" + b);
+    ScoringPos = b;
+  }
+  public int getScoringPos(){
+    return ScoringPos;
+  }
   public void setJustScored(boolean b){
     justScored = b;
   }

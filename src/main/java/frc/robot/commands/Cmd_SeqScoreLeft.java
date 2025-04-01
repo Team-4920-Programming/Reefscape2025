@@ -40,7 +40,7 @@ public class Cmd_SeqScoreLeft extends SequentialCommandGroup {
     addCommands(
       new CmdT_StopDrive(Drive_SS),
       new ParallelCommandGroup(
-      new CmdT_MoveToLevel(Coral_SS, true),
+      new CmdT_MoveToLevel(Coral_SS, true, 1),
       new CmdA_DriveToReefPositionV9_PreProvincials(Drive_SS, 1)).andThen(new CmdT_CheckSetpoints(Coral_SS)),
       new CmdT_CoralOutTake(Coral_SS),
       new Reef_MarkOurs(Reef_SS, 0),

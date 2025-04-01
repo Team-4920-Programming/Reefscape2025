@@ -25,10 +25,12 @@ public class CmdT_MoveToLevel extends Command {
   double TargetHeight = 0;
   double TargetElbowAng = 0;
   double TargetWristAng = 0;
-  public CmdT_MoveToLevel(CoralElevatorSubsystem CoralSS, boolean b) {
+  Integer spos =0;
+  public CmdT_MoveToLevel(CoralElevatorSubsystem CoralSS, boolean b, Integer scorepos) {
     // Use addRequirements() here to declare subsystem dependencies.
     Coral_SS  = CoralSS;
     toggleRedZoneOverride = b;
+    spos = scorepos;
     addRequirements(CoralSS);
   }
 
@@ -36,6 +38,9 @@ public class CmdT_MoveToLevel extends Command {
   @Override
   public void initialize() {
       Coral_SS.setIsScoring(true);
+      System.out.println("setting scorring position "+ spos);
+      Coral_SS.setScoringPos(spos);
+      
       DogLog.log("Tele/MoveToLevelCmd/CommandStatus", "initialized");
       DogLog.log("Tele/MoveToLevelCmd/Conditions/ScoreSelection", -1);
       Coral_SS.OverrideRedZone = toggleRedZoneOverride;

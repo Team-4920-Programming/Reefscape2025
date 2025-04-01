@@ -31,7 +31,7 @@ public class CmdT_CoralOutTake extends Command {
   @Override
   public void initialize() {
     DogLog.log("Tele/CoralOutTakeCmd/CommandStatus", "initialized");
-
+    CoralElevatorSS.setScoringPos(0);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
