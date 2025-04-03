@@ -21,7 +21,7 @@
                     {
                       "type": "wait",
                       "data": {
-                        "waitTime": 0.5
+                        "waitTime": 0.25
                       }
                     }
                   ]
@@ -43,9 +43,22 @@
           }
         },
         {
-          "type": "named",
+          "type": "parallel",
           "data": {
-            "name": "CmdA_CoralOutTake"
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "CmdA_CoralOutTake"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "Reef_MarkOursL"
+                }
+              }
+            ]
           }
         },
         {
@@ -96,7 +109,7 @@
                     {
                       "type": "wait",
                       "data": {
-                        "waitTime": 0.5
+                        "waitTime": 0.25
                       }
                     }
                   ]
@@ -112,9 +125,22 @@
           }
         },
         {
-          "type": "named",
+          "type": "parallel",
           "data": {
-            "name": "CmdA_CoralOutTake"
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "CmdA_CoralOutTake"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "Reef_MarkOursR"
+                }
+              }
+            ]
           }
         },
         {
@@ -159,7 +185,7 @@
                     {
                       "type": "wait",
                       "data": {
-                        "waitTime": 0.5
+                        "waitTime": 0.25
                       }
                     }
                   ]
@@ -175,9 +201,22 @@
           }
         },
         {
-          "type": "named",
+          "type": "parallel",
           "data": {
-            "name": "CmdA_CoralOutTake"
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "CmdA_CoralOutTake"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "Reef_MarkOursL"
+                }
+              }
+            ]
           }
         },
         {

@@ -53,6 +53,7 @@ import frc.robot.commands.Elevator.Auto.CmdA_SafePosition;
 import frc.robot.commands.Elevator.Auto.CmdA_Station;
 import frc.robot.commands.Elevator.TeleOp.*;
 import frc.robot.commands.ReefSurvey.AddToReefTest;
+import frc.robot.commands.ReefSurvey.Reef_MarkOurs;
 import frc.robot.commands.swervedrive.auto.CmdA_DriveToFeederPositionV3_Prov;
 import frc.robot.commands.swervedrive.auto.CmdA_DriveToFeederPosition_Relative;
 import frc.robot.commands.swervedrive.auto.CmdA_DriveToPoseRelativeBackAwayFromReef;
@@ -194,10 +195,13 @@ public class RobotContainer
     NamedCommands.registerCommand("CmdA_DRTest2", new CmdA_DriveToReefPositionV9_PreProvincials(drivebase, 2));
     NamedCommands.registerCommand("CmdA_DLTest2", new CmdA_DriveToReefPositionV9_PreProvincials(drivebase, 1));
     NamedCommands.registerCommand("CmdA_CheckSetpoints", new CmdA_CheckSetpoints(CoralElevatorSS));
+    NamedCommands.registerCommand("Reef_MarkOursL", new Reef_MarkOurs(ReefSurveySS, 0));
+    NamedCommands.registerCommand("Reef_MarkOursR", new Reef_MarkOurs(ReefSurveySS, 1));
 
 
-    DogLog.setOptions(new DogLogOptions().withNtPublish(true));
-    DogLog.setOptions(new DogLogOptions().withCaptureDs(true));
+    
+    DogLog.setOptions(new DogLogOptions().withNtPublish(true).withCaptureDs(true));
+    //DogLog.setOptions(new DogLogOptions().withCaptureDs(true));
 
     DogLog.setPdh(new PowerDistribution());
     DogLog.setEnabled(true);

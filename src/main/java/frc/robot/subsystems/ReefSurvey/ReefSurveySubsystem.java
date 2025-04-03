@@ -187,6 +187,7 @@ public class ReefSurveySubsystem extends SubsystemBase {
         ReefChar[35]= getReefDataScoredChar(3,11); // set 6 Level 4R
 
         String reefDataString = String.valueOf(ReefChar);
+String reefdatatest = "111100000000000000000000000000000000";
         SmartDashboard.putString("ReefString", reefDataString);
         DogLog.log("ReefString", reefDataString); //publish so Driverstation can read
        

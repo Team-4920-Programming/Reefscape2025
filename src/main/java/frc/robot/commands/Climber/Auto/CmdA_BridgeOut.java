@@ -24,12 +24,12 @@ public class CmdA_BridgeOut extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    Climber_SS.SetRightFlap(3.15);
+    Climber_SS.SetRightFlap(2.1);
   }
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {}
+  public void end(boolean interrupted) {} 
 
   // Returns true when the command should end.
   @Override

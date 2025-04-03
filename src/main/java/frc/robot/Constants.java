@@ -366,7 +366,7 @@ public final class Constants
     public static class CoralStation {
       public static final double wrist = 160; //degrees //-202
       public static final double elbow = 0; //degrees
-      public static final double height = 0.11; //meters
+      public static final double height = 0.12; //meters
     }
     public static class TransportCoralUp{
       public static final double wrist = 85;

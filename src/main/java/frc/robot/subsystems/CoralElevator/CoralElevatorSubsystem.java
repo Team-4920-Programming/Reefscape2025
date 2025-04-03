@@ -248,8 +248,8 @@ private final ArmFeedforward wristFF = new ArmFeedforward(PIDs.CoralElevator.Tes
 
 //Mike's new logic for Setpoints - March 22
   double ElevatorGoal = 0.0;
-  double WristGoal = SafePosition.wrist;
-  double ElbowGoal = 0;
+  double ElbowGoal = 0.0;
+  double WristGoal = 90.0;
   boolean SawElbowGoal = false;
   boolean SawWristGoal = false;
   boolean SawElevatorGoal = false;
@@ -335,13 +335,19 @@ private final ArmFeedforward wristFF = new ArmFeedforward(PIDs.CoralElevator.Tes
     WristPID.setTolerance(4);
     // if robot.issimulation was here
     // ElbowPID.setSetpoint(GetElbowAngle());
-    m_elbowcontroller.setGoal(new State(GetElbowAngle(), 0));
-    m_controller.setGoal(new State(Math.max(getFilteredElevatorHeight(),0.16), 0));
+    // m_elbowcontroller.setGoal(new State(GetElbowAngle(), 0));
+    m_elbowcontroller.setGoal(new State(ElbowGoal, 0));
+
+    // m_controller.setGoal(new State(Math.max(getFilteredElevatorHeight(),0.16), 0));
+    m_controller.setGoal(new State(ElevatorGoal, 0));
+
     ElevatorPID.setSetpoint(Math.max(getFilteredElevatorHeight(),0.16));
     CoralIntakeConfig.inverted(true);
     CoralIntakeMotor.configure(CoralIntakeConfig, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
     WristPID.setSetpoint(GetWristAngleWorldCoordinates());
     m_wristcontroller.setGoal(new State(GetWristAngleWorldCoordinates(), 0));
+    m_wristcontroller.setGoal(new State(WristGoal, 0));
+
     
     m_elbowcontroller.setTolerance(3);
     m_controller.setTolerance(0.015);
@@ -913,7 +919,7 @@ private final ArmFeedforward wristFF = new ArmFeedforward(PIDs.CoralElevator.Tes
         }
         // boolean WristCloseEnough = Math.abs(WristPID.getError()) < 3* WristPID.getErrorTolerance();
         // boolean ArmCloseEnought = (Math.abs(ElbowPID.getError()) < 4* ElbowPID.getErrorTolerance());
-       if (WristGoal <= SafePosition.wrist && WristGoal >= -60 && GetWristAngleWorldCoordinates() <= SafePosition.wrist && GetWristAngleWorldCoordinates() >= -60){
+       if (WristGoal <= SafePosition.wrist && WristGoal >= -60 && ((GetWristAngleWorldCoordinates() <= SafePosition.wrist && GetWristAngleWorldCoordinates() >= -60) || (GetElbowAngle() >= 15 && ElbowGoal >= 15))){
           m_wristcontroller.setGoal(new State(WristGoal, 0));
           DogLog.log("CoralElevatorSS/Debug/ElevatorState", 4.2);
         }
