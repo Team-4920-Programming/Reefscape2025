@@ -172,7 +172,7 @@ public final class Constants
       }
 
       public static class TestWrist{
-        public static final double kp = 0.06187;
+        public static final double kp = 0.08;//0.06187
         public static final double ki = 0.000;
         public static final double kd = 0.00059369;
 

@@ -296,7 +296,7 @@ private final ArmFeedforward wristFF = new ArmFeedforward(PIDs.CoralElevator.Tes
     elevatorConfig.voltageCompensation(12);
     ElevatorStageMotor.configure(elevatorConfig, SparkBase.ResetMode.kResetSafeParameters, SparkBase.PersistMode.kPersistParameters);
     
-    ElbowPID.setTolerance(3);
+    ElbowPID.setTolerance(4);
  
     elbowConfig.idleMode(IdleMode.kBrake);
     elbowConfig.inverted(false);
@@ -332,7 +332,7 @@ private final ArmFeedforward wristFF = new ArmFeedforward(PIDs.CoralElevator.Tes
     // 360/151.875 is conversion factor
 
 
-    WristPID.setTolerance(3);
+    WristPID.setTolerance(4);
     // if robot.issimulation was here
     // ElbowPID.setSetpoint(GetElbowAngle());
     m_elbowcontroller.setGoal(new State(GetElbowAngle(), 0));
@@ -913,13 +913,19 @@ private final ArmFeedforward wristFF = new ArmFeedforward(PIDs.CoralElevator.Tes
         }
         // boolean WristCloseEnough = Math.abs(WristPID.getError()) < 3* WristPID.getErrorTolerance();
         // boolean ArmCloseEnought = (Math.abs(ElbowPID.getError()) < 4* ElbowPID.getErrorTolerance());
-       if (WristGoal <= SafePosition.wrist && ElbowGoal >= SafePosition.elbow && ElbowGoal <= 195 && GetWristAngleWorldCoordinates() <= SafePosition.wrist + m_wristcontroller.getPositionTolerance() && GetElbowAngle() >= SafePosition.elbow - m_elbowcontroller.getPositionTolerance() && GetElbowAngle() <= 195){
+       if (WristGoal <= SafePosition.wrist && WristGoal >= -60 && GetWristAngleWorldCoordinates() <= SafePosition.wrist && GetWristAngleWorldCoordinates() >= -60){
           m_wristcontroller.setGoal(new State(WristGoal, 0));
-          m_elbowcontroller.setGoal(new State(ElbowGoal, 0));
           DogLog.log("CoralElevatorSS/Debug/ElevatorState", 4.2);
         }
         else{
           m_wristcontroller.setGoal(new State(SafePosition.wrist, 0));
+
+        }
+        if (ElbowGoal >= SafePosition.elbow && ElbowGoal <= 195 && GetElbowAngle() >= 5.5 && GetElbowAngle() <= 195){
+          m_elbowcontroller.setGoal(new State(ElbowGoal, 0));
+          DogLog.log("CoralElevatorSS/Debug/ElevatorState", 4.2);
+        }
+        else{
           m_elbowcontroller.setGoal(new State(SafePosition.elbow, 0));
         }
 
