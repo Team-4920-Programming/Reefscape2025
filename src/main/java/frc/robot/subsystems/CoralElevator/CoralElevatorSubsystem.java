@@ -249,7 +249,7 @@ private final ArmFeedforward wristFF = new ArmFeedforward(PIDs.CoralElevator.Tes
 //Mike's new logic for Setpoints - March 22
   double ElevatorGoal = 0.0;
   double WristGoal = SafePosition.wrist;
-  double ElbowGoal = SafePosition.elbow;
+  double ElbowGoal = 0;
   boolean SawElbowGoal = false;
   boolean SawWristGoal = false;
   boolean SawElevatorGoal = false;
