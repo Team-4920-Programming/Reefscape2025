@@ -9,22 +9,9 @@
           "data": {
             "commands": [
               {
-                "type": "sequential",
+                "type": "named",
                 "data": {
-                  "commands": [
-                    {
-                      "type": "named",
-                      "data": {
-                        "name": "CmdA_DLTest2"
-                      }
-                    },
-                    {
-                      "type": "wait",
-                      "data": {
-                        "waitTime": 0.25
-                      }
-                    }
-                  ]
+                  "name": "CmdA_DLTest2"
                 }
               },
               {
@@ -97,22 +84,9 @@
           "data": {
             "commands": [
               {
-                "type": "sequential",
+                "type": "named",
                 "data": {
-                  "commands": [
-                    {
-                      "type": "named",
-                      "data": {
-                        "name": "CmdA_DRTest2"
-                      }
-                    },
-                    {
-                      "type": "wait",
-                      "data": {
-                        "waitTime": 0.25
-                      }
-                    }
-                  ]
+                  "name": "CmdA_DRTest2"
                 }
               },
               {
@@ -173,22 +147,9 @@
           "data": {
             "commands": [
               {
-                "type": "sequential",
+                "type": "named",
                 "data": {
-                  "commands": [
-                    {
-                      "type": "named",
-                      "data": {
-                        "name": "CmdA_DLTest2"
-                      }
-                    },
-                    {
-                      "type": "wait",
-                      "data": {
-                        "waitTime": 0.25
-                      }
-                    }
-                  ]
+                  "name": "CmdA_DLTest2"
                 }
               },
               {

@@ -352,15 +352,8 @@ public class RobotContainer
   driverXbox.y().whileTrue(new CmdT_CoralOutTake(CoralElevatorSS ));
 
   driverXbox.a().whileTrue(new CmdA_DriveToFeederPositionV3_Prov(drivebase));
-  driverXbox.b().whileTrue(new CmdA_DriveToReefPositionV9_PreProvincials(drivebase,2));
+  // driverXbox.b().whileTrue(new CmdA_DriveToReefPositionV9_PreProvincials(drivebase,2));
 
-  if (CoralElevatorSS.DH_Out_HasCoral){
-    driverXbox.setRumble(RumbleType.kBothRumble, 1);
-  }
-  else{
-    driverXbox.setRumble(RumbleType.kBothRumble, 0);
-
-  }
 
   // Button 1: Abort climb
   OperatorJoystick.button(1 ).whileTrue(new CmdT_ClimberIn(ClimberSS, CoralElevatorSS));
@@ -385,9 +378,9 @@ public class RobotContainer
   OperatorJoystick.button(9).onTrue(new CmdT_TogglePabloOverride(CoralElevatorSS));
 
   // Button 11: High Algae
-  OperatorJoystick.button(12).whileTrue(new Cmd_SeqRemoveLowAlgea(CoralElevatorSS, drivebase));
+  OperatorJoystick.button(11).whileTrue(new Cmd_SeqRemoveLowAlgea(CoralElevatorSS, drivebase));
   // Button 12: High Algae
-  OperatorJoystick.button(11).whileTrue(new Cmd_SeqRemoveHighAlgea(CoralElevatorSS, drivebase));
+  OperatorJoystick.button(10).whileTrue(new Cmd_SeqRemoveHighAlgea(CoralElevatorSS, drivebase));
 
 
   ReefJoystick.button(1).whileTrue(new CmdT_LevelSelect(CoralElevatorSS, 1));

@@ -90,7 +90,7 @@ public class CmdA_DriveToFeederPositionV3_Prov extends Command {
     lastSetpointTranslation = currentPose.getTranslation();
     lastSetpointRotation = target.getRotation();
     lastTime = Timer.getTimestamp();
-    thetaController.setTolerance(Units.degreesToRadians(5));
+    thetaController.setTolerance(Units.degreesToRadians(2));
     driveController.setTolerance(0.05);
 
     DogLog.log("Tele/DriveToReefV8/Init/currentPose", currentPose);

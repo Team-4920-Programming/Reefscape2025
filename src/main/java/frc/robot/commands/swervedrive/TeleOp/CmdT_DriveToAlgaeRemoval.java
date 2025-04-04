@@ -52,7 +52,7 @@ public class CmdT_DriveToAlgaeRemoval extends Command {
    
     
 
-    Transform2d test = new Transform2d(Units.inchesToMeters(22.0),Units.inchesToMeters(14.5),new Rotation2d(0));
+    Transform2d test = new Transform2d(Units.inchesToMeters(20.0),Units.inchesToMeters(14.5),new Rotation2d(0));
 
       target = DriveSS.GetClosestReefSegment().plus(test);
     

@@ -9,22 +9,9 @@
           "data": {
             "commands": [
               {
-                "type": "parallel",
+                "type": "path",
                 "data": {
-                  "commands": [
-                    {
-                      "type": "path",
-                      "data": {
-                        "pathName": "P2 - Swoop Middle R - 1"
-                      }
-                    },
-                    {
-                      "type": "wait",
-                      "data": {
-                        "waitTime": 0.5
-                      }
-                    }
-                  ]
+                  "pathName": "P2 - Swoop Middle R - 1"
                 }
               },
               {
@@ -104,22 +91,9 @@
           "data": {
             "commands": [
               {
-                "type": "parallel",
+                "type": "path",
                 "data": {
-                  "commands": [
-                    {
-                      "type": "path",
-                      "data": {
-                        "pathName": "P2 - Swoop Middle R - 3"
-                      }
-                    },
-                    {
-                      "type": "wait",
-                      "data": {
-                        "waitTime": 0.5
-                      }
-                    }
-                  ]
+                  "pathName": "P2 - Swoop Middle R - 3"
                 }
               },
               {

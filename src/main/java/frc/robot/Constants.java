@@ -127,12 +127,12 @@ public final class Constants
         // public static final double ka = 0.0058474;
 
         //36:1
-          public static final double kp = 0.12913;
+          public static final double kp = 0.12913; //0.12913;
           public static final double ki = 0.000;
           public static final double kd = 0.025224;
 
         //trying 45:1 FF numbers
-                  public static final double ks = 1.3432;
+        public static final double ks = 1.3432;
         public static final double kg = 0.76004;
         public static final double kv = 0.027346;
         public static final double ka = 0.0058474;
@@ -172,7 +172,7 @@ public final class Constants
       }
 
       public static class TestWrist{
-        public static final double kp = 0.08;//0.06187
+        public static final double kp = 0.1;//0.06187 // 0.08
         public static final double ki = 0.000;
         public static final double kd = 0.00059369;
 
@@ -421,7 +421,7 @@ public final class Constants
     public static class AlgaeL3{
       public static final double wrist = 0 ; //degrees
       public static final double elbow =45; //degrees
-      public static final double height = 0.625; //meters
+      public static final double height = 0.65; //meters
     }
     public static class AlgaeL2{
       public static final double wrist = 0 ; //degrees
@@ -490,7 +490,7 @@ public final class Constants
       public static final double distanceFromFace = Units.inchesToMeters(25.75);
     }
     public static class AutoAlignCoralFeederStation{
-      public static final double distanceFromFace = Units.inchesToMeters(20);
+      public static final double distanceFromFace = Units.inchesToMeters(21);
     }
   }
 

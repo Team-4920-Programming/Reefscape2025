@@ -121,6 +121,8 @@ import dev.doglog.DogLog;
 import au.grapplerobotics.ConfigurationFailedException;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Ultrasonic;
+import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 
 public class CoralElevatorSubsystem extends SubsystemBase {
 
@@ -147,6 +149,9 @@ public class CoralElevatorSubsystem extends SubsystemBase {
 
   /** Physical Robot Init START**/
   
+  XboxController driverController = new XboxController(0);
+
+
   // Motors
 
   SparkFlex ElevatorStageMotor = new SparkFlex(CanIDs.CoralElevator.ElevatorStage, MotorType.kBrushless);
@@ -1153,6 +1158,13 @@ private final ArmFeedforward wristFF = new ArmFeedforward(PIDs.CoralElevator.Tes
       return true;
     }
     
+    if (!ElevatorCoralPresence.get())
+    {
+      driverController.setRumble(RumbleType.kBothRumble, 1);
+    }
+    else{
+      driverController.setRumble(RumbleType.kBothRumble, 0);
+    }
     return !ElevatorCoralPresence.get();
   }
 
