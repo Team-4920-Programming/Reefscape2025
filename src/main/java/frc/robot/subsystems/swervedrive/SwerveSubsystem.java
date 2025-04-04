@@ -107,6 +107,9 @@ public class SwerveSubsystem extends SubsystemBase
   // Datahighway information
   public boolean DH_In_HasCoral = false;
   public boolean DH_In_InRedZone = false;
+  public boolean DH_In_InCageRedZone = false;
+  public boolean DH_In_InReefRedZone =false;
+  public boolean DH_In_InFeederRedZone = false;
   public boolean DH_In_CoralYellow =false;
   public boolean DH_InStationZone = false;
   public boolean DH_In_InLeftCoralZone = false;
@@ -923,7 +926,7 @@ private void ProcessVision4920()
 
       ChassisSpeeds speed = velocity.get();
         
-      if (DH_In_InRedZone)
+      if (DH_In_InFeederRedZone || DH_In_InCageRedZone || (DH_In_HasCoral && DH_In_InReefRedZone))
       {
         if (speed.vxMetersPerSecond> 1)  speed.vxMetersPerSecond =1;
         if (speed.vyMetersPerSecond> 1)  speed.vyMetersPerSecond =1;

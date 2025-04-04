@@ -1152,6 +1152,7 @@ private final ArmFeedforward wristFF = new ArmFeedforward(PIDs.CoralElevator.Tes
     if(Robot.isSimulation()){
       return true;
     }
+    
     return !ElevatorCoralPresence.get();
   }
 

@@ -281,6 +281,9 @@ public class DataHighwaySubsystem extends SubsystemBase {
     // Drive_SS.DH_In_CoralYellow = InReefYellowZone;
     // Drive_SS.DH_InStationZone = InCoralSationZone;
     Drive_SS.DH_In_InRedZone = inReefRedZone || inCoralStationRedZone || inCageRedZone;
+    Drive_SS.DH_In_InCageRedZone = inCageRedZone;
+    Drive_SS.DH_In_InFeederRedZone = inCoralStationRedZone;
+    Drive_SS.DH_In_InReefRedZone = inReefRedZone;
     Drive_SS.DH_In_CoralYellow = inReefYellowZone;
     Drive_SS.DH_InStationZone = inLeftCoralZone || inRightCoralZone;
     Drive_SS.DH_In_InLeftCoralZone = inLeftCoralZone;

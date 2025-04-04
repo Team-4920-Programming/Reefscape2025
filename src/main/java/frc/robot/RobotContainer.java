@@ -18,6 +18,7 @@ import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.XboxController.Axis;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -352,6 +353,14 @@ public class RobotContainer
 
   driverXbox.a().whileTrue(new CmdA_DriveToFeederPositionV3_Prov(drivebase));
   driverXbox.b().whileTrue(new CmdA_DriveToReefPositionV9_PreProvincials(drivebase,2));
+
+  if (CoralElevatorSS.DH_Out_HasCoral){
+    driverXbox.setRumble(RumbleType.kBothRumble, 1);
+  }
+  else{
+    driverXbox.setRumble(RumbleType.kBothRumble, 0);
+
+  }
 
   // Button 1: Abort climb
   OperatorJoystick.button(1 ).whileTrue(new CmdT_ClimberIn(ClimberSS, CoralElevatorSS));
